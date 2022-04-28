@@ -17,11 +17,17 @@ import (
 
 type Server struct {
 	config *config.Config
+	// tracer otgo.Tracer
+	// closer io.Closer
 }
 
 func NewServer(config *config.Config) *Server {
+	// newTracer, closer := tracer.Init(config.JaegerServiceName)
+	// otgo.SetGlobalTracer(newTracer)
 	return &Server{
 		config: config,
+		// tracer: newTracer,
+		// closer: closer,
 	}
 }
 

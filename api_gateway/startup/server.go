@@ -3,12 +3,14 @@ package startup
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
 	cfg "github.com/dislinkt/api_gateway/startup/config"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	otgo "github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -16,6 +18,8 @@ import (
 type Server struct {
 	config *cfg.Config
 	mux    *runtime.ServeMux
+	tracer otgo.Tracer
+	closer io.Closer
 }
 
 func NewServer(config *cfg.Config) *Server {
