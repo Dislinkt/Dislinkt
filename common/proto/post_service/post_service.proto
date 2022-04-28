@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option go_package = "github.com/Dislinkt/common/proto/post_service";
+
+package proto;
+
+import "google/api/annotations.proto";
+
+service PostService{
+    rpc Get(GetRequest) returns(GetResponse) {
+      option (google.api.http) = {
+        get: "/post/{id}"
+      };
+    }
+    rpc getAll(Empty) returns(GetAllResponse) {
+      option (google.api.http) = {
+        get: "/post"
+      };
+    }
+    rpc createPost(CreatePostRequest) returns (Empty) {
+      option (google.api.http) = {
+        post: "/post"
+      };
+    }
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+message GetResponse {
+  Post post = 1;
+}
+
+message GetAllResponse {
+  repeated Post posts = 1;
+}
+
+message Empty {}
+
+message CreatePostRequest {
+  Post post = 1;
+}
+
+message Post {
+  string id = 1;
+  string userId = 2;
+  string postText = 3;
+  repeated string imagePaths = 4;
+  repeated string Links = 5;
+  string datePosted = 6;
+  repeated Reaction reactions = 7;
+  repeated Comment comments = 8;
+}
+
+message Reaction {
+  string username = 1;
+  int32 reaction = 2;
+}
+
+message Comment {
+  string username = 1;
+  string commentText = 2;
+}
