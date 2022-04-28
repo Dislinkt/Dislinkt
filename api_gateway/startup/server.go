@@ -34,6 +34,11 @@ func (server *Server) initHandlers() {
 	if err != nil {
 		panic(err)
 	}
+	postEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.PostPort)
+	err = userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, postEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (server *Server) Start() {
