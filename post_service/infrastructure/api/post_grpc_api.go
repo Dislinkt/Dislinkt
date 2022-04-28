@@ -31,12 +31,12 @@ func (handler *PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*p
 	return response, nil
 }
 
-func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.GetAllResponse, error) {
+func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.GetAllPostsResponse, error) {
 	posts, err := handler.service.GetAll()
 	if err != nil {
 		return nil, err
 	}
-	response := &pb.GetAllResponse{Posts: []*pb.Post{}}
+	response := &pb.GetAllPostsResponse{Posts: []*pb.Post{}}
 	for _, post := range posts {
 		current := mapPost(post)
 		response.Posts = append(response.Posts, current)

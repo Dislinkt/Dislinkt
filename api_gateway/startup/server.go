@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	cfg "github.com/dislinkt/api_gateway/startup/config"
+	postGw "github.com/dislinkt/common/proto/post_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -34,8 +35,8 @@ func (server *Server) initHandlers() {
 	if err != nil {
 		panic(err)
 	}
-	postEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.PostPort)
-	err = userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, postEndpoint, opts)
+	postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
+	err = postGw.RegisterPostServiceHandlerFromEndpoint(context.TODO(), server.mux, postEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}

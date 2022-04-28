@@ -1,4 +1,4 @@
-package post_service
+package main
 
 import (
 	"post_service/startup"

@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostServiceClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllResponse, error)
+	GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllPostsResponse, error)
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -44,8 +44,8 @@ func (c *postServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grp
 	return out, nil
 }
 
-func (c *postServiceClient) GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllResponse, error) {
-	out := new(GetAllResponse)
+func (c *postServiceClient) GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllPostsResponse, error) {
+	out := new(GetAllPostsResponse)
 	err := c.cc.Invoke(ctx, "/proto.PostService/getAll", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostReques
 // for forward compatibility
 type PostServiceServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
-	GetAll(context.Context, *Empty) (*GetAllResponse, error)
+	GetAll(context.Context, *Empty) (*GetAllPostsResponse, error)
 	CreatePost(context.Context, *CreatePostRequest) (*Empty, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
@@ -79,7 +79,7 @@ type UnimplementedPostServiceServer struct {
 func (UnimplementedPostServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedPostServiceServer) GetAll(context.Context, *Empty) (*GetAllResponse, error) {
+func (UnimplementedPostServiceServer) GetAll(context.Context, *Empty) (*GetAllPostsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (UnimplementedPostServiceServer) CreatePost(context.Context, *CreatePostRequest) (*Empty, error) {
