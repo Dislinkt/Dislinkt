@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostServiceClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllPostsResponse, error)
+	GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllResponse, error)
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -37,16 +37,16 @@ func NewPostServiceClient(cc grpc.ClientConnInterface) PostServiceClient {
 
 func (c *postServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/proto.PostService/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *postServiceClient) GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllPostsResponse, error) {
-	out := new(GetAllPostsResponse)
-	err := c.cc.Invoke(ctx, "/proto.PostService/getAll", in, out, opts...)
+func (c *postServiceClient) GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/getAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *postServiceClient) GetAll(ctx context.Context, in *Empty, opts ...grpc.
 
 func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/proto.PostService/createPost", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/createPost", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostReques
 // for forward compatibility
 type PostServiceServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
-	GetAll(context.Context, *Empty) (*GetAllPostsResponse, error)
+	GetAll(context.Context, *Empty) (*GetAllResponse, error)
 	CreatePost(context.Context, *CreatePostRequest) (*Empty, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
@@ -79,7 +79,7 @@ type UnimplementedPostServiceServer struct {
 func (UnimplementedPostServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedPostServiceServer) GetAll(context.Context, *Empty) (*GetAllPostsResponse, error) {
+func (UnimplementedPostServiceServer) GetAll(context.Context, *Empty) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (UnimplementedPostServiceServer) CreatePost(context.Context, *CreatePostRequest) (*Empty, error) {
@@ -108,7 +108,7 @@ func _PostService_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.PostService/Get",
+		FullMethod: "/post_service_proto.PostService/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).Get(ctx, req.(*GetRequest))
@@ -126,7 +126,7 @@ func _PostService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.PostService/getAll",
+		FullMethod: "/post_service_proto.PostService/getAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).GetAll(ctx, req.(*Empty))
@@ -144,7 +144,7 @@ func _PostService_CreatePost_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.PostService/createPost",
+		FullMethod: "/post_service_proto.PostService/createPost",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).CreatePost(ctx, req.(*CreatePostRequest))
@@ -156,7 +156,7 @@ func _PostService_CreatePost_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PostService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.PostService",
+	ServiceName: "post_service_proto.PostService",
 	HandlerType: (*PostServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

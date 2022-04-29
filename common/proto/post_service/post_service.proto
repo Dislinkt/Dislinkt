@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option go_package = "github.com/Dislinkt/common/proto/post_service";
 
-package proto;
+package post_service_proto;
 
 import "google/api/annotations.proto";
 
@@ -12,7 +12,7 @@ service PostService{
         get: "/post/{id}"
       };
     }
-    rpc getAll(Empty) returns(GetAllPostsResponse) {
+    rpc getAll(Empty) returns(GetAllResponse) {
       option (google.api.http) = {
         get: "/post"
       };
@@ -32,7 +32,7 @@ message GetResponse {
   Post post = 1;
 }
 
-message GetAllPostsResponse {
+message GetAllResponse {
   repeated Post posts = 1;
 }
 
