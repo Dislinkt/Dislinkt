@@ -6,6 +6,8 @@ import (
 
 	"github.com/dislinkt/user-service/domain"
 	uuid "github.com/satori/go.uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type UserService struct {
@@ -52,19 +54,54 @@ func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
 	return service.store.Update(user)
 }
 
-func (service *UserService) UpdatePrivacy(privacy bool, uuid uuid.UUID) (*domain.User, error) {
+func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.User,
+	uuid uuid.UUID) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	user, err := service.store.Find(uuid)
+	foundUser, err := service.store.Find(uuid)
+	fmt.Println(uuid.String())
+	fmt.Println(foundUser.Id)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	user.Private = privacy
+
+	updatedUser, err := updateField(updatePaths, foundUser, requestUser)
+	if err != nil {
+		return nil, err
+	}
+	err = service.store.Update(updatedUser)
+	return updatedUser, nil
+}
+
+func updateField(paths []string, user *domain.User, requestUser *domain.User) (*domain.User, error) {
+	for _, path := range paths {
+		switch path {
+		case "private":
+			user.Private = requestUser.Private
+		case "name":
+			user.Name = requestUser.Name
+		case "surname":
+			user.Surname = requestUser.Surname
+		case "email":
+			user.Email = requestUser.Email
+		case "username":
+			user.Username = requestUser.Username
+		case "number":
+			user.Number = requestUser.Number
+		case "gender":
+			user.Gender = requestUser.Gender
+		case "date_of_birth":
+			user.DateOfBirth = requestUser.DateOfBirth
+		case "biography":
+			user.Biography = requestUser.Biography
+		default:
+			return nil, status.Errorf(codes.PermissionDenied, "cannot update field '"+path+"'")
+		}
+	}
 	user.UpdatedAt = time.Now()
-	err = service.store.Update(user)
 	return user, nil
 }
 

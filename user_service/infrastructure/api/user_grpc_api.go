@@ -97,7 +97,7 @@ func (handler *UserHandler) PatchUser(ctx context.Context, request *pb.PatchUser
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	user, err := handler.service.UpdatePrivacy(request.User.Private, parsedUUID)
+	user, err := handler.service.PatchUser(request.UpdateMask.Paths, mapNewUser(request.User), parsedUUID)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err

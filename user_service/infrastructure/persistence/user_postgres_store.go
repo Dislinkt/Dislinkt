@@ -52,7 +52,7 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 
 func (store *UserPostgresStore) Find(uuid uuid.UUID) (user *domain.User, err error) {
 	foundUser := domain.User{}
-	if result := store.db.First(&foundUser); result.Error != nil {
+	if result := store.db.First(&foundUser, uuid); result.Error != nil {
 		return nil, result.Error
 	}
 	return &foundUser, nil
