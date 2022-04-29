@@ -20,6 +20,7 @@ service PostService{
     rpc createPost(CreatePostRequest) returns (Empty) {
       option (google.api.http) = {
         post: "/post"
+        body: "post"
       };
     }
 }
