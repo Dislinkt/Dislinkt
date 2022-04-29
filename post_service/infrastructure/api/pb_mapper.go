@@ -2,6 +2,7 @@ package api
 
 import (
 	pb "github.com/dislinkt/common/proto/post_service"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"post_service/domain"
 	"time"
 )
@@ -36,6 +37,7 @@ func mapPost(post *domain.Post) *pb.Post {
 
 func mapNewPost(postPb *pb.Post) *domain.Post {
 	post := &domain.Post{
+		Id:         primitive.NewObjectID(),
 		UserId:     postPb.UserId,
 		PostText:   postPb.PostText,
 		DatePosted: time.Now(),
@@ -46,5 +48,6 @@ func mapNewPost(postPb *pb.Post) *domain.Post {
 	for _, link := range postPb.Links {
 		post.Links = append(post.Links, link)
 	}
+
 	return post
 }
