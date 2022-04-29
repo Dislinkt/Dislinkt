@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	cfg "github.com/dislinkt/api_gateway/startup/config"
+	additionaluserGw "github.com/dislinkt/common/proto/additional_user_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	otgo "github.com/opentracing/opentracing-go"
@@ -35,6 +36,8 @@ func (server *Server) initHandlers() {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
+	additionalUserEndpoint := fmt.Sprintf("%s:%s", server.config.AdditionalUserHost, server.config.AdditionalUserPort)
+	err = additionaluserGw.RegisterAdditionalUserServiceHandlerFromEndpoint(context.TODO(), server.mux, additionalUserEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}

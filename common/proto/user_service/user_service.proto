@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/dislinkt/user-service/proto";
+option go_package = "github.com/dislinkt/user_service/proto";
 
 package user_service_proto;
 

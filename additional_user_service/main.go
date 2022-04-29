@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/dislinkt/user_service/startup"
-	cfg "github.com/dislinkt/user_service/startup/config"
+	"github.com/dislinkt/additional_user_service/startup"
+	cfg "github.com/dislinkt/additional_user_service/startup/config"
 )
 
 func main() {

@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+option go_package = "github.com/dislinkt/additional_user_service/proto";
+
+package additional_user_service_proto;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service AdditionalUserService{
+  rpc NewEducation(NewEducationRequest) returns(EducationResponse) {
+    option (google.api.http) = {
+      post: "/user/{id}/education"
+      body: "education"
+    };
+  }
+  rpc GetAllEducation(GetAllEducationRequest) returns(GetAllEducationResponse) {
+    option (google.api.http) = {
+      get: "/user/{id}/education"
+    };
+  }
+}
+
+message EmptyMessage {
+}
+
+message GetAllEducationRequest{
+  string id = 1;
+}
+
+message GetAllEducationResponse{
+  repeated Education educations = 1;
+}
+
+message NewEducationRequest{
+  string id =1;
+  NewEducation education = 2;
+}
+
+message EducationResponse{
+  Education education = 1;
+}
+
+message NewEducation{
+  string school = 1;
+  string degree = 2;
+  string field_of_study = 3;
+  string start_date = 4;
+  string end_date = 5;
+}
+
+message Education{
+  string id = 1;
+  string school = 2;
+  string degree = 3;
+  string field_of_study = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+}
