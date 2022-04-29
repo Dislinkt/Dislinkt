@@ -6,11 +6,11 @@ import (
 	"net"
 
 	userProto "github.com/dislinkt/common/proto/user_service"
-	"github.com/dislinkt/user-service/application"
-	"github.com/dislinkt/user-service/domain"
-	"github.com/dislinkt/user-service/infrastructure/api"
-	"github.com/dislinkt/user-service/infrastructure/persistence"
-	"github.com/dislinkt/user-service/startup/config"
+	"github.com/dislinkt/user_service/application"
+	"github.com/dislinkt/user_service/domain"
+	"github.com/dislinkt/user_service/infrastructure/api"
+	"github.com/dislinkt/user_service/infrastructure/persistence"
+	"github.com/dislinkt/user_service/startup/config"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 )

@@ -1,4 +1,4 @@
-module github.com/dislinkt/user-service
+module github.com/dislinkt/user_service
 
 go 1.18
 

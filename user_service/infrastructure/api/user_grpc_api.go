@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	pb "github.com/dislinkt/common/proto/user_service"
-	"github.com/dislinkt/user-service/application"
+	"github.com/dislinkt/user_service/application"
 	uuid "github.com/satori/go.uuid"
 )
 

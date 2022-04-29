@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dislinkt/user-service/domain"
+	"github.com/dislinkt/user_service/domain"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

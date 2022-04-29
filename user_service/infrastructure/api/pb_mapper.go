@@ -4,7 +4,7 @@ import (
 	"time"
 
 	pb "github.com/dislinkt/common/proto/user_service"
-	"github.com/dislinkt/user-service/domain"
+	"github.com/dislinkt/user_service/domain"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

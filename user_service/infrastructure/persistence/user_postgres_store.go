@@ -1,7 +1,7 @@
 package persistence
 
 import (
-	"github.com/dislinkt/user-service/domain"
+	"github.com/dislinkt/user_service/domain"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
