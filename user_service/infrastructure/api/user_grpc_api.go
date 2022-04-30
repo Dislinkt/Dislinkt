@@ -65,7 +65,6 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 	// defer span.Finish()
 
 	user := mapNewUser(request.User)
-	fmt.Println(user.Biography)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Insert( ctx, user)

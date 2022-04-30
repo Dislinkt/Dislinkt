@@ -22,7 +22,6 @@ func Init(service string) (opentracing.Tracer, io.Closer) {
 		return nil, nil
 	}
 
-	fmt.Println("///////////////////////////" + service)
 	cfg.ServiceName = service
 	cfg.Sampler.Type = jaeger.SamplerTypeConst
 	cfg.Sampler.Param = 1

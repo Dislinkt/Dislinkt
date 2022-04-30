@@ -1,7 +1,6 @@
 package application
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/dislinkt/user_service/domain"
@@ -29,12 +28,6 @@ func (service *UserService) Insert(user *domain.User) error {
 	newUUID := uuid.NewV4()
 	user.Id = newUUID
 	err := service.store.Insert(user)
-
-	if err != nil {
-		fmt.Println("///////////////////////////")
-		fmt.Println(err.Error())
-		fmt.Println("///////////////////////////")
-	}
 	return err
 }
 
@@ -45,7 +38,6 @@ func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 	_, err := service.store.Find(uuid)
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 
@@ -61,10 +53,7 @@ func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 	foundUser, err := service.store.Find(uuid)
-	fmt.Println(uuid.String())
-	fmt.Println(foundUser.Id)
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
 
