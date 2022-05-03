@@ -1,6 +1,11 @@
 package config
 
-import "os"
+import (
+	"flag"
+	"os"
+
+	cfg "github.com/dislinkt/common/config"
+)
 
 type Config struct {
 	Port              string
@@ -13,6 +18,13 @@ type Config struct {
 }
 
 func NewConfig() *Config {
+	devEnv := flag.Bool("dev", false, "use dev environment variables")
+	flag.Parse()
+
+	if *devEnv {
+		cfg.LoadEnv()
+	}
+
 	return &Config{
 		Port:              os.Getenv("USER_SERVICE_PORT"),
 		UserDBHost:        os.Getenv("USER_DB_HOST"),
@@ -22,12 +34,4 @@ func NewConfig() *Config {
 		UserDBPass:        os.Getenv("USER_DB_PASS"),
 		JaegerServiceName: os.Getenv("JAEGER_SERVICE_NAME"),
 	}
-	// return &Config{
-	// 	Port:       "8090",
-	// 	UserDBHost: "localhost",
-	// 	UserDBPort: "5432",
-	// 	UserDBName: "dislinkt-users",
-	// 	UserDBUser: "postgres",
-	// 	UserDBPass: "password",
-	// }
 }
