@@ -27,6 +27,22 @@ services:
     networks:
       - network
 
+  additional_user_service:
+    image: additional_user_service
+    container_name: additional_user_service
+    build:
+      context: .
+      dockerfile: ./additional_user_service/Dockerfile
+    restart: on-failure
+    environment:
+      - ADDITIONAL_USER_DB_HOST=${ADDITIONAL_USER_DB_HOST}
+      - ADDITIONAL_USER_DB_PORT=${ADDITIONAL_USER_DB_PORT}
+      - ADDITIONAL_USER_SERVICE_PORT=${ADDITIONAL_USER_SERVICE_PORT}
+    depends_on:
+      - additional_user_db
+    networks:
+      - network
+
   api_gateway:
     image: api_gateway
     container_name: api_gateway
@@ -40,6 +56,8 @@ services:
       GATEWAY_PORT: ${GATEWAY_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      ADDITIONAL_USER_SERVICE_HOST: ${ADDITIONAL_USER_SERVICE_HOST}
+      ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
     networks:
       - network
 #      - jaeger-demo
@@ -57,6 +75,12 @@ services:
     networks:
       - network
 
+  additional_user_db:
+    image: mongo
+    container_name: additional_user_db
+    restart: on-failure
+    networks:
+      - network
 #  tracing:
 #    image: jaegertracing/all-in-one
 #    container_name: jaeger
