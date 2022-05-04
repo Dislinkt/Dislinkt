@@ -1,12 +1,12 @@
 version: "3.8"
 
 services:
-  user_service:
+  auth_service:
     image: user_service
     container_name: user_service
     build:
       context: .
-      dockerfile: ./user_service/Dockerfile
+      dockerfile: ./auth_service/Dockerfile
     restart: on-failure
     environment:
       USER_DB_HOST: ${USER_DB_HOST}
@@ -32,6 +32,8 @@ services:
       GATEWAY_PORT: ${GATEWAY_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
     networks:
       - network
 
