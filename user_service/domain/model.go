@@ -1,5 +1,11 @@
 package domain
 
+import (
+	"time"
+
+	uuid "github.com/satori/go.uuid"
+)
+
 type Role int
 
 const (
@@ -17,15 +23,19 @@ const (
 )
 
 type User struct {
-	Id          string `gorm:"index:idx_name,unique"`
+	Id          uuid.UUID `gorm:"index:idx_name,unique"`
 	Name        string
 	Surname     string
-	Username    string `gorm:"unique"`
-	Email       string `gorm:"unique"`
+	Username    *string `gorm:"unique"`
+	Email       *string `gorm:"unique"`
 	Number      string
 	Gender      Gender
 	DateOfBirth string
 	Password    string
 	UserRole    Role
 	Biography   string
+	Blocked     bool
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Private     bool
 }

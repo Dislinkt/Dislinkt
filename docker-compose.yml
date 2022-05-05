@@ -9,16 +9,40 @@ services:
       dockerfile: ./user_service/Dockerfile
     restart: on-failure
     environment:
-      USER_DB_HOST: ${USER_DB_HOST}
-      USER_DB_PORT: ${USER_DB_PORT}
-      USER_DB_USER: ${USER_DB_USER}
-      USER_DB_PASS: ${USER_DB_PASS}
-      USER_DB_NAME: ${USER_DB_NAME}
-      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      - USER_DB_HOST=${USER_DB_HOST}
+      - USER_DB_PORT=${USER_DB_PORT}
+      - USER_DB_USER=${USER_DB_USER}
+      - USER_DB_PASS=${USER_DB_PASS}
+      - USER_DB_NAME=${USER_DB_NAME}
+      - USER_SERVICE_PORT=${USER_SERVICE_PORT}
+#      - JAEGER_SERVICE_NAME=${JAEGER_SERVICE_NAME}
+#      - JAEGER_AGENT_HOST=tracing
+#      - JAEGER_AGENT_PORT=6831
+#      - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+#      - JAEGER_SAMPLER_TYPE=const
+#      - JAEGER_SAMPLER_PARAM=1
     depends_on:
       - user_db
+#      - tracing
     networks:
       - network
+
+  additional_user_service:
+    image: additional_user_service
+    container_name: additional_user_service
+    build:
+      context: .
+      dockerfile: ./additional_user_service/Dockerfile
+    restart: on-failure
+    environment:
+      - ADDITIONAL_USER_DB_HOST=${ADDITIONAL_USER_DB_HOST}
+      - ADDITIONAL_USER_DB_PORT=${ADDITIONAL_USER_DB_PORT}
+      - ADDITIONAL_USER_SERVICE_PORT=${ADDITIONAL_USER_SERVICE_PORT}
+    depends_on:
+      - additional_user_db
+    networks:
+      - network
+
   api_gateway:
     image: api_gateway
     container_name: api_gateway
@@ -32,8 +56,13 @@ services:
       GATEWAY_PORT: ${GATEWAY_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      ADDITIONAL_USER_SERVICE_HOST: ${ADDITIONAL_USER_SERVICE_HOST}
+      ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
     networks:
       - network
+#      - jaeger-demo
+#    depends_on:
+#      - tracing
 
   user_db:
     image: postgres
@@ -46,6 +75,25 @@ services:
     networks:
       - network
 
+  additional_user_db:
+    image: mongo
+    container_name: additional_user_db
+    restart: on-failure
+    networks:
+      - network
+#  tracing:
+#    image: jaegertracing/all-in-one
+#    container_name: jaeger
+#    ports:
+#      - "6831:6831/udp"
+#      - "6832:6832/udp"
+#      - "16686:16686"
+#      - "14268:14268"
+#      - "14250:14250"
+#    networks:
+#      - jaeger-demo
+
 networks:
   network:
     driver: bridge
+#  jaeger-demo:
