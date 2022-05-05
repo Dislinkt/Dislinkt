@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   auth_service:
-    image: user_service
-    container_name: user_service
+    image: auth_service
+    container_name: auth_service
     build:
       context: .
       dockerfile: ./auth_service/Dockerfile
@@ -19,6 +19,26 @@ services:
       - user_db
     networks:
       - network
+
+  user_service:
+    image: user_service
+    container_name: user_service
+    build:
+      context: .
+      dockerfile: ./user_service/Dockerfile
+    restart: on-failure
+    environment:
+      USER_DB_HOST: ${USER_DB_HOST}
+      USER_DB_PORT: ${USER_DB_PORT}
+      USER_DB_USER: ${USER_DB_USER}
+      USER_DB_PASS: ${USER_DB_PASS}
+      USER_DB_NAME: ${USER_DB_NAME}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+    depends_on:
+      - user_db
+    networks:
+      - network
+
   api_gateway:
     image: api_gateway
     container_name: api_gateway

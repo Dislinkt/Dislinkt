@@ -8,17 +8,17 @@ import "google/api/annotations.proto";
 
 service AuthService{
   rpc AuthenticateUser(LoginRequest) returns(JwtTokenResponse) {
-    option (google.api.http) = {
-      post: "/api/auth/login",
-      body: "userData"
-    };
+//    option (google.api.http) = {
+//      post: "/api/auth/login",
+//      body: "userData"
+//    };
   }
 
   rpc ValidateToken(ValidateRequest) returns(ValidateResponse) {
-    option (google.api.http) = {
-      post: "/api/auth/validate",
-      body: "jwt"
-    };
+//    option (google.api.http) = {
+//      post: "/api/auth/validate",
+//      body: "jwt"
+//    };
   }
 }
 

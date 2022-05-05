@@ -8,9 +8,9 @@ import "google/api/annotations.proto";
 
 service UserService{
   rpc GetAll(GetAllRequest) returns(GetAllResponse) {
-    option (google.api.http) = {
-      get: "/user"
-    };
+//    option (google.api.http) = {
+//      get: "/user"
+//    };
   }
 }
 
