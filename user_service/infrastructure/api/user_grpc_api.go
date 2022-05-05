@@ -6,6 +6,7 @@ import (
 
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/application"
+	"github.com/dislinkt/user_service/domain"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -20,13 +21,19 @@ func NewUserHandler(service *application.UserService) *UserHandler {
 	}
 }
 
-func (handler *UserHandler) GetAll(ctx context.Context, request *pb.EmptyMessage) (*pb.GetAllResponse, error) {
+func (handler *UserHandler) GetAll(ctx context.Context, request *pb.SearchMessage) (*pb.GetAllResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// users, err := handler.service.GetAll(ctx)
-	users, err := handler.service.GetAll()
+	var users *[]domain.User
+	var err error
+	if len(request.SearchText) == 0 {
+		users, err = handler.service.GetAll()
+	} else {
+		users, err = handler.service.Search(request.SearchText)
+	}
 	if err != nil || *users == nil {
 		return nil, err
 	}
@@ -36,6 +43,23 @@ func (handler *UserHandler) GetAll(ctx context.Context, request *pb.EmptyMessage
 	for _, user := range *users {
 		current := mapUser(&user)
 		response.Users = append(response.Users, current)
+	}
+	return response, nil
+}
+
+func (handler *UserHandler) GetOne(ctx context.Context, request *pb.GetOneMessage) (*pb.UserResponse, error) {
+	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
+	// defer span.Finish()
+
+	// ctx = tracer.ContextWithSpan(context.Background(), span)
+	// users, err := handler.service.GetAll(ctx)
+	parsedUUID, err := uuid.FromString(request.Id)
+	user, err := handler.service.GetOne(parsedUUID)
+	if err != nil || user == nil {
+		return nil, err
+	}
+	response := &pb.UserResponse{
+		User: mapUser(user),
 	}
 	return response, nil
 }

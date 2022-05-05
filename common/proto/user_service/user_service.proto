@@ -9,9 +9,14 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/field_mask.proto";
 
 service UserService{
-  rpc GetAll(EmptyMessage) returns(GetAllResponse) {
+  rpc GetAll(SearchMessage) returns(GetAllResponse) {
     option (google.api.http) = {
       get: "/user"
+    };
+  }
+  rpc GetOne(GetOneMessage) returns(UserResponse) {
+    option (google.api.http) = {
+      get: "/user/{id}"
     };
   }
   rpc RegisterUser(RegisterUserRequest) returns(RegisterUserResponse) {
@@ -35,6 +40,14 @@ service UserService{
 }
 
 message EmptyMessage {
+}
+
+message SearchMessage{
+ string searchText = 1;
+}
+
+message GetOneMessage{
+  string id = 1;
 }
 
 message PatchUserRequest{

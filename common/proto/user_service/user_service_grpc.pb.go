@@ -22,7 +22,13 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	GetAll(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*GetAllResponse, error)
+	GetAll(ctx context.Context, in *SearchMessage, opts ...grpc.CallOption) (*GetAllResponse, error)
+	//  rpc Search(SearchMessage) returns(GetAllResponse) {
+	//    option (google.api.http) = {
+	//      get: "/user"
+	//    };
+	//  }
+	GetOne(ctx context.Context, in *GetOneMessage, opts ...grpc.CallOption) (*UserResponse, error)
 	RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*RegisterUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	PatchUser(ctx context.Context, in *PatchUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -36,9 +42,18 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) GetAll(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*GetAllResponse, error) {
+func (c *userServiceClient) GetAll(ctx context.Context, in *SearchMessage, opts ...grpc.CallOption) (*GetAllResponse, error) {
 	out := new(GetAllResponse)
 	err := c.cc.Invoke(ctx, "/user_service_proto.UserService/GetAll", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetOne(ctx context.Context, in *GetOneMessage, opts ...grpc.CallOption) (*UserResponse, error) {
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, "/user_service_proto.UserService/GetOne", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +91,13 @@ func (c *userServiceClient) PatchUser(ctx context.Context, in *PatchUserRequest,
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	GetAll(context.Context, *EmptyMessage) (*GetAllResponse, error)
+	GetAll(context.Context, *SearchMessage) (*GetAllResponse, error)
+	//  rpc Search(SearchMessage) returns(GetAllResponse) {
+	//    option (google.api.http) = {
+	//      get: "/user"
+	//    };
+	//  }
+	GetOne(context.Context, *GetOneMessage) (*UserResponse, error)
 	RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
 	PatchUser(context.Context, *PatchUserRequest) (*UserResponse, error)
@@ -87,8 +108,11 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) GetAll(context.Context, *EmptyMessage) (*GetAllResponse, error) {
+func (UnimplementedUserServiceServer) GetAll(context.Context, *SearchMessage) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedUserServiceServer) GetOne(context.Context, *GetOneMessage) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOne not implemented")
 }
 func (UnimplementedUserServiceServer) RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
@@ -113,7 +137,7 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 }
 
 func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmptyMessage)
+	in := new(SearchMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -125,7 +149,25 @@ func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/user_service_proto.UserService/GetAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetAll(ctx, req.(*EmptyMessage))
+		return srv.(UserServiceServer).GetAll(ctx, req.(*SearchMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetOne_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOneMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetOne(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_service_proto.UserService/GetOne",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetOne(ctx, req.(*GetOneMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -194,6 +236,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAll",
 			Handler:    _UserService_GetAll_Handler,
+		},
+		{
+			MethodName: "GetOne",
+			Handler:    _UserService_GetOne_Handler,
 		},
 		{
 			MethodName: "RegisterUser",

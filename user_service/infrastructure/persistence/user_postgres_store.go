@@ -57,3 +57,13 @@ func (store *UserPostgresStore) Find(uuid uuid.UUID) (user *domain.User, err err
 	}
 	return &foundUser, nil
 }
+
+func (store *UserPostgresStore) Search(searchText string) (*[]domain.User, error) {
+	var users []domain.User
+	arg := "%" + searchText + "%"
+	result := store.db.Where("name LIKE ? OR surname LIKE ? OR username LIKE ?", arg, arg, arg).Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &users, nil
+}

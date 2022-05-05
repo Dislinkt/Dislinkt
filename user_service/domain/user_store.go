@@ -7,4 +7,5 @@ type UserStore interface {
 	Update(user *User) error
 	GetAll() (*[]User, error)
 	Find(uuid uuid.UUID) (*User, error)
+	Search(searchText string) (*[]User, error)
 }

@@ -101,3 +101,11 @@ func (service *UserService) GetAll() (*[]domain.User, error) {
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 	return service.store.GetAll()
 }
+
+func (service *UserService) Search(searchText string) (*[]domain.User, error) {
+	return service.store.Search(searchText)
+}
+
+func (service *UserService) GetOne(uuid uuid.UUID) (*domain.User, error) {
+	return service.store.Find(uuid)
+}
