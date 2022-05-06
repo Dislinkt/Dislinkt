@@ -3,7 +3,8 @@ package domain
 type AdditionalUserStore interface {
 	FindUserDocument(uuid string) (*AdditionalUser, error)
 	CreateUserDocument(uuid string) (*AdditionalUser, error)
-	FindOrCreateDocument(uuid string) (*AdditionalUser, error)
+	DeleteUserDocument(uuid string) error
+	FindDocument(uuid string) (*AdditionalUser, error)
 
 	// EDUCATION
 	InsertEducation(uuid string, education *Education) (*Education, error)

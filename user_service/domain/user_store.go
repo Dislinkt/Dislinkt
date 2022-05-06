@@ -6,6 +6,8 @@ type UserStore interface {
 	Insert(user *User) error
 	Update(user *User) error
 	GetAll() (*[]User, error)
-	Find(uuid uuid.UUID) (*User, error)
+	FindByID(uuid uuid.UUID) (*User, error)
+	FindByUsername(username string) (*User, error)
 	Search(searchText string) (*[]User, error)
+	Delete(user *User) error
 }

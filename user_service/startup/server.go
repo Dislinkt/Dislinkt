@@ -6,6 +6,8 @@ import (
 	"net"
 
 	userProto "github.com/dislinkt/common/proto/user_service"
+	saga "github.com/dislinkt/common/saga/messaging"
+	"github.com/dislinkt/common/saga/messaging/nats"
 	"github.com/dislinkt/user_service/application"
 	"github.com/dislinkt/user_service/domain"
 	"github.com/dislinkt/user_service/infrastructure/api"
@@ -39,7 +41,15 @@ func (server *Server) Start() {
 	postgresClient := server.initUserClient()
 	userStore := server.initUserStore(postgresClient)
 
-	userService := server.initUserService(userStore)
+	commandPublisher := server.initPublisher(server.config.RegisterUserCommandSubject)
+	replySubscriber := server.initSubscriber(server.config.RegisterUserReplySubject, QueueGroup)
+	registerUserOrchestrator := server.initRegisterUserOrchestrator(commandPublisher, replySubscriber)
+
+	userService := server.initUserService(userStore, registerUserOrchestrator)
+
+	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
+	server.initRegisterUserHandler(userService, replyPublisher, commandSubscriber)
 
 	userHandler := server.initUserHandler(userService)
 
@@ -64,7 +74,7 @@ func (server *Server) initUserStore(client *gorm.DB) domain.UserStore {
 	}
 	// store.DeleteAll()
 	// for _, Product := range products {
-	// 	err := store.Insert(Product)
+	// 	err := store.Register(Product)
 	// 	if err != nil {
 	// 		log.Fatal(err)
 	// 	}
@@ -72,8 +82,46 @@ func (server *Server) initUserStore(client *gorm.DB) domain.UserStore {
 	return store
 }
 
-func (server *Server) initUserService(store domain.UserStore) *application.UserService {
-	return application.NewUserService(store)
+func (server *Server) initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewNATSPublisher(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return publisher
+}
+
+func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewNATSSubscriber(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return subscriber
+}
+
+func (server *Server) initRegisterUserOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.RegisterUserOrchestrator {
+	orchestrator, err := application.NewRegisterUserOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
+func (server *Server) initUserService(store domain.UserStore,
+	orchestrator *application.RegisterUserOrchestrator) *application.UserService {
+	return application.NewUserService(store, orchestrator)
+}
+
+func (server *Server) initRegisterUserHandler(service *application.UserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) initUserHandler(service *application.UserService) *api.UserHandler {

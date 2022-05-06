@@ -48,10 +48,14 @@ func (store *AdditionalUserMongoDBStore) CreateUserDocument(uuid string) (*domai
 	return &userDocument, nil
 }
 
-func (store *AdditionalUserMongoDBStore) FindOrCreateDocument(uuid string) (*domain.AdditionalUser, error) {
+func (store *AdditionalUserMongoDBStore) DeleteUserDocument(uuid string) error {
+	_, err := store.users.DeleteOne(context.TODO(), bson.M{"userUUID": uuid})
+	return err
+}
+
+func (store *AdditionalUserMongoDBStore) FindDocument(uuid string) (*domain.AdditionalUser, error) {
 	userDocument, err := store.FindUserDocument(uuid)
 	if err != nil {
-		userDocument, err = store.CreateUserDocument(uuid)
 		if err != nil {
 			return nil, err
 		}
