@@ -43,3 +43,26 @@ func (handler *ConnectionHandler) CreateConnection(ctx context.Context, request 
 	fmt.Println("[ConnectionHandler]:CreateConnection")
 	return handler.service.CreateConnection(request.Connection.BaseUserUUID, request.Connection.ConnectUserUUID)
 }
+
+func (handler *ConnectionHandler) AcceptConnection(ctx context.Context, request *pb.AcceptConnectionMessage) (response *pb.NewConnectionResponse, err error) {
+	fmt.Println("[ConnectionHandler]:AcceptConnection")
+	return handler.service.AcceptConnection(request.AcceptConnection.RequestSenderUser, request.AcceptConnection.RequestApprovalUser)
+}
+
+func (handler *ConnectionHandler) GetAllConnectionForUser(ctx context.Context, request *pb.GetConnectionRequest) (*pb.GetAllResponse, error) {
+
+	users, err := handler.service.GetAllConnectionForUser(request.GetUuid())
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllResponse{
+		Users: []*pb.User{},
+	}
+
+	for _, user := range users {
+		current := pb.User{UserID: user.UserUID, Status: string(user.Status)}
+		response.Users = append(response.Users, &current)
+	}
+
+	return response, nil
+}

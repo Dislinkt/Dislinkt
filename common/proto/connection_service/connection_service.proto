@@ -26,6 +26,20 @@ service ConnectionService{
     };
   }
 
+  rpc AcceptConnection(AcceptConnectionMessage) returns (NewConnectionResponse) {
+    option (google.api.http) = {
+      put: "/connection/accept"
+      body: "acceptConnection"
+    };
+  }
+
+  rpc GetAllConnectionForUser(GetConnectionRequest) returns (GetAllResponse) {
+    option (google.api.http) = {
+      get: "/connection/user/{uuid}"
+      body: ""
+    };
+  }
+
 }
 
 message RegisterRequest{
@@ -43,9 +57,22 @@ message  NewConnectionResponse {
     string  ConnectionResponse = 3;
 }
 
+message GetConnectionRequest{
+    string uuid = 1;
+}
+
 message Connection {
   string  BaseUserUUID = 1;
   string  ConnectUserUUID = 2;
+}
+
+message AcceptConnection {
+  string  RequestSenderUser = 1;
+  string  RequestApprovalUser = 2;
+}
+
+message AcceptConnectionMessage {
+  AcceptConnection acceptConnection = 1;
 }
 
 message  NewConnectionRequest {
@@ -55,5 +82,9 @@ message  NewConnectionRequest {
 message User {
   string userID = 1;
   string status = 2;
+}
+
+message GetAllResponse {
+  repeated User users = 1;
 }
 

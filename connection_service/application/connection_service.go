@@ -25,3 +25,12 @@ func (service *ConnectionService) CreateConnection(baseUserUuid string, connectU
 	fmt.Println("[ConnectionService CreateConnection]")
 	return service.store.CreateConnection(baseUserUuid, connectUserUuid)
 }
+
+func (service *ConnectionService) AcceptConnection(requestSenderUser string, requestApprovalUser string) (*pb.NewConnectionResponse, error) {
+	fmt.Println("[ConnectionService AcceptConnection")
+	return service.store.AcceptConnection(requestSenderUser, requestApprovalUser)
+}
+
+func (service *ConnectionService) GetAllConnectionForUser(userUid string) ([]*domain.UserNode, error) {
+	return service.store.GetAllConnectionForUser(userUid)
+}

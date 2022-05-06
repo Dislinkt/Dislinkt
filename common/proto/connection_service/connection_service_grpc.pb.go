@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type ConnectionServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	CreateConnection(ctx context.Context, in *NewConnectionRequest, opts ...grpc.CallOption) (*NewConnectionResponse, error)
+	AcceptConnection(ctx context.Context, in *AcceptConnectionMessage, opts ...grpc.CallOption) (*NewConnectionResponse, error)
+	GetAllConnectionForUser(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 }
 
 type connectionServiceClient struct {
@@ -52,12 +54,32 @@ func (c *connectionServiceClient) CreateConnection(ctx context.Context, in *NewC
 	return out, nil
 }
 
+func (c *connectionServiceClient) AcceptConnection(ctx context.Context, in *AcceptConnectionMessage, opts ...grpc.CallOption) (*NewConnectionResponse, error) {
+	out := new(NewConnectionResponse)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/AcceptConnection", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) GetAllConnectionForUser(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/GetAllConnectionForUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConnectionServiceServer is the server API for ConnectionService service.
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
 type ConnectionServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	CreateConnection(context.Context, *NewConnectionRequest) (*NewConnectionResponse, error)
+	AcceptConnection(context.Context, *AcceptConnectionMessage) (*NewConnectionResponse, error)
+	GetAllConnectionForUser(context.Context, *GetConnectionRequest) (*GetAllResponse, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -70,6 +92,12 @@ func (UnimplementedConnectionServiceServer) Register(context.Context, *RegisterR
 }
 func (UnimplementedConnectionServiceServer) CreateConnection(context.Context, *NewConnectionRequest) (*NewConnectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateConnection not implemented")
+}
+func (UnimplementedConnectionServiceServer) AcceptConnection(context.Context, *AcceptConnectionMessage) (*NewConnectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptConnection not implemented")
+}
+func (UnimplementedConnectionServiceServer) GetAllConnectionForUser(context.Context, *GetConnectionRequest) (*GetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllConnectionForUser not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -120,6 +148,42 @@ func _ConnectionService_CreateConnection_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_AcceptConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptConnectionMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).AcceptConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/AcceptConnection",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).AcceptConnection(ctx, req.(*AcceptConnectionMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_GetAllConnectionForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).GetAllConnectionForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/GetAllConnectionForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).GetAllConnectionForUser(ctx, req.(*GetConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +198,14 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateConnection",
 			Handler:    _ConnectionService_CreateConnection_Handler,
+		},
+		{
+			MethodName: "AcceptConnection",
+			Handler:    _ConnectionService_AcceptConnection_Handler,
+		},
+		{
+			MethodName: "GetAllConnectionForUser",
+			Handler:    _ConnectionService_GetAllConnectionForUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
