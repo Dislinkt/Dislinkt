@@ -17,6 +17,7 @@ func NewConnectionService(store domain.ConnectionStore) *ConnectionService {
 }
 
 func (service *ConnectionService) Register(userID string, status string) (*domain.UserNode, error) {
+	fmt.Println("[ConnectionService Register]")
 	node := domain.UserNode{userID, domain.ProfileStatus(status)}
 	return service.store.Register(&node)
 }

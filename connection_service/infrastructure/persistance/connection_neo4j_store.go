@@ -212,8 +212,10 @@ func (store *ConnectionDBStore) GetAllConnectionForUser(userUid string) (userNod
 }
 
 func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.UserNode, error) {
-
+	fmt.Println("[ConnectionDBStore Register]")
+	fmt.Println(userNode)
 	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+
 	defer func(session neo4j.Session) {
 		err := session.Close()
 		if err != nil {
@@ -221,15 +223,19 @@ func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.Use
 		}
 	}(session)
 
+	fmt.Println(session)
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
-
+		fmt.Println("linija5")
 		if checkIfUserExist(userNode.UserUID, tx) {
+			fmt.Println("linija6")
 			return &domain.UserNode{
 				UserUID: "",
 				Status:  "",
 			}, nil
 		}
 
+		fmt.Println("[ConnectionDBStore Register1]")
+		fmt.Println(userNode)
 		records, err := tx.Run("CREATE (n:UserNode { uid: $uid, status: $status  }) RETURN n.uid, n.status", map[string]interface{}{
 			"uid":    userNode.UserUID,
 			"status": userNode.Status,
