@@ -23,7 +23,7 @@ func mapPost(post *domain.Post) *pb.Post {
 	for _, reaction := range post.Reactions {
 		postPb.Reactions = append(postPb.Reactions, &pb.Reaction{
 			Username: reaction.Username,
-			Reaction: int32(reaction.Reaction),
+			Reaction: mapReactionTypeToPb(reaction.Reaction),
 		})
 	}
 	for _, comment := range post.Comments {
@@ -59,4 +59,16 @@ func mapNewComment(commentPb *pb.Comment) *domain.Comment {
 	}
 
 	return comment
+}
+
+func mapReactionTypeToPb(reactionType domain.ReactionType) pb.ReactionType {
+	switch reactionType {
+	case domain.Neutral:
+		return pb.ReactionType_Neutral
+	case domain.LIKED:
+		return pb.ReactionType_LIKED
+	case domain.DISLIKED:
+		return pb.ReactionType_DISLIKED
+	}
+	return pb.ReactionType_Neutral
 }

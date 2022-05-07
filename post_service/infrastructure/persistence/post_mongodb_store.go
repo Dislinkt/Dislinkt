@@ -76,6 +76,77 @@ func (store *PostMongoDBStore) CreateComment(post *domain.Post, comment *domain.
 	return nil
 }
 
+func (store *PostMongoDBStore) LikePost(post *domain.Post, username string) error {
+
+	var reactions []domain.Reaction
+
+	reactionExists := false
+	for _, reaction := range post.Reactions {
+		if reaction.Username != username {
+			reactions = append(reactions, reaction)
+		} else {
+			if reaction.Reaction != domain.LIKED {
+				reaction.Reaction = domain.LIKED
+				reactions = append(reactions, reaction)
+			}
+			reactionExists = true
+		}
+
+	}
+	if !reactionExists {
+		reaction := domain.Reaction{
+			Username: username,
+			Reaction: domain.LIKED,
+		}
+		reactions = append(reactions, reaction)
+	}
+
+	_, err := store.posts.UpdateOne(context.TODO(), bson.M{"_id": post.Id}, bson.D{
+		{"$set", bson.D{{"reactions", reactions}}},
+	},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (store *PostMongoDBStore) DislikePost(post *domain.Post, username string) error {
+	var reactions []domain.Reaction
+
+	reactionExists := false
+	for _, reaction := range post.Reactions {
+		if reaction.Username != username {
+			reactions = append(reactions, reaction)
+		} else {
+			if reaction.Reaction != domain.DISLIKED {
+				reaction.Reaction = domain.DISLIKED
+				reactions = append(reactions, reaction)
+			}
+			reactionExists = true
+		}
+
+	}
+	if !reactionExists {
+		reaction := domain.Reaction{
+			Username: username,
+			Reaction: domain.DISLIKED,
+		}
+		reactions = append(reactions, reaction)
+	}
+
+	_, err := store.posts.UpdateOne(context.TODO(), bson.M{"_id": post.Id}, bson.D{
+		{"$set", bson.D{{"reactions", reactions}}},
+	},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (store *PostMongoDBStore) filter(filter interface{}) ([]*domain.Post, error) {
 	cursor, err := store.posts.Find(context.TODO(), filter)
 	defer cursor.Close(context.TODO())

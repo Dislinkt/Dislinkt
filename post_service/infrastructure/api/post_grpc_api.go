@@ -78,7 +78,44 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 		return nil, err
 	}
 	comment := mapNewComment(request.Comment)
-	handler.service.CreateComment(post, comment)
+	err = handler.service.CreateComment(post, comment)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.Empty{}, nil
+}
+
+func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRequest) (*pb.Empty, error) {
+	objectId, err := primitive.ObjectIDFromHex(request.PostId)
+	if err != nil {
+		return nil, err
+	}
+	post, err := handler.service.Get(objectId)
+	if err != nil {
+		return nil, err
+	}
+	err = handler.service.LikePost(post, request.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.Empty{}, nil
+}
+
+func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.ReactionRequest) (*pb.Empty, error) {
+	objectId, err := primitive.ObjectIDFromHex(request.PostId)
+	if err != nil {
+		return nil, err
+	}
+	post, err := handler.service.Get(objectId)
+	if err != nil {
+		return nil, err
+	}
+	err = handler.service.DislikePost(post, request.Username)
+	if err != nil {
+		return nil, err
+	}
 
 	return &pb.Empty{}, nil
 }

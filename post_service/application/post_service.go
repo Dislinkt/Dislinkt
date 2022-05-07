@@ -36,3 +36,11 @@ func (service *PostService) GetAllByConnectionIds(uuids []string) ([]*domain.Pos
 func (service *PostService) CreateComment(post *domain.Post, comment *domain.Comment) error {
 	return service.store.CreateComment(post, comment)
 }
+
+func (service *PostService) LikePost(post *domain.Post, username string) error {
+	return service.store.LikePost(post, username)
+}
+
+func (service *PostService) DislikePost(post *domain.Post, username string) error {
+	return service.store.DislikePost(post, username)
+}

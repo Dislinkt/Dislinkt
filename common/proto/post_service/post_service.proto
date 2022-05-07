@@ -29,6 +29,18 @@ service PostService{
         body: "comment"
       };
     }
+    rpc likePost(ReactionRequest) returns (Empty) {
+      option (google.api.http) = {
+        post: "/post/{postId}/like"
+        body: "*"
+      };
+    }
+    rpc dislikePost(ReactionRequest) returns (Empty) {
+      option (google.api.http) = {
+        post: "/post/{postId}/dislike"
+        body: "*"
+      };
+    }
 }
 
 message GetRequest {
@@ -54,6 +66,11 @@ message CreateCommentRequest {
   Comment comment = 2;
 }
 
+message ReactionRequest {
+  string postId = 1;
+  string username = 2;
+}
+
 message Post {
   string id = 1;
   string userId = 2;
@@ -67,7 +84,13 @@ message Post {
 
 message Reaction {
   string username = 1;
-  int32 reaction = 2;
+  ReactionType reaction = 2;
+}
+
+enum ReactionType {
+  Neutral = 0;
+  LIKED = 1;
+  DISLIKED = 2;
 }
 
 message Comment {

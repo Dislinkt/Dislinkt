@@ -9,4 +9,6 @@ type PostStore interface {
 	GetAllByUserId(uuid string) ([]*Post, error)
 	GetAllByConnectionIds(uuids []string) ([]*Post, error)
 	CreateComment(post *Post, comment *Comment) error
+	LikePost(post *Post, username string) error
+	DislikePost(post *Post, username string) error
 }
