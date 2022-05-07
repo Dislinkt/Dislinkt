@@ -1,6 +1,10 @@
 package config
 
-import "os"
+import (
+	"flag"
+	cfg "github.com/dislinkt/common/config"
+	"os"
+)
 
 type Config struct {
 	Port       string
@@ -9,6 +13,13 @@ type Config struct {
 }
 
 func NewConfig() *Config {
+	devEnv := flag.Bool("dev", false, "use dev environment variables")
+	flag.Parse()
+
+	if *devEnv {
+		cfg.LoadEnv()
+	}
+
 	return &Config{
 		Port:       os.Getenv("POST_SERVICE_PORT"),
 		PostDBHost: os.Getenv("POST_DB_HOST"),
