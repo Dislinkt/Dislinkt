@@ -16,27 +16,42 @@ func NewPostHandler(service *application.PostService) *PostHandler {
 	return &PostHandler{service: service}
 }
 
-func (handler *PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
+func (handler *PostHandler) GetAllByUserId(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
 	id := request.Id
-	objectId, err := primitive.ObjectIDFromHex(id)
+	posts, err := handler.service.GetAllByUserId(id)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
-	if err != nil {
-		return nil, err
+	response := &pb.GetMultipleResponse{Posts: []*pb.Post{}}
+	for _, post := range posts {
+		current := mapPost(post)
+		response.Posts = append(response.Posts, current)
 	}
-	postPb := mapPost(post)
-	response := &pb.GetResponse{Post: postPb}
 	return response, nil
 }
 
-func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.GetAllResponse, error) {
+/*
+func (handler *PostHandler) GetAllByConnectionIds(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
+	id := request.Id
+	posts, err := handler.service.GetAllByConnectionIds(id)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetMultipleResponse{Posts: []*pb.Post{}}
+	for _, post := range posts {
+		current := mapPost(post)
+		response.Posts = append(response.Posts, current)
+	}
+	return response, nil
+}
+*/
+
+func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
 	posts, err := handler.service.GetAll()
 	if err != nil {
 		return nil, err
 	}
-	response := &pb.GetAllResponse{Posts: []*pb.Post{}}
+	response := &pb.GetMultipleResponse{Posts: []*pb.Post{}}
 	for _, post := range posts {
 		current := mapPost(post)
 		response.Posts = append(response.Posts, current)
@@ -50,5 +65,20 @@ func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePo
 	if err != nil {
 		return nil, err
 	}
+	return &pb.Empty{}, nil
+}
+
+func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.CreateCommentRequest) (*pb.Empty, error) {
+	objectId, err := primitive.ObjectIDFromHex(request.PostId)
+	if err != nil {
+		return nil, err
+	}
+	post, err := handler.service.Get(objectId)
+	if err != nil {
+		return nil, err
+	}
+	comment := mapNewComment(request.Comment)
+	handler.service.CreateComment(post, comment)
+
 	return &pb.Empty{}, nil
 }

@@ -32,12 +32,46 @@ func (store *PostMongoDBStore) GetAll() ([]*domain.Post, error) {
 	return store.filter(filter)
 }
 
+func (store *PostMongoDBStore) GetAllByUserId(uuid string) ([]*domain.Post, error) {
+	filter := bson.M{"user_id": uuid}
+	return store.filter(filter)
+}
+
+func (store *PostMongoDBStore) GetAllByConnectionIds(uuids []string) ([]*domain.Post, error) {
+	var posts []*domain.Post
+
+	for _, uuid := range uuids {
+		postsByUser, err := store.GetAllByUserId(uuid)
+		posts = append(posts, postsByUser...)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return posts, nil
+}
+
 func (store *PostMongoDBStore) Insert(post *domain.Post) error {
 	result, err := store.posts.InsertOne(context.TODO(), post)
 	if err != nil {
 		return err
 	}
 	post.Id = result.InsertedID.(primitive.ObjectID)
+
+	return nil
+}
+
+func (store *PostMongoDBStore) CreateComment(post *domain.Post, comment *domain.Comment) error {
+	comments := append(post.Comments, *comment)
+
+	_, err := store.posts.UpdateOne(context.TODO(), bson.M{"_id": post.Id}, bson.D{
+		{"$set", bson.D{{"comments", comments}}},
+	},
+	)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

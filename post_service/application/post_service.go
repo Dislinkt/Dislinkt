@@ -24,3 +24,15 @@ func (service *PostService) GetAll() ([]*domain.Post, error) {
 func (service *PostService) Insert(post *domain.Post) error {
 	return service.store.Insert(post)
 }
+
+func (service *PostService) GetAllByUserId(uuid string) ([]*domain.Post, error) {
+	return service.store.GetAllByUserId(uuid)
+}
+
+func (service *PostService) GetAllByConnectionIds(uuids []string) ([]*domain.Post, error) {
+	return service.store.GetAllByConnectionIds(uuids)
+}
+
+func (service *PostService) CreateComment(post *domain.Post, comment *domain.Comment) error {
+	return service.store.CreateComment(post, comment)
+}

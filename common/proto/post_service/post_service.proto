@@ -7,12 +7,12 @@ package post_service_proto;
 import "google/api/annotations.proto";
 
 service PostService{
-    rpc Get(GetRequest) returns(GetResponse) {
+    rpc getAllByUserId(GetRequest) returns(GetMultipleResponse) {
       option (google.api.http) = {
         get: "/post/{id}"
       };
     }
-    rpc getAll(Empty) returns(GetAllResponse) {
+    rpc getAll(Empty) returns(GetMultipleResponse) {
       option (google.api.http) = {
         get: "/post"
       };
@@ -21,6 +21,12 @@ service PostService{
       option (google.api.http) = {
         post: "/post"
         body: "post"
+      };
+    }
+    rpc createComment(CreateCommentRequest) returns (Empty) {
+      option (google.api.http) = {
+        post: "/post/{postId}/comment"
+        body: "comment"
       };
     }
 }
@@ -33,7 +39,7 @@ message GetResponse {
   Post post = 1;
 }
 
-message GetAllResponse {
+message GetMultipleResponse {
   repeated Post posts = 1;
 }
 
@@ -41,6 +47,11 @@ message Empty {}
 
 message CreatePostRequest {
   Post post = 1;
+}
+
+message CreateCommentRequest {
+  string postId = 1;
+  Comment comment = 2;
 }
 
 message Post {

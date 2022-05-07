@@ -51,3 +51,12 @@ func mapNewPost(postPb *pb.Post) *domain.Post {
 
 	return post
 }
+
+func mapNewComment(commentPb *pb.Comment) *domain.Comment {
+	comment := &domain.Comment{
+		Username:    commentPb.Username,
+		CommentText: commentPb.CommentText,
+	}
+
+	return comment
+}
