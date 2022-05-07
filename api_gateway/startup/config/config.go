@@ -27,13 +27,13 @@ func NewConfig() *Config {
 		//Port:           "8080",
 		//ConnectionHost: "localhost",
 		//ConnectionPort: "8001",
-		Port:           os.Getenv("GATEWAY_PORT"),
-		ConnectionHost: os.Getenv("CONNECTION_SERVICE_HOST"),
-		ConnectionPort: os.Getenv("CONNECTION_SERVICE_PORT"),
-		//UserHost:           os.Getenv("USER_SERVICE_HOST"),
-		//UserPort:           os.Getenv("USER_SERVICE_PORT"),
-		//AdditionalUserHost: os.Getenv("ADDITIONAL_USER_SERVICE_HOST"),
-		//AdditionalUserPort: os.Getenv("ADDITIONAL_USER_SERVICE_PORT"),
+		Port:               os.Getenv("GATEWAY_PORT"),
+		ConnectionHost:     os.Getenv("CONNECTION_SERVICE_HOST"),
+		ConnectionPort:     os.Getenv("CONNECTION_SERVICE_PORT"),
+		UserHost:           os.Getenv("USER_SERVICE_HOST"),
+		UserPort:           os.Getenv("USER_SERVICE_PORT"),
+		AdditionalUserHost: os.Getenv("ADDITIONAL_USER_SERVICE_HOST"),
+		AdditionalUserPort: os.Getenv("ADDITIONAL_USER_SERVICE_PORT"),
 	}
 
 }

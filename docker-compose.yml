@@ -1,48 +1,48 @@
 version: "3.8"
 
 services:
-#  user_service:
-#    image: user_service
-#    container_name: user_service
-#    build:
-#      context: .
-#      dockerfile: ./user_service/Dockerfile
-#    restart: on-failure
-#    environment:
-#      - USER_DB_HOST=${USER_DB_HOST}
-#      - USER_DB_PORT=${USER_DB_PORT}
-#      - USER_DB_USER=${USER_DB_USER}
-#      - USER_DB_PASS=${USER_DB_PASS}
-#      - USER_DB_NAME=${USER_DB_NAME}
-#      - USER_SERVICE_PORT=${USER_SERVICE_PORT}
-##      - JAEGER_SERVICE_NAME=${JAEGER_SERVICE_NAME}
-##      - JAEGER_AGENT_HOST=tracing
-##      - JAEGER_AGENT_PORT=6831
-##      - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
-##      - JAEGER_SAMPLER_TYPE=const
-##      - JAEGER_SAMPLER_PARAM=1
-#    depends_on:
-#      - user_db
-##      - tracing
-#    networks:
-#      - network
-#
-#  additional_user_service:
-#    image: additional_user_service
-#    container_name: additional_user_service
-#    build:
-#      context: .
-#      dockerfile: ./additional_user_service/Dockerfile
-#    restart: on-failure
-#    environment:
-#      - ADDITIONAL_USER_DB_HOST=${ADDITIONAL_USER_DB_HOST}
-#      - ADDITIONAL_USER_DB_PORT=${ADDITIONAL_USER_DB_PORT}
-#      - ADDITIONAL_USER_SERVICE_PORT=${ADDITIONAL_USER_SERVICE_PORT}
-#    depends_on:
-#      - additional_user_db
-#    networks:
-#      - network
-#
+  user_service:
+    image: user_service
+    container_name: user_service
+    build:
+      context: .
+      dockerfile: ./user_service/Dockerfile
+    restart: on-failure
+    environment:
+      - USER_DB_HOST=${USER_DB_HOST}
+      - USER_DB_PORT=${USER_DB_PORT}
+      - USER_DB_USER=${USER_DB_USER}
+      - USER_DB_PASS=${USER_DB_PASS}
+      - USER_DB_NAME=${USER_DB_NAME}
+      - USER_SERVICE_PORT=${USER_SERVICE_PORT}
+#      - JAEGER_SERVICE_NAME=${JAEGER_SERVICE_NAME}
+#      - JAEGER_AGENT_HOST=tracing
+#      - JAEGER_AGENT_PORT=6831
+#      - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+#      - JAEGER_SAMPLER_TYPE=const
+#      - JAEGER_SAMPLER_PARAM=1
+    depends_on:
+      - user_db
+#      - tracing
+    networks:
+      - network
+
+  additional_user_service:
+    image: additional_user_service
+    container_name: additional_user_service
+    build:
+      context: .
+      dockerfile: ./additional_user_service/Dockerfile
+    restart: on-failure
+    environment:
+      - ADDITIONAL_USER_DB_HOST=${ADDITIONAL_USER_DB_HOST}
+      - ADDITIONAL_USER_DB_PORT=${ADDITIONAL_USER_DB_PORT}
+      - ADDITIONAL_USER_SERVICE_PORT=${ADDITIONAL_USER_SERVICE_PORT}
+    depends_on:
+      - additional_user_db
+    networks:
+      - network
+
   connection_service:
     image: connection_service
     container_name: connection_service
@@ -72,10 +72,10 @@ services:
       - ${GATEWAY_PORT}:${GATEWAY_PORT}
     environment:
       GATEWAY_PORT: ${GATEWAY_PORT}
-#      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
-#      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
-#      ADDITIONAL_USER_SERVICE_HOST: ${ADDITIONAL_USER_SERVICE_HOST}
-#      ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      ADDITIONAL_USER_SERVICE_HOST: ${ADDITIONAL_USER_SERVICE_HOST}
+      ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
       CONNECTION_SERVICE_HOST: ${CONNECTION_SERVICE_HOST}
       CONNECTION_SERVICE_PORT: ${CONNECTION_SERVICE_PORT}
     networks:
@@ -84,16 +84,16 @@ services:
 #    depends_on:
 #      - tracing
 
-#  user_db:
-#    image: postgres
-#    container_name: user_db
-#    restart: on-failure
-#    environment:
-#      POSTGRES_USER: ${USER_DB_USER}
-#      POSTGRES_PASSWORD: ${USER_DB_PASS}
-#      POSTGRES_DB: ${USER_DB_NAME}
-#    networks:
-#      - network
+  user_db:
+    image: postgres
+    container_name: user_db
+    restart: on-failure
+    environment:
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASS}
+      POSTGRES_DB: ${USER_DB_NAME}
+    networks:
+      - network
 
   neo4j:
     image: neo4j:4.3.3-community #4.3.3-community  latest
@@ -110,12 +110,13 @@ services:
 
 
 
-#  additional_user_db:
-#    image: mongo
-#    container_name: additional_user_db
-#    restart: on-failure
-#    networks:
-#      - network
+  additional_user_db:
+    image: mongo
+    container_name: additional_user_db
+    restart: on-failure
+    networks:
+      - network
+
 #  tracing:
 #    image: jaegertracing/all-in-one
 #    container_name: jaeger
