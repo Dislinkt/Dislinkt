@@ -1,0 +1,273 @@
+syntax = "proto3";
+
+option go_package = "github.com/dislinkt/additional_user_service/proto";
+
+package additional_user_service_proto;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service AdditionalUserService{
+  //EDUCATION
+  rpc NewEducation(NewEducationRequest) returns(EducationResponse) {
+    option (google.api.http) = {
+      post: "/user/{id}/education"
+      body: "education"
+    };
+  }
+  rpc GetAllEducation(GetAllEducationRequest) returns(AllEducationResponse) {
+    option (google.api.http) = {
+      get: "/user/{id}/education"
+    };
+  }
+  rpc UpdateEducation(UpdateEducationRequest) returns(AllEducationResponse) {
+    option (google.api.http) = {
+      put: "/user/{userId}/education/{educationId}"
+      body: "education"
+    };
+  }
+  rpc DeleteEducation(EmptyRequest) returns(AllEducationResponse) {
+    option (google.api.http) = {
+      delete: "/user/{userId}/education/{additionId}"
+    };
+  }
+
+  // POSITION
+  rpc NewPosition(NewPositionRequest) returns(PositionResponse) {
+    option (google.api.http) = {
+      post: "/user/{id}/position"
+      body: "position"
+    };
+  }
+  rpc GetAllPosition(GetAllPositionRequest) returns(AllPositionResponse) {
+    option (google.api.http) = {
+      get: "/user/{id}/position"
+    };
+  }
+  rpc UpdatePosition(UpdatePositionRequest) returns(AllPositionResponse) {
+    option (google.api.http) = {
+      put: "/user/{userId}/position/{positionId}"
+      body: "position"
+    };
+  }
+  rpc DeletePosition(EmptyRequest) returns(AllPositionResponse) {
+    option (google.api.http) = {
+      delete: "/user/{userId}/position/{additionId}"
+    };
+  }
+
+  // SKILL
+  rpc NewSkill(NewSkillRequest) returns(SkillResponse) {
+    option (google.api.http) = {
+      post: "/user/{id}/skill"
+      body: "skill"
+    };
+  }
+  rpc GetAllSkill(GetAllSkillRequest) returns(AllSkillResponse) {
+    option (google.api.http) = {
+      get: "/user/{id}/skill"
+    };
+  }
+  rpc UpdateSkill(UpdateSkillRequest) returns(AllSkillResponse) {
+    option (google.api.http) = {
+      put: "/user/{userId}/skill/{skillId}"
+      body: "skill"
+    };
+  }
+  rpc DeleteSkill(EmptyRequest) returns(AllSkillResponse) {
+    option (google.api.http) = {
+      delete: "/user/{userId}/skill/{additionId}"
+    };
+  }
+
+  // INTEREST
+  rpc NewInterest(NewInterestRequest) returns(InterestResponse) {
+    option (google.api.http) = {
+      post: "/user/{id}/interest"
+      body: "interest"
+    };
+  }
+  rpc GetAllInterest(GetAllInterestRequest) returns(AllInterestResponse) {
+    option (google.api.http) = {
+      get: "/user/{id}/interest"
+    };
+  }
+  rpc UpdateInterest(UpdateInterestRequest) returns(AllInterestResponse) {
+    option (google.api.http) = {
+      put: "/user/{userId}/interest/{interestId}"
+      body: "interest"
+    };
+  }
+  rpc DeleteInterest(EmptyRequest) returns(AllInterestResponse) {
+    option (google.api.http) = {
+      delete: "/user/{userId}/interest/{additionId}"
+    };
+  }
+}
+
+message EmptyRequest{
+  string userId = 1;
+  string additionId = 2;
+}
+
+// EDUCATION
+
+message UpdateEducationRequest{
+  string userId = 1;
+  string educationId = 2;
+  NewEducation education = 3;
+}
+
+message GetAllEducationRequest{
+  string id = 1;
+}
+
+message AllEducationResponse{
+  repeated Education educations = 1;
+}
+
+message NewEducationRequest{
+  string id =1;
+  NewEducation education = 2;
+}
+
+message EducationResponse{
+  Education education = 1;
+}
+
+message NewEducation{
+  string school = 1;
+  string degree = 2;
+  string field_of_study = 3;
+  string start_date = 4;
+  string end_date = 5;
+}
+
+message Education{
+  string id = 1;
+  string school = 2;
+  string degree = 3;
+  string field_of_study = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+}
+
+
+// POSITION
+
+message UpdatePositionRequest{
+  string userId = 1;
+  string positionId = 2;
+  NewPosition position = 3;
+}
+
+message GetAllPositionRequest{
+  string id = 1;
+}
+
+message AllPositionResponse{
+  repeated Position positions = 1;
+}
+
+message NewPositionRequest{
+  string id =1;
+  NewPosition position = 2;
+}
+
+message PositionResponse{
+  Position position = 1;
+}
+
+message NewPosition{
+  string title = 1;
+  string company_name = 2;
+  string industry = 3;
+  string start_date = 4;
+  string end_date = 5;
+  bool current = 6;
+}
+
+message Position{
+  string id = 1;
+  string title = 2;
+  string company_name = 3;
+  string industry = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  bool current = 7;
+}
+
+// SKILL
+
+message UpdateSkillRequest{
+  string userId = 1;
+  string skillId = 2;
+  NewSkill skill = 3;
+}
+
+message GetAllSkillRequest{
+  string id = 1;
+}
+
+message AllSkillResponse{
+  repeated Skill skills = 1;
+}
+
+message NewSkillRequest{
+  string id =1;
+  NewSkill skill = 2;
+}
+
+message SkillResponse{
+  Skill skill = 1;
+}
+
+message NewSkill{
+  string name = 1;
+}
+
+message Skill{
+  string id = 1;
+  string name = 2;
+}
+
+
+// SKILL
+
+message UpdateInterestRequest{
+  string userId = 1;
+  string interestId = 2;
+  NewInterest interest = 3;
+}
+
+message GetAllInterestRequest{
+  string id = 1;
+}
+
+message AllInterestResponse{
+  repeated Interest interests = 1;
+}
+
+message NewInterestRequest{
+  string id =1;
+  NewInterest interest = 2;
+}
+
+message InterestResponse{
+  Interest interest = 1;
+}
+
+enum InterestGroup{
+  Group1 = 0;
+  Group2 = 1;
+  Group3 = 2;
+}
+
+message NewInterest{
+  string name = 1;
+}
+
+message Interest{
+  string id = 1;
+  string name = 2;
+}

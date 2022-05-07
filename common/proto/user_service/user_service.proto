@@ -1,28 +1,124 @@
 syntax = "proto3";
 
-option go_package = "github.com/dislinkt/user-service/proto";
+option go_package = "github.com/dislinkt/user_service/proto";
 
-package proto;
+package user_service_proto;
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
 
 service UserService{
-  rpc GetAll(GetAllRequest) returns(GetAllResponse) {
+  rpc GetAll(SearchMessage) returns(GetAllResponse) {
     option (google.api.http) = {
       get: "/user"
     };
   }
+  rpc GetOne(GetOneMessage) returns(UserResponse) {
+    option (google.api.http) = {
+      get: "/user/{id}"
+    };
+  }
+  rpc RegisterUser(RegisterUserRequest) returns(RegisterUserResponse) {
+    option (google.api.http) = {
+      post: "/user"
+      body: "user"
+    };
+  }
+  rpc UpdateUser(UpdateUserRequest) returns(UserResponse) {
+    option (google.api.http) = {
+      put: "/user/{id}"
+      body: "user"
+    };
+  }
+  rpc PatchUser(PatchUserRequest) returns(UserResponse) {
+    option (google.api.http) = {
+      patch: "/user/{id}"
+      body: "*"
+    };
+  }
 }
 
-message GetAllRequest {
+message EmptyMessage {
+}
+
+message SearchMessage{
+ string searchText = 1;
+}
+
+message GetOneMessage{
+  string id = 1;
+}
+
+message PatchUserRequest{
+  string id = 1;
+  NewUser user = 2;
+  google.protobuf.FieldMask update_mask = 3;
 }
 
 message GetAllResponse {
   repeated User users = 1;
 }
 
+message UpdateUserRequest{
+  string id = 1;
+  NewUser user = 2;
+  google.protobuf.FieldMask update_mask = 3;
+}
+
+message UserResponse{
+  User user = 1;
+}
+
+enum Gender{
+  Empty = 0;
+  Male = 1;
+  Female = 2;
+}
+
+message NewUser{
+  string name = 1;
+  string surname = 2;
+  string username = 3;
+  string email = 4;
+  string number = 5;
+  Gender gender = 6;
+  string date_of_birth = 7;
+  string password = 8;
+  string biography = 9;
+  bool private = 10;
+}
+
+enum UserRole{
+    Regular = 0;
+    Admin = 1;
+    Agent = 2;
+}
+
 message User {
   string id = 1;
   string name = 2;
   string surname = 3;
+  string username = 4;
+  string email = 5;
+  string number = 6;
+  Gender gender = 7;
+  string date_of_birth = 8;
+  string password = 9;
+  string biography = 11;
+  bool blocked = 12;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+  bool private = 15;
+  UserRole user_role = 16;
 }
+
+message RegisterUserRequest {
+  NewUser user = 1;
+}
+
+message RegisterUserResponse {
+  User user = 1;
+}
+
+
