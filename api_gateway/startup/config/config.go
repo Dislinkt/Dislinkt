@@ -13,6 +13,8 @@ type Config struct {
 	UserPort           string
 	AdditionalUserHost string
 	AdditionalUserPort string
+	PostHost string
+	PostPort string
 }
 
 func NewConfig() *Config {
@@ -28,6 +30,8 @@ func NewConfig() *Config {
 		UserPort:           os.Getenv("USER_SERVICE_PORT"),
 		AdditionalUserHost: os.Getenv("ADDITIONAL_USER_SERVICE_HOST"),
 		AdditionalUserPort: os.Getenv("ADDITIONAL_USER_SERVICE_PORT"),
+		PostHost: os.Getenv("POST_SERVICE_HOST"),
+		PostPort: os.Getenv("POST_SERVICE_PORT"),
 	}
 
 }
