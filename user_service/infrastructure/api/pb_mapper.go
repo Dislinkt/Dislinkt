@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/domain"
+	uuid "github.com/satori/go.uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -31,6 +32,7 @@ func mapUser(userD *domain.User) *pb.User {
 
 func mapNewUser(userPb *pb.NewUser) *domain.User {
 	userD := &domain.User{
+		Id:          uuid.NewV4(),
 		Name:        userPb.Name,
 		Surname:     userPb.Surname,
 		Username:    &userPb.Username,

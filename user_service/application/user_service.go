@@ -34,16 +34,14 @@ func (service *UserService) Register(user *domain.User) error {
 	return err
 }
 
-func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
+func (service *UserService) Insert(user *domain.User) error {
 	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 
-	newUUID := uuid.NewV4()
-	user.Id = newUUID
 	err := service.store.Insert(user)
-	return newUUID, err
+	return err
 }
 func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
 	// span := tracer.StartSpanFromContext(ctx, "Update-Service")

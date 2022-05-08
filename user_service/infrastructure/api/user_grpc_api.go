@@ -69,16 +69,18 @@ func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.Regist
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
+	fmt.Println("Register user")
 	user := mapNewUser(request.User)
+	fmt.Println("mapper zavrsio")
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
 	err := handler.service.Register(user)
+	fmt.Println("Register zavrsio")
 	if err != nil {
 		return nil, err
 	}
 
-	user, _ = handler.service.FindByUsername(*user.Username)
 	return &pb.RegisterUserResponse{
 		User: mapUser(user),
 	}, nil

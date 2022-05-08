@@ -2,6 +2,11 @@ package startup
 
 import (
 	"fmt"
+	"log"
+	"net"
+
+	saga "github.com/dislinkt/common/saga/messaging"
+	"github.com/dislinkt/common/saga/messaging/nats"
 	"github.com/dislinkt/connection_service/infrastructure/persistance"
 	"google.golang.org/grpc"
 
@@ -11,8 +16,6 @@ import (
 	"github.com/dislinkt/connection_service/infrastructure/api"
 	"github.com/dislinkt/connection_service/startup/config"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
-	"log"
-	"net"
 )
 
 type Server struct {
@@ -25,6 +28,10 @@ func NewServer(config *config.Config) *Server {
 	}
 }
 
+const (
+	QueueGroup = "connection_service"
+)
+
 func (server *Server) Start() {
 
 	neo4jClient := server.initNeo4J()
@@ -32,6 +39,10 @@ func (server *Server) Start() {
 	connectionStore := server.initConnectionStore(neo4jClient)
 
 	connectionService := server.initConnectionService(connectionStore)
+
+	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
+	server.initRegisterUserHandler(connectionService, replyPublisher, commandSubscriber)
 
 	connectionHandler := server.initConnectionHandler(connectionService)
 
@@ -53,6 +64,32 @@ func (server *Server) initConnectionStore(client *neo4j.Driver) domain.Connectio
 
 func (server *Server) initConnectionService(store domain.ConnectionStore) *application.ConnectionService {
 	return application.NewConnectionService(store)
+}
+func (server *Server) initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewNATSPublisher(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return publisher
+}
+
+func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewNATSSubscriber(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return subscriber
+}
+func (server *Server) initRegisterUserHandler(service *application.ConnectionService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) initConnectionHandler(service *application.ConnectionService) *api.ConnectionHandler {

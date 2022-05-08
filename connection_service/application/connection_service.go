@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/domain"
 )

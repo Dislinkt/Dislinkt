@@ -5,30 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b9daecb-4516-47d7-a378-7076ddd3e267" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/common/proto/connection_service/google/api/annotations.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/proto/connection_service/google/api/field_behavior.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/proto/connection_service/google/api/field_mask.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/proto/connection_service/google/api/http.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/proto/connection_service/google/api/httpbody.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/application/connection_service.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/domain/connection_store.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/domain/model.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/infrastructure/api/connection_grpc_api.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/infrastructure/api/pb_mapper.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/infrastructure/persistance/client.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/infrastructure/persistance/connection_neo4j_store.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/startup/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/connection_service/startup/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/protoeditor.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/connection_service/infrastructure/api/register_user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/register_user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/register_user_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api_gateway/startup/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/startup/config/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api_gateway/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/common/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/common/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/saga/messaging/nats/nats_publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/saga/messaging/nats/nats_publisher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/saga/messaging/nats/nats_subscriber.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/saga/messaging/nats/nats_subscriber.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/application/connection_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/application/connection_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/domain/connection_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/domain/connection_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/startup/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/startup/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/startup/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/application/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/application/user_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/register_user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/register_user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,23 +55,18 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="28ixci1nIvrbEK14wCDoiz9DR4J" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="DefaultGoTemplateProperty" value="Go File" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="go.format.on.save.advertiser.fired" value="true" />
-    <property name="go.formatter.settings.were.checked" value="true" />
-    <property name="go.import.settings.migrated" value="true" />
-    <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
-    <property name="go.sdk.automatically.set" value="true" />
-    <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/connection_service" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\Desktop\XML-projekat\Dislinkt\connection_service" />
@@ -115,8 +111,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
   </component>
 </project>

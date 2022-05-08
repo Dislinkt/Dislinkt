@@ -58,7 +58,6 @@ func (o *RegisterUserOrchestrator) nextCommandType(reply events.RegisterUserRepl
 	case events.UserServiceNotUpdated:
 		return events.CancelRegistration
 	case events.AdditionalServiceUpdated:
-		// return events.RegistrationApproved
 		return events.UpdateConnectionNode
 	case events.AdditionalServiceNotUpdated:
 		return events.RollbackUser
