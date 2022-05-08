@@ -59,7 +59,7 @@ func (store *ConnectionDBStore) CreateConnection(baseUserUuid string, connectUse
 
 			} else {
 				connectionStatus = "CONNECTED"
-				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = &connect_user_uuid  MATCH (u2:UserNode) WHERE u2.uid = &base_user_uuid CREATE (u1)-[r1:CONNECTION {status: &status, date: &date}]->(u2) CREATE (u2)-[r1:CONNECTION {status: &status, date: &date}]->(u1)", map[string]interface{}{
+				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $connect_user_uuid  MATCH (u2:UserNode) WHERE u2.uid = $base_user_uuid CREATE (u1)-[r2:CONNECTION {status: $status, date: $date}]->(u2) CREATE (u2)-[r1:CONNECTION {status: $status, date: $date}]->(u1)", map[string]interface{}{
 					"connect_user_uuid": connectUserUuid,
 					"base_user_uuid":    baseUserUuid,
 					"status":            "CONNECTED",
