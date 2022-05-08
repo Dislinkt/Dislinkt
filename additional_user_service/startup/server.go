@@ -11,6 +11,8 @@ import (
 	"github.com/dislinkt/additional_user_service/infrastructure/persistence"
 	"github.com/dislinkt/additional_user_service/startup/config"
 	additionalUserProto "github.com/dislinkt/common/proto/additional_user_service"
+	saga "github.com/dislinkt/common/saga/messaging"
+	"github.com/dislinkt/common/saga/messaging/nats"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 )
@@ -41,6 +43,10 @@ func (server *Server) Start() {
 
 	additionalUserService := server.initAdditionalUserService(additionalUserStore)
 
+	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
+	server.initRegisterUserHandler(additionalUserService, replyPublisher, commandSubscriber)
+
 	additionalUserHandler := server.initAdditionalUserHandler(additionalUserService)
 
 	server.startGrpcServer(additionalUserHandler)
@@ -61,6 +67,34 @@ func (server *Server) initAdditionalUserStore(client *mongo.Client) domain.Addit
 
 func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore) *application.AdditionalUserService {
 	return application.NewAdditionalUserService(store)
+}
+
+func (server *Server) initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewNATSPublisher(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return publisher
+}
+
+func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewNATSSubscriber(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return subscriber
+}
+
+func (server *Server) initRegisterUserHandler(service *application.AdditionalUserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) initAdditionalUserHandler(service *application.AdditionalUserService) *api.AdditionalUserHandler {

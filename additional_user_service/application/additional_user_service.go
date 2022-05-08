@@ -8,6 +8,24 @@ type AdditionalUserService struct {
 	store domain.AdditionalUserStore
 }
 
+func (service *AdditionalUserService) CreateDocument(uuid string) error {
+	_, err := service.store.CreateUserDocument(uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *AdditionalUserService) DeleteDocument(uuid string) error {
+	err := service.store.DeleteUserDocument(uuid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // EDUCATION
 
 func NewAdditionalUserService(store domain.AdditionalUserStore) *AdditionalUserService {
@@ -19,7 +37,7 @@ func NewAdditionalUserService(store domain.AdditionalUserStore) *AdditionalUserS
 func (service *AdditionalUserService) CreateEducation(uuid string, education *domain.Education) (*domain.Education,
 	error) {
 
-	_, err := service.store.FindOrCreateDocument(uuid)
+	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +88,7 @@ func (service *AdditionalUserService) DeleteUserEducation(uuid string, additionI
 func (service *AdditionalUserService) CreatePosition(uuid string, position *domain.Position) (*domain.Position,
 	error) {
 
-	_, err := service.store.FindOrCreateDocument(uuid)
+	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +138,7 @@ func (service *AdditionalUserService) DeleteUserPosition(uuid string, additionID
 func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Skill) (*domain.Skill,
 	error) {
 
-	_, err := service.store.FindOrCreateDocument(uuid)
+	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +188,7 @@ func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID st
 func (service *AdditionalUserService) CreateInterest(uuid string, interest *domain.Interest) (*domain.Interest,
 	error) {
 
-	_, err := service.store.FindOrCreateDocument(uuid)
+	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
 	}

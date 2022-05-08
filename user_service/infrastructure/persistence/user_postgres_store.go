@@ -21,7 +21,7 @@ func NewUserPostgresStore(db *gorm.DB) (domain.UserStore, error) {
 }
 
 func (store *UserPostgresStore) Insert(user *domain.User) error {
-	// span := tracer.StartSpanFromContext(ctx, "Insert-DB")
+	// span := tracer.StartSpanFromContext(ctx, "Register-DB")
 	// defer span.Finish()
 	result := store.db.Create(user)
 	if result.Error != nil {
@@ -50,9 +50,17 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 	return &users, nil
 }
 
-func (store *UserPostgresStore) Find(uuid uuid.UUID) (user *domain.User, err error) {
+func (store *UserPostgresStore) FindByID(uuid uuid.UUID) (user *domain.User, err error) {
 	foundUser := domain.User{}
 	if result := store.db.First(&foundUser, uuid); result.Error != nil {
+		return nil, result.Error
+	}
+	return &foundUser, nil
+}
+
+func (store *UserPostgresStore) FindByUsername(username string) (user *domain.User, err error) {
+	foundUser := domain.User{}
+	if result := store.db.Model(domain.User{Username: &username}).First(&foundUser); result.Error != nil {
 		return nil, result.Error
 	}
 	return &foundUser, nil
@@ -66,4 +74,12 @@ func (store *UserPostgresStore) Search(searchText string) (*[]domain.User, error
 		return nil, result.Error
 	}
 	return &users, nil
+}
+
+func (store *UserPostgresStore) Delete(user *domain.User) error {
+	result := store.db.Delete(user)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
