@@ -14,12 +14,12 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		Port:       os.Getenv("USER_SERVICE_PORT"),
-		UserDBHost: os.Getenv("USER_DB_HOST"),
-		UserDBPort: os.Getenv("USER_DB_PORT"),
-		UserDBName: os.Getenv("USER_DB_NAME"),
-		UserDBUser: os.Getenv("USER_DB_USER"),
-		UserDBPass: os.Getenv("USER_DB_PASS"),
+		Port:       os.Getenv("AUTH_SERVICE_PORT"),
+		UserDBHost: os.Getenv("AUTH_DB_HOST"),
+		UserDBPort: os.Getenv("AUTH_DB_PORT"),
+		UserDBName: os.Getenv("AUTH_DB_NAME"),
+		UserDBUser: os.Getenv("AUTH_DB_USER"),
+		UserDBPass: os.Getenv("AUTH_DB_PASS"),
 		Secret:     os.Getenv("SECRET"),
 	}
 	// return &Config{
