@@ -2,8 +2,9 @@ package config
 
 import (
 	"flag"
-	cfg "github.com/dislinkt/common/config"
 	"os"
+
+	cfg "github.com/dislinkt/common/config"
 )
 
 type Config struct {
@@ -35,10 +36,10 @@ func NewConfig() *Config {
 		AuthPort:           os.Getenv("AUTH_SERVICE_PORT"),
 		ConnectionHost:     os.Getenv("CONNECTION_SERVICE_HOST"),
 		ConnectionPort:     os.Getenv("CONNECTION_SERVICE_PORT"),
+		PostHost:           os.Getenv("POST_SERVICE_HOST"),
+		PostPort:           os.Getenv("POST_SERVICE_PORT"),
 		AdditionalUserHost: os.Getenv("ADDITIONAL_USER_SERVICE_HOST"),
 		AdditionalUserPort: os.Getenv("ADDITIONAL_USER_SERVICE_PORT"),
-		PostHost:           os.Getenv("POST_HOST"),
-		PostPort:           os.Getenv("POST_PORT"),
 	}
 
 }

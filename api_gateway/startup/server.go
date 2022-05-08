@@ -3,12 +3,12 @@ package startup
 import (
 	"context"
 	"fmt"
-	cfg "github.com/dislinkt/api_gateway/startup/config"
 	authGw "github.com/dislinkt/common/proto/auth_service"
 	"io"
 	"log"
 	"net/http"
 
+	cfg "github.com/dislinkt/api_gateway/startup/config"
 	additionaluserGw "github.com/dislinkt/common/proto/additional_user_service"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
@@ -46,10 +46,6 @@ func (server *Server) initHandlers() {
 	}
 	postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
 	err = postGw.RegisterPostServiceHandlerFromEndpoint(context.TODO(), server.mux, postEndpoint, opts)
-	//userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
-	//err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
-	//additionalUserEndpoint := fmt.Sprintf("%s:%s", server.config.AdditionalUserHost, server.config.AdditionalUserPort)
-	//err = additionaluserGw.RegisterAdditionalUserServiceHandlerFromEndpoint(context.TODO(), server.mux, additionalUserEndpoint, opts)
 	connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
 	err = connectionGw.RegisterConnectionServiceHandlerFromEndpoint(context.TODO(), server.mux, connectionEndpoint, opts)
 	if err != nil {

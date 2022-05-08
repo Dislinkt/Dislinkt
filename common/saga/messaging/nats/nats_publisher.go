@@ -1,8 +1,8 @@
 package nats
 
 import (
+	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/nats-io/nats.go"
-	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
 )
 
 type Publisher struct {

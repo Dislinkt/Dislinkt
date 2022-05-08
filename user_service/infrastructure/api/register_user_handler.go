@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	saga "github.com/dislinkt/common/saga/messaging"
 	events "github.com/dislinkt/common/saga/register_user"
 	"github.com/dislinkt/user_service/application"
@@ -31,14 +33,15 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 
 	switch command.Type {
 	case events.UpdateUser:
-		uuid, err := handler.userService.Insert(mapCommandUser(command))
-		reply.User.Id = uuid.String()
+		fmt.Println("userhandler-update")
+		err := handler.userService.Insert(mapCommandUser(command))
 		if err != nil {
 			reply.Type = events.UserServiceNotUpdated
 			return
 		}
 		reply.Type = events.UserServiceUpdated
 	case events.RollbackUser:
+		fmt.Println("userhandler-rollback")
 		err := handler.userService.Delete(mapCommandUser(command))
 		if err != nil {
 			return

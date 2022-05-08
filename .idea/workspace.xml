@@ -4,11 +4,32 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ed2f7df1-7a94-483e-afcd-a8fa6c689a3f" name="Changes" comment="">
+    <list default="true" id="4b9daecb-4516-47d7-a378-7076ddd3e267" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/connection_service/infrastructure/api/register_user_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/user/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/user/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/user/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/user/routes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/user/routes/getAll.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/user/routes/getAll.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/register_user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/register_user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api_gateway/startup/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/startup/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api_gateway/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/common/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/common/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/saga/messaging/nats/nats_publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/saga/messaging/nats/nats_publisher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/saga/messaging/nats/nats_subscriber.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/saga/messaging/nats/nats_subscriber.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/application/connection_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/application/connection_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/domain/connection_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/domain/connection_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/startup/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/startup/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/application/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/application/user_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/register_user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/register_user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +56,7 @@
   </component>
   <component name="ProjectId" id="28ixci1nIvrbEK14wCDoiz9DR4J" />
   <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="1" id="Add" />
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -43,8 +64,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "last_opened_file_path": "D:/XML/Dislinkt/auth_service/infrastructure/api"
+    "DefaultGoTemplateProperty": "Go File"
   }
 }]]></component>
   <component name="RecentsManager">
