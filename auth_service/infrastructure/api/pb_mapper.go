@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/dislinkt/auth-service/domain"
+	"github.com/dislinkt/auth_service/domain"
 	pb "github.com/dislinkt/common/proto/auth_service"
 )
 

@@ -2,7 +2,8 @@ package application
 
 import (
 	"errors"
-	"github.com/dislinkt/auth-service/domain"
+	"github.com/dislinkt/auth_service/domain"
+	uuid "github.com/satori/go.uuid"
 )
 
 type UserService struct {
@@ -23,4 +24,20 @@ func (service *UserService) GetByUsername(username string) (*domain.User, error)
 	}
 
 	return user, err
+}
+
+func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
+	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
+	// defer span.Finish()
+	//
+	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+
+	newUUID := uuid.NewV4()
+	user.Id = newUUID
+	err := service.store.Insert(user)
+	return newUUID, err
+}
+
+func (service *UserService) Delete(user *domain.User) interface{} {
+	return service.store.Delete(user)
 }

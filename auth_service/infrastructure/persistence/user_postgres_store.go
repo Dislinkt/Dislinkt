@@ -1,7 +1,7 @@
 package persistence
 
 import (
-	"github.com/dislinkt/auth-service/domain"
+	"github.com/dislinkt/auth_service/domain"
 	"gorm.io/gorm"
 )
 
@@ -44,9 +44,9 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 }
 
 func (store *UserPostgresStore) GetByUsername(username string) (user *domain.User, err error) {
-	foundUser := domain.User{Id: "1", Username: "ok", Password: "ok"}
-	//if result := store.db.First(&foundUser, uuid); result.Error != nil {
-	//	return nil, result.Error
-	//}
+	var foundUser domain.User
+	if result := store.db.Model(domain.User{Username: username}).First(&foundUser); result.Error != nil {
+		return nil, result.Error
+	}
 	return &foundUser, nil
 }

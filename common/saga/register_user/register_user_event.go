@@ -33,6 +33,7 @@ const (
 	UpdateConnectionNode
 	RollbackConnectionNode
 	UpdateAuth
+	RollbackAuth
 	ApproveRegistration
 	UnknownCommand
 )

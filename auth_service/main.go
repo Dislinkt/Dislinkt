@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/dislinkt/auth-service/startup"
-	cfg "github.com/dislinkt/auth-service/startup/config"
+	"github.com/dislinkt/auth_service/startup"
+	cfg "github.com/dislinkt/auth_service/startup/config"
 )
 
 func main() {

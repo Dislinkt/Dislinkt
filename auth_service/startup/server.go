@@ -2,14 +2,16 @@ package startup
 
 import (
 	"fmt"
+	saga "github.com/dislinkt/common/saga/messaging"
+	"github.com/dislinkt/common/saga/messaging/nats"
 	"log"
 	"net"
 
-	"github.com/dislinkt/auth-service/application"
-	"github.com/dislinkt/auth-service/domain"
-	"github.com/dislinkt/auth-service/infrastructure/api"
-	"github.com/dislinkt/auth-service/infrastructure/persistence"
-	"github.com/dislinkt/auth-service/startup/config"
+	"github.com/dislinkt/auth_service/application"
+	"github.com/dislinkt/auth_service/domain"
+	"github.com/dislinkt/auth_service/infrastructure/api"
+	"github.com/dislinkt/auth_service/infrastructure/persistence"
+	"github.com/dislinkt/auth_service/startup/config"
 	authProto "github.com/dislinkt/common/proto/auth_service"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
@@ -37,6 +39,10 @@ func (server *Server) Start() {
 
 	authService := server.initAuthService(userService)
 
+	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
+	server.initRegisterUserHandler(userService, replyPublisher, commandSubscriber)
+
 	authHandler := server.initAuthHandler(authService)
 
 	server.startGrpcServer(authHandler)
@@ -44,9 +50,9 @@ func (server *Server) Start() {
 
 func (server *Server) initUserClient() *gorm.DB {
 	client, err := persistence.GetClient(
-		server.config.UserDBHost, server.config.UserDBUser,
-		server.config.UserDBPass, server.config.UserDBName,
-		server.config.UserDBPort)
+		server.config.AuthDBHost, server.config.AuthDBUser,
+		server.config.AuthDBPass, server.config.AuthDBName,
+		server.config.AuthDBPort)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,6 +76,34 @@ func (server *Server) initUserStore(client *gorm.DB) domain.UserStore {
 
 func (server *Server) initUserService(store domain.UserStore) *application.UserService {
 	return application.NewUserService(store)
+}
+
+func (server *Server) initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewNATSPublisher(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return publisher
+}
+
+func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewNATSSubscriber(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return subscriber
+}
+
+func (server *Server) initRegisterUserHandler(service *application.UserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) initAuthService(userService *application.UserService) *application.AuthService {

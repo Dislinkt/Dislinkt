@@ -2,10 +2,10 @@ package api
 
 import (
 	"context"
-	//"github.com/dislinkt/auth-service/domain"
+	//"github.com/dislinkt/auth_service/domain"
 	"net/http"
 
-	"github.com/dislinkt/auth-service/application"
+	"github.com/dislinkt/auth_service/application"
 	pb "github.com/dislinkt/common/proto/auth_service"
 )
 

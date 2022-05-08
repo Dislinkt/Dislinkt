@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/dislinkt/auth-service/domain"
+	"github.com/dislinkt/auth_service/domain"
+	//	"github.com/nats-io/jwt/v2"
 	"time"
 )
 

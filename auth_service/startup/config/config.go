@@ -3,24 +3,36 @@ package config
 import "os"
 
 type Config struct {
-	Port       string
-	UserDBHost string
-	UserDBPort string
-	UserDBName string
-	UserDBUser string
-	UserDBPass string
-	Secret     string
+	Port                       string
+	AuthDBHost                 string
+	AuthDBPort                 string
+	AuthDBName                 string
+	AuthDBUser                 string
+	AuthDBPass                 string
+	Secret                     string
+	NatsHost                   string
+	NatsPort                   string
+	NatsUser                   string
+	NatsPass                   string
+	RegisterUserCommandSubject string
+	RegisterUserReplySubject   string
 }
 
 func NewConfig() *Config {
 	return &Config{
-		Port:       os.Getenv("AUTH_SERVICE_PORT"),
-		UserDBHost: os.Getenv("AUTH_DB_HOST"),
-		UserDBPort: os.Getenv("AUTH_DB_PORT"),
-		UserDBName: os.Getenv("AUTH_DB_NAME"),
-		UserDBUser: os.Getenv("AUTH_DB_USER"),
-		UserDBPass: os.Getenv("AUTH_DB_PASS"),
-		Secret:     os.Getenv("SECRET"),
+		Port:                       os.Getenv("AUTH_SERVICE_PORT"),
+		AuthDBHost:                 os.Getenv("AUTH_DB_HOST"),
+		AuthDBPort:                 os.Getenv("AUTH_DB_PORT"),
+		AuthDBName:                 os.Getenv("AUTH_DB_NAME"),
+		AuthDBUser:                 os.Getenv("AUTH_DB_USER"),
+		AuthDBPass:                 os.Getenv("AUTH_DB_PASS"),
+		Secret:                     os.Getenv("SECRET"),
+		NatsHost:                   os.Getenv("NATS_HOST"),
+		NatsPort:                   os.Getenv("NATS_PORT"),
+		NatsUser:                   os.Getenv("NATS_USER"),
+		NatsPass:                   os.Getenv("NATS_PASS"),
+		RegisterUserCommandSubject: os.Getenv("REGISTER_USER_COMMAND_SUBJECT"),
+		RegisterUserReplySubject:   os.Getenv("REGISTER_USER_REPLY_SUBJECT"),
 	}
 	// return &Config{
 	// 	Port:       "8090",

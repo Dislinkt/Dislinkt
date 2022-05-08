@@ -1,8 +1,12 @@
 package domain
 
+import (
+	uuid "github.com/satori/go.uuid"
+)
+
 type User struct {
-	Id       string `gorm:"index:idx_name,unique"`
-	Username string `gorm:"unique"`
+	Id       uuid.UUID `gorm:"index:idx_name,unique"`
+	Username string    `gorm:"unique"`
 	Password string
 }
 
