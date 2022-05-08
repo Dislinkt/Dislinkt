@@ -19,11 +19,11 @@ type JwtWrapper struct {
 	ExpirationHours int64
 }
 
-type jwtClaims struct {
-	jwt.StandardClaims
-	Id    int64
-	Email string
-}
+//type jwtClaims struct {
+//	jwt.StandardClaims
+//	Id    int64
+//	Email string
+//}
 
 func NewAuthService(userService *UserService) *AuthService {
 	return &AuthService{
@@ -52,7 +52,7 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 	return token, err
 }
 
-func equalPasswords(hashedPwd string, passwordRequest string) bool {
+func equalPasswords(password string, passwordRequest string) bool {
 
 	//byteHash := []byte(hashedPwd)
 	//plainPwd := []byte(passwordRequest)
@@ -60,6 +60,10 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 	//if err != nil {
 	//	return false
 	//}
+
+	if passwordRequest != password {
+		return false
+	}
 
 	return true
 }
