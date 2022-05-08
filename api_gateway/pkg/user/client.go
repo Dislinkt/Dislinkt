@@ -2,7 +2,6 @@ package user
 
 import (
 	"fmt"
-
 	"github.com/dislinkt/api_gateway/startup/config"
 	pb "github.com/dislinkt/common/proto/user_service"
 	"google.golang.org/grpc"

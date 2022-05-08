@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAll(ctx *gin.Context, c pb.UserServiceClient) {
+func GetOne(ctx *gin.Context, c pb.UserServiceClient) {
 
-	res, err := c.GetAll(context.Background(), &pb.SearchMessage{})
+	res, err := c.GetOne(context.Background(), &pb.GetOneMessage{})
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadGateway, err)

@@ -7,19 +7,35 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.Engine, c *config.Config, authSvc *auth.ServiceClient) /**ServiceClient*/ {
+func RegisterRoutes(r *gin.Engine, c *config.Config, authSvc *auth.ServiceClient) {
 	a := auth.InitAuthMiddleware(authSvc)
 	svc := &ServiceClient{
 		Client: InitServiceClient(c),
 	}
 
-	routes := r.Group("/api/user")
-	routes.Use(a.AuthRequired)
-	routes.GET("/user", svc.GetAll)
+	routes := r.Group("/user")
 
-	//return svc
+	routes.POST("", svc.RegisterUser)
+	//routes.PUT("/{id}", svc.UpdateUser)
+	routes.PATCH("/{id}", svc.PatchUser)
+	routes.Use(a.AuthRequired)
+	routes.GET("", svc.GetAll)
+	routes.GET("/{id}", svc.GetOne)
 }
 
 func (svc *ServiceClient) GetAll(ctx *gin.Context) {
 	routes.GetAll(ctx, svc.Client)
+}
+func (svc *ServiceClient) GetOne(ctx *gin.Context) {
+	routes.GetOne(ctx, svc.Client)
+}
+func (svc *ServiceClient) RegisterUser(ctx *gin.Context) {
+	routes.RegisterUser(ctx, svc.Client)
+}
+
+//func (svc *ServiceClient) UpdateUser(ctx *gin.Context) {
+//	routes.UpdateUser(ctx, svc.Client)
+//}
+func (svc *ServiceClient) PatchUser(ctx *gin.Context) {
+	routes.PatchUser(ctx, svc.Client)
 }
