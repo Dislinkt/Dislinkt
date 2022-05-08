@@ -95,6 +95,31 @@ services:
     networks:
       - network
 
+  auth_service:
+    image: auth_service
+    container_name: auth_service
+    build:
+      context: .
+      dockerfile: ./auth_service/Dockerfile
+    restart: on-failure
+    environment:
+      AUTH_DB_HOST: ${AUTH_DB_HOST}
+      AUTH_DB_PORT: ${AUTH_DB_PORT}
+      AUTH_DB_USER: ${AUTH_DB_USER}
+      AUTH_DB_PASS: ${AUTH_DB_PASS}
+      AUTH_DB_NAME: ${AUTH_DB_NAME}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: ${NATS_PORT}
+      NATS_USER: ${NATS_USER}
+      NATS_PASS: ${NATS_PASS}
+      REGISTER_USER_COMMAND_SUBJECT: ${REGISTER_USER_COMMAND_SUBJECT}
+      REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
+    depends_on:
+      - auth_db
+    networks:
+      - network
+
   api_gateway:
     image: api_gateway
     container_name: api_gateway
@@ -108,6 +133,8 @@ services:
       GATEWAY_PORT: ${GATEWAY_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      AUTH_SERVICE_HOST: ${AUTH_SERVICE_HOST}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       POST_SERVICE_HOST: ${POST_SERVICE_HOST}
       POST_SERVICE_PORT: ${POST_SERVICE_PORT}
       ADDITIONAL_USER_SERVICE_HOST: ${ADDITIONAL_USER_SERVICE_HOST}
@@ -128,6 +155,17 @@ services:
       POSTGRES_USER: ${USER_DB_USER}
       POSTGRES_PASSWORD: ${USER_DB_PASS}
       POSTGRES_DB: ${USER_DB_NAME}
+    networks:
+      - network
+
+  auth_db:
+    image: postgres
+    container_name: auth_db
+    restart: on-failure
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASS}
+      POSTGRES_DB: ${AUTH_DB_NAME}
     networks:
       - network
 

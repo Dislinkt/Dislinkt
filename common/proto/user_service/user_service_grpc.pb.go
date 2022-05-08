@@ -23,11 +23,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	GetAll(ctx context.Context, in *SearchMessage, opts ...grpc.CallOption) (*GetAllResponse, error)
-	//  rpc Search(SearchMessage) returns(GetAllResponse) {
-	//    option (google.api.http) = {
-	//      get: "/user"
-	//    };
-	//  }
 	GetOne(ctx context.Context, in *GetOneMessage, opts ...grpc.CallOption) (*UserResponse, error)
 	RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*RegisterUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -92,11 +87,6 @@ func (c *userServiceClient) PatchUser(ctx context.Context, in *PatchUserRequest,
 // for forward compatibility
 type UserServiceServer interface {
 	GetAll(context.Context, *SearchMessage) (*GetAllResponse, error)
-	//  rpc Search(SearchMessage) returns(GetAllResponse) {
-	//    option (google.api.http) = {
-	//      get: "/user"
-	//    };
-	//  }
 	GetOne(context.Context, *GetOneMessage) (*UserResponse, error)
 	RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)

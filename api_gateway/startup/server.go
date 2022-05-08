@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dislinkt/api_gateway/infrastructure/api"
+	authGw "github.com/dislinkt/common/proto/auth_service"
 	"io"
 	"log"
 	"net/http"
@@ -49,6 +50,11 @@ func (server *Server) initHandlers() {
 	err = postGw.RegisterPostServiceHandlerFromEndpoint(context.TODO(), server.mux, postEndpoint, opts)
 	connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
 	err = connectionGw.RegisterConnectionServiceHandlerFromEndpoint(context.TODO(), server.mux, connectionEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+	authEndpoint := fmt.Sprintf("%s:%s", server.config.AuthHost, server.config.AuthPort)
+	err = authGw.RegisterAuthServiceHandlerFromEndpoint(context.TODO(), server.mux, authEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}
