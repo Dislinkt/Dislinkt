@@ -72,12 +72,13 @@ func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.Regist
 	user := mapNewUser(request.User)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
-	err := handler.service.Insert(user)
+	// err := handler.service.Register( ctx, user)
+	err := handler.service.Register(user)
 	if err != nil {
 		return nil, err
 	}
 
+	user, _ = handler.service.FindByUsername(*user.Username)
 	return &pb.RegisterUserResponse{
 		User: mapUser(user),
 	}, nil
@@ -91,7 +92,7 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 	user := mapNewUser(request.User)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	parsedUUID, err := uuid.FromString(request.Id)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -114,7 +115,7 @@ func (handler *UserHandler) PatchUser(ctx context.Context, request *pb.PatchUser
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	parsedUUID, err := uuid.FromString(request.Id)
 	if err != nil {
 		fmt.Println(err.Error())

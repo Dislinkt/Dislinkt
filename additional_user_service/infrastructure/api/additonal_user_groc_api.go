@@ -29,7 +29,7 @@ func (handler *AdditionalUserHandler) NewEducation(ctx context.Context, request 
 	education := mapNewEducation(request.Education)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	createdEducation, err := handler.service.CreateEducation(request.Id, education)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -46,7 +46,7 @@ func (handler *AdditionalUserHandler) GetAllEducation(ctx context.Context, reque
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	educations, err := handler.service.FindUserEducations(request.Id)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -63,7 +63,7 @@ func (handler *AdditionalUserHandler) UpdateEducation(ctx context.Context, reque
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	educations, err := handler.service.UpdateUserEducation(request.UserId, request.EducationId,
 		mapNewEducation(request.Education))
 	if err != nil {
@@ -82,7 +82,7 @@ func (handler *AdditionalUserHandler) DeleteEducation(ctx context.Context, reque
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	educations, err := handler.service.DeleteUserEducation(request.UserId, request.AdditionId)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -104,7 +104,7 @@ func (handler *AdditionalUserHandler) NewPosition(ctx context.Context, request *
 	position := mapNewPosition(request.Position)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	createdPosition, err := handler.service.CreatePosition(request.Id, position)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -121,7 +121,7 @@ func (handler *AdditionalUserHandler) GetAllPosition(ctx context.Context, reques
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	positions, err := handler.service.FindUserPositions(request.Id)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -138,7 +138,7 @@ func (handler *AdditionalUserHandler) UpdatePosition(ctx context.Context, reques
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	positions, err := handler.service.UpdateUserPosition(request.UserId, request.PositionId,
 		mapNewPosition(request.Position))
 	if err != nil {
@@ -157,7 +157,7 @@ func (handler *AdditionalUserHandler) DeletePosition(ctx context.Context, reques
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	positions, err := handler.service.DeleteUserPosition(request.UserId, request.AdditionId)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -179,7 +179,7 @@ func (handler *AdditionalUserHandler) NewSkill(ctx context.Context, request *pb.
 	skill := mapNewSkill(request.Skill)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	createdSkill, err := handler.service.CreateSkill(request.Id, skill)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -196,7 +196,7 @@ func (handler *AdditionalUserHandler) GetAllSkill(ctx context.Context, request *
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	skills, err := handler.service.FindUserSkills(request.Id)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -213,7 +213,7 @@ func (handler *AdditionalUserHandler) UpdateSkill(ctx context.Context, request *
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	skills, err := handler.service.UpdateUserSkill(request.UserId, request.SkillId,
 		mapNewSkill(request.Skill))
 	if err != nil {
@@ -232,7 +232,7 @@ func (handler *AdditionalUserHandler) DeleteSkill(ctx context.Context, request *
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	skills, err := handler.service.DeleteUserSkill(request.UserId, request.AdditionId)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -254,7 +254,7 @@ func (handler *AdditionalUserHandler) NewInterest(ctx context.Context, request *
 	interest := mapNewInterest(request.Interest)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	createdInterest, err := handler.service.CreateInterest(request.Id, interest)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -271,7 +271,7 @@ func (handler *AdditionalUserHandler) GetAllInterest(ctx context.Context, reques
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	interests, err := handler.service.FindUserInterests(request.Id)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -288,7 +288,7 @@ func (handler *AdditionalUserHandler) UpdateInterest(ctx context.Context, reques
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	interests, err := handler.service.UpdateUserInterest(request.UserId, request.InterestId,
 		mapNewInterest(request.Interest))
 	if err != nil {
@@ -307,7 +307,7 @@ func (handler *AdditionalUserHandler) DeleteInterest(ctx context.Context, reques
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Insert( ctx, user)
+	// err := handler.service.Register( ctx, user)
 	interests, err := handler.service.DeleteUserInterest(request.UserId, request.AdditionId)
 	if err != nil {
 		fmt.Println(err.Error())

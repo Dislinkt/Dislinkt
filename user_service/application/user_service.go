@@ -10,17 +10,32 @@ import (
 )
 
 type UserService struct {
-	store domain.UserStore
+	store        domain.UserStore
+	orchestrator *RegisterUserOrchestrator
 }
 
-func NewUserService(store domain.UserStore) *UserService {
+func NewUserService(store domain.UserStore, orchestrator *RegisterUserOrchestrator) *UserService {
 	return &UserService{
-		store: store,
+		store:        store,
+		orchestrator: orchestrator,
 	}
 }
 
-func (service *UserService) Insert(user *domain.User) error {
-	// span := tracer.StartSpanFromContext(ctx, "Insert-Service")
+func (service *UserService) Register(user *domain.User) error {
+	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
+	// defer span.Finish()
+	//
+	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	err := service.orchestrator.Start(user)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
+	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
@@ -28,15 +43,14 @@ func (service *UserService) Insert(user *domain.User) error {
 	newUUID := uuid.NewV4()
 	user.Id = newUUID
 	err := service.store.Insert(user)
-	return err
+	return newUUID, err
 }
-
 func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
 	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	_, err := service.store.Find(uuid)
+	_, err := service.store.FindByID(uuid)
 	if err != nil {
 		return err
 	}
@@ -52,7 +66,7 @@ func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	foundUser, err := service.store.Find(uuid)
+	foundUser, err := service.store.FindByID(uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -107,5 +121,13 @@ func (service *UserService) Search(searchText string) (*[]domain.User, error) {
 }
 
 func (service *UserService) GetOne(uuid uuid.UUID) (*domain.User, error) {
-	return service.store.Find(uuid)
+	return service.store.FindByID(uuid)
+}
+
+func (service *UserService) FindByUsername(username string) (*domain.User, error) {
+	return service.store.FindByUsername(username)
+}
+
+func (service *UserService) Delete(user *domain.User) interface{} {
+	return service.store.Delete(user)
 }
