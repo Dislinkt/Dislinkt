@@ -85,10 +85,10 @@ func loadUserPosts(postsPb []*postGw.Post) []domain.Post {
 func loadPostReactions(reactionsPb []*postGw.Reaction) []domain.Reaction {
 	var reactions []domain.Reaction
 
-	for _, commentPb := range reactionsPb {
+	for _, reactionPb := range reactionsPb {
 		var reaction domain.Reaction
-		reaction.Username = commentPb.Username
-		reaction.Reaction = int(commentPb.Reaction)
+		reaction.Username = reactionPb.Username
+		reaction.Reaction = int(reactionPb.Reaction)
 
 		reactions = append(reactions, reaction)
 	}

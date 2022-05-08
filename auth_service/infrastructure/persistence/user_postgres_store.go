@@ -54,8 +54,10 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 
 func (store *UserPostgresStore) GetByUsername(username string) (user *domain.User, err error) {
 	foundUser := domain.User{}
-	if result := store.db.Model(domain.User{Username: username}).First(&foundUser); result.Error != nil {
+	if result := store.db.Where("username=?", username).First(&foundUser); result.Error != nil {
 		return nil, result.Error
 	}
+	fmt.Println(foundUser)
+	fmt.Println(&foundUser)
 	return &foundUser, nil
 }
