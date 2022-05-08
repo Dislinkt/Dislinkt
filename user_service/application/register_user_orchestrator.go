@@ -27,7 +27,7 @@ func (o *RegisterUserOrchestrator) Start(user *domain.User) error {
 	event := &events.RegisterUserCommand{
 		Type: events.UpdateUser,
 		User: events.User{
-			Id:          "",
+			Id:          user.Id.String(),
 			Name:        user.Name,
 			Surname:     user.Surname,
 			Username:    *user.Username,

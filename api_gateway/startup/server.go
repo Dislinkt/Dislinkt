@@ -3,6 +3,7 @@ package startup
 import (
 	"context"
 	"fmt"
+	"github.com/dislinkt/api_gateway/infrastructure/api"
 	"io"
 	"log"
 	"net/http"
@@ -31,6 +32,7 @@ func NewServer(config *cfg.Config) *Server {
 		mux:    runtime.NewServeMux(),
 	}
 	server.initHandlers()
+	server.initCustomHandlers()
 	return server
 }
 
@@ -50,6 +52,13 @@ func (server *Server) initHandlers() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (server *Server) initCustomHandlers() {
+	postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
+	connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
+	userFeedHandler := api.NewUserFeedHandler(postEndpoint, connectionEndpoint)
+	userFeedHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {
