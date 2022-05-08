@@ -1,12 +1,20 @@
 package persistence
 
 import (
+	"fmt"
 	"github.com/dislinkt/auth_service/domain"
 	"gorm.io/gorm"
 )
 
 type UserPostgresStore struct {
 	db *gorm.DB
+}
+
+func (store *UserPostgresStore) Delete(user *domain.User) error {
+	if result := store.db.Delete(user); result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func NewUserPostgresStore(db *gorm.DB) (domain.UserStore, error) {
@@ -20,6 +28,7 @@ func NewUserPostgresStore(db *gorm.DB) (domain.UserStore, error) {
 }
 
 func (store *UserPostgresStore) Insert(user *domain.User) error {
+	fmt.Println("TU SAM")
 	result := store.db.Create(user)
 	if result.Error != nil {
 		return result.Error
@@ -44,7 +53,7 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 }
 
 func (store *UserPostgresStore) GetByUsername(username string) (user *domain.User, err error) {
-	var foundUser domain.User
+	foundUser := domain.User{}
 	if result := store.db.Model(domain.User{Username: username}).First(&foundUser); result.Error != nil {
 		return nil, result.Error
 	}

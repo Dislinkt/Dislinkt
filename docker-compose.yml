@@ -103,14 +103,20 @@ services:
       dockerfile: ./auth_service/Dockerfile
     restart: on-failure
     environment:
-      USER_DB_HOST: ${AUTH_DB_HOST}
-      USER_DB_PORT: ${AUTH_DB_PORT}
-      USER_DB_USER: ${AUTH_DB_USER}
-      USER_DB_PASS: ${AUTH_DB_PASS}
-      USER_DB_NAME: ${AUTH_DB_NAME}
-      USER_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      AUTH_DB_HOST: ${AUTH_DB_HOST}
+      AUTH_DB_PORT: ${AUTH_DB_PORT}
+      AUTH_DB_USER: ${AUTH_DB_USER}
+      AUTH_DB_PASS: ${AUTH_DB_PASS}
+      AUTH_DB_NAME: ${AUTH_DB_NAME}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: ${NATS_PORT}
+      NATS_USER: ${NATS_USER}
+      NATS_PASS: ${NATS_PASS}
+      REGISTER_USER_COMMAND_SUBJECT: ${REGISTER_USER_COMMAND_SUBJECT}
+      REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
     depends_on:
-      - user_db
+      - auth_db
     networks:
       - network
 
@@ -154,7 +160,7 @@ services:
 
   auth_db:
     image: postgres
-    container_name: user_db
+    container_name: auth_db
     restart: on-failure
     environment:
       POSTGRES_USER: ${AUTH_DB_USER}

@@ -39,8 +39,8 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 			reply.Type = events.AdditionalServiceNotUpdated
 			return
 		}
-		// reply.Type = events.AdditionalServiceUpdated
-		reply.Type = events.RegistrationApproved
+		reply.Type = events.AdditionalServiceUpdated
+		//reply.Type = events.RegistrationApproved
 	case events.RollbackAdditional:
 		fmt.Println("additional handler-rollback")
 		err := handler.additionalService.DeleteDocument(command.User.Id)

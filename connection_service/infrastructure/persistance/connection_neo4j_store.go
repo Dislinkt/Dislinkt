@@ -222,7 +222,7 @@ func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.Use
 
 		}
 	}(session)
-
+	
 	fmt.Println(session)
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 		fmt.Println("linija5")
@@ -240,7 +240,7 @@ func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.Use
 			"uid":    userNode.UserUID,
 			"status": userNode.Status,
 		})
-
+		fmt.Println("TU SAM")
 		if err != nil {
 			return nil, err
 		}

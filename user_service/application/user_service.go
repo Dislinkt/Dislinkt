@@ -39,7 +39,6 @@ func (service *UserService) Insert(user *domain.User) error {
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-
 	err := service.store.Insert(user)
 	return err
 }

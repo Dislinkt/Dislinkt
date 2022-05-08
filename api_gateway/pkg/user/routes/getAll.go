@@ -17,5 +17,5 @@ func GetAll(ctx *gin.Context, c pb.UserServiceClient) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, &res)
+	ctx.JSON(http.StatusOK, &res)
 }

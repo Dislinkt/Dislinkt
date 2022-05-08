@@ -9,8 +9,9 @@ import (
 )
 
 func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
+	id, _ := uuid.FromString(command.User.Id)
 	userD := &domain.User{
-		Id:          uuid.UUID{},
+		Id:          id,
 		Name:        command.User.Name,
 		Surname:     command.User.Surname,
 		Username:    &command.User.Username,

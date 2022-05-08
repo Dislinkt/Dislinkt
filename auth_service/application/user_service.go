@@ -2,6 +2,7 @@ package application
 
 import (
 	"errors"
+	"fmt"
 	"github.com/dislinkt/auth_service/domain"
 	uuid "github.com/satori/go.uuid"
 )
@@ -17,6 +18,7 @@ func NewUserService(store domain.UserStore) *UserService {
 }
 
 func (service *UserService) GetByUsername(username string) (*domain.User, error) {
+	fmt.Println(username)
 	user, err := service.store.GetByUsername(username)
 
 	if err != nil {
@@ -38,6 +40,6 @@ func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 	return newUUID, err
 }
 
-func (service *UserService) Delete(user *domain.User) interface{} {
+func (service *UserService) Delete(user *domain.User) error {
 	return service.store.Delete(user)
 }

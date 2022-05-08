@@ -9,25 +9,25 @@ import (
 )
 
 type NewUserRequestBody struct {
-	name          string `json:"name"`
-	surname       string `json:"surname"`
-	username      string `json:"username"`
-	email         string `json:"email"`
-	number        string `json:"number"`
-	gender        int    `json:"gender"`
-	date_of_birth string `json:"date_of_birth"`
-	password      string `json:"password"`
-	biography     string `json:"biography"`
-	private       bool   `json:"private"`
+	Name        string `json:"name"`
+	Surname     string `json:"surname"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	Number      string `json:"number"`
+	Gender      int    `json:"gender"`
+	DateOfBirth string `json:"date_of_birth"`
+	Password    string `json:"password"`
+	Biography   string `json:"biography"`
+	Private     bool   `json:"private"`
 }
 
 type PatchUserRequestBody struct {
-	id          string             `json:"id"`
-	user        NewUserRequestBody `json:"user"`
-	update_mask []string           `json:"update_mask"`
+	User       NewUserRequestBody `json:"user"`
+	UpdateMask []string           `json:"update_mask"`
 }
 
 func PatchUser(ctx *gin.Context, c pb.UserServiceClient) {
+	id := ctx.Param("id")
 	b := PatchUserRequestBody{}
 
 	if err := ctx.BindJSON(&b); err != nil {
@@ -36,11 +36,11 @@ func PatchUser(ctx *gin.Context, c pb.UserServiceClient) {
 	}
 
 	res, err := c.PatchUser(context.Background(), &pb.PatchUserRequest{
-		Id: b.id,
-		User: &pb.NewUser{Name: b.user.name, Surname: b.user.surname, Username: b.user.username, Email: b.user.email,
-			Number: b.user.number, Gender: pb.Gender(b.user.gender), DateOfBirth: b.user.date_of_birth, Password: b.user.password,
-			Biography: b.user.biography, Private: b.user.private},
-		UpdateMask: &fieldmaskpb.FieldMask{Paths: b.update_mask},
+		Id: id,
+		User: &pb.NewUser{Name: b.User.Name, Surname: b.User.Surname, Username: b.User.Username, Email: b.User.Email,
+			Number: b.User.Number, Gender: pb.Gender(b.User.Gender), DateOfBirth: b.User.DateOfBirth, Password: b.User.Password,
+			Biography: b.User.Biography, Private: b.User.Private},
+		UpdateMask: &fieldmaskpb.FieldMask{Paths: b.UpdateMask},
 	})
 
 	if err != nil {
@@ -48,5 +48,5 @@ func PatchUser(ctx *gin.Context, c pb.UserServiceClient) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, &res)
+	ctx.JSON(http.StatusOK, &res)
 }

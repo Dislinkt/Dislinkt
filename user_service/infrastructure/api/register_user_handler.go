@@ -34,6 +34,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 	switch command.Type {
 	case events.UpdateUser:
 		fmt.Println("userhandler-update")
+		fmt.Println(command.User)
 		err := handler.userService.Insert(mapCommandUser(command))
 		if err != nil {
 			reply.Type = events.UserServiceNotUpdated
