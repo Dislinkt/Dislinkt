@@ -2,12 +2,13 @@ package api
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 	"github.com/dislinkt/api_gateway/domain"
 	"github.com/dislinkt/api_gateway/infrastructure/services"
+	"github.com/dislinkt/api_gateway/startup/config"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
@@ -16,32 +17,36 @@ type UserFeedHandler struct {
 	connectionClientAddress string
 }
 
-func NewUserFeedHandler(postClientAddress, connectionClientAddress string) Handler {
+func NewUserFeedHandler(c *config.Config) *UserFeedHandler {
 	return &UserFeedHandler{
-		postClientAddress:       postClientAddress,
-		connectionClientAddress: connectionClientAddress,
+		postClientAddress:       fmt.Sprintf("%s:%s", c.PostHost, c.PostPort),
+		connectionClientAddress: fmt.Sprintf("%s:%s", c.ConnectionHost, c.ConnectionPort),
 	}
 }
 
-func (handler *UserFeedHandler) Init(mux *runtime.ServeMux) {
-	err := mux.HandlePath("GET", "/user/{userId}/feed", handler.GetUserFeed)
-	if err != nil {
-		panic(err)
-	}
-}
+//func (handler *UserFeedHandler) Init(mux *runtime.ServeMux) {
+//	err := mux.HandlePath("GET", "/user/{userId}/feed", handler.GetUserFeed)
+//	if err != nil {
+//		panic(err)
+//	}
+//}
 
-func (handler *UserFeedHandler) GetUserFeed(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
-	id := pathParams["userId"]
-	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+func (handler *UserFeedHandler) GetUserFeed(ctx *gin.Context) {
+	//id := pathParams["userId"]
+	id := ctx.Param("id")
+	//if id == "" {
+	//	//w.WriteHeader(http.StatusBadRequest)
+	//	//return
+	//	ctx.AbortWithError(http.StatusBadGateway, _)
+	//	return
+	//}
 
 	postClient := services.NewPostClient(handler.postClientAddress)
 	connectionClient := services.NewConnectionClient(handler.connectionClientAddress)
 	connections, err := connectionClient.GetAllConnectionForUser(context.TODO(), &connectionGw.GetConnectionRequest{Uuid: id})
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		//w.WriteHeader(http.StatusNotFound)
+		ctx.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
@@ -49,19 +54,24 @@ func (handler *UserFeedHandler) GetUserFeed(w http.ResponseWriter, r *http.Reque
 	for _, user := range connections.Users {
 		postsResponse, err := postClient.GetAllByUserId(context.TODO(), &postGw.GetRequest{Id: user.UserID})
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			//w.WriteHeader(http.StatusBadRequest)
+			//return
+			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 		feed = append(feed, loadUserPosts(postsResponse.Posts)...)
 	}
 
-	response, err := json.Marshal(feed)
+	response := feed
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		//w.WriteHeader(http.StatusInternalServerError)
+		//return
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	//w.WriteHeader(http.StatusOK)
+	//w.Write(response)
+	ctx.JSON(http.StatusOK, &response)
 }
 
 func loadUserPosts(postsPb []*postGw.Post) []domain.Post {

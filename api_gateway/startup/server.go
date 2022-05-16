@@ -3,7 +3,7 @@ package startup
 import (
 	"context"
 	"fmt"
-	"github.com/dislinkt/api_gateway/infrastructure/api"
+	//"github.com/dislinkt/api_gateway/infrastructure/api"
 	authGw "github.com/dislinkt/common/proto/auth_service"
 	"io"
 	"log"
@@ -61,10 +61,10 @@ func (server *Server) initHandlers() {
 }
 
 func (server *Server) initCustomHandlers() {
-	postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
-	connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
-	userFeedHandler := api.NewUserFeedHandler(postEndpoint, connectionEndpoint)
-	userFeedHandler.Init(server.mux)
+	//postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
+	//connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
+	//userFeedHandler := api.NewUserFeedHandler(postEndpoint, connectionEndpoint)
+	//userFeedHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {
