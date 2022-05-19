@@ -3,6 +3,9 @@ package startup
 import (
 	"context"
 	"fmt"
+	"github.com/dislinkt/api_gateway/infrastructure/api"
+	"github.com/gorilla/handlers"
+
 	//"github.com/dislinkt/api_gateway/infrastructure/api"
 	cfg "github.com/dislinkt/api_gateway/startup/config"
 	additionaluserGw "github.com/dislinkt/common/proto/additional_user_service"
@@ -29,8 +32,8 @@ type Server struct {
 func NewServer(config *cfg.Config) *Server {
 	server := &Server{
 		config: config,
-		mux:    runtime.NewServeMux(
-		//runtime.WithIncomingHeaderMatcher(customMatcher),
+		mux: runtime.NewServeMux(
+			runtime.WithIncomingHeaderMatcher(customMatcher),
 		),
 	}
 	server.initHandlers()
@@ -38,15 +41,14 @@ func NewServer(config *cfg.Config) *Server {
 	return server
 }
 
-//
-//func customMatcher(key string) (string, bool) {
-//	switch key {
-//	case "Authorization":
-//		return key, true
-//	default:
-//		return key, false
-//	}
-//}
+func customMatcher(key string) (string, bool) {
+	switch key {
+	case "Authorization":
+		return key, true
+	default:
+		return key, false
+	}
+}
 
 func (server *Server) initHandlers() {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
@@ -74,24 +76,24 @@ func (server *Server) initHandlers() {
 func (server *Server) initCustomHandlers() {
 	//postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
 	//connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
-	//userFeedHandler := api.NewUserFeedHandler(server.config)
-	//userFeedHandler.Init(server.mux)
+	userFeedHandler := api.NewUserFeedHandler(server.config)
+	userFeedHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {
-	//cors := handlers.CORS(
-	//	handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**", "http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**"}),
-	//	handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
-	//	handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
-	//	handlers.AllowCredentials(),
-	//)
-	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
+	cors := handlers.CORS(
+		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**", "http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
+		handlers.AllowCredentials(),
+	)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
+	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
 }
 
-//func muxMiddleware(server *Server) http.Handler {
-//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//		log.Println(server.config.AuthHost + ":" + server.config.AuthPort)
-//		server.mux.ServeHTTP(w, r)
-//	})
-//}
+func muxMiddleware(server *Server) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(server.config.AuthHost + ":" + server.config.AuthPort)
+		server.mux.ServeHTTP(w, r)
+	})
+}

@@ -5,6 +5,7 @@ go 1.18
 replace github.com/dislinkt/common => ../common
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	github.com/nats-io/nats-server/v2 v2.7.4
 	github.com/satori/go.uuid v1.2.0

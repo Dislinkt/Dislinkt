@@ -3,19 +3,20 @@ package services
 import (
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
+	userGw "github.com/dislinkt/common/proto/user_service"
 	"log"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-//func NewUserClient(address string) userGw.UserServiceClient {
-//	conn, err := getConnection(address)
-//	if err != nil {
-//		log.Fatalf("Failed to start gRPC connection to User service: %v", err)
-//	}
-//	return userGw.NewUserServiceClient(conn)
-//}
+func NewUserClient(address string) userGw.UserServiceClient {
+	conn, err := getConnection(address)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC connection to User service: %v", err)
+	}
+	return userGw.NewUserServiceClient(conn)
+}
 
 func NewPostClient(address string) postGw.PostServiceClient {
 	conn, err := getConnection(address)

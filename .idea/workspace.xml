@@ -5,40 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de4c83c8-1760-4cca-8cc9-6726fe2f70f9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/api_gateway/pkg/auth/accessible_roles.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api_gateway/startup/config/basic_policy.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api_gateway/startup/config/rbac_model.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/interceptor/interceptor.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user_service/application/email_service.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user_service/startup/config/accessible_roles.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api_gateway/infrastructure/api/feed_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/infrastructure/api/feed_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api_gateway/infrastructure/services/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/infrastructure/services/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api_gateway/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/additional/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/additional/routes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/auth/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/auth/middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/connection/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/connection/routes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/post/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/post/routes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/pkg/user/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/pkg/user/routes.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api_gateway/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/startup/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/application/auth_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/application/auth_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/domain/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/domain/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/infrastructure/api/auth_grpc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/infrastructure/api/auth_grpc_api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/infrastructure/api/saga_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/infrastructure/api/saga_mapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/common/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/common/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.gw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/saga/register_user/register_user_event.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/saga/register_user/register_user_event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/connection_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/interceptor/interceptor.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/interceptor/interceptor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/startup/config/accessible_roles.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/startup/config/accessible_roles.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user_service/startup/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/startup/config/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/startup/server.go" afterDir="false" />
     </list>

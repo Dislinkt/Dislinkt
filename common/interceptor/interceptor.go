@@ -27,6 +27,7 @@ func NewAuthInterceptor(accessibleRoles map[string][]string, publicKey *rsa.Publ
 
 func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		fmt.Println(info.FullMethod)
 		ctx, err := interceptor.Authorize(ctx, info.FullMethod)
 		if err != nil {
 			fmt.Println("EROOOOOOOOOOOOOOOOOOOOOOR")
@@ -42,38 +43,45 @@ func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string
 	accessibleRoles, ok := interceptor.accessibleRoles[method]
 	// u mapi ne postoje role za ovu metodu => javno dostupna putanja
 	if !ok {
+		fmt.Println("NEMA ROLE")
 		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
 	}
 
 	var values []string
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
+		fmt.Println("NEMA METADATA")
 		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
 	}
 
 	values = md.Get("Authorization")
 	if len(values) == 0 {
+		fmt.Println("NEMA AUTH")
 		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
 	}
 
 	authHeader := values[0]
 	parts := strings.Split(authHeader, " ")
 	if len(parts) != 2 {
+		fmt.Println("NIJE SPLIT")
 		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
 	}
 
 	claims, err := interceptor.verifyToken(parts[1])
 	if err != nil {
+		fmt.Println("NIJE VALIDAN")
 		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
 	}
 
+	fmt.Println(claims["role"].(string))
 	for _, role := range accessibleRoles {
-		if role == "ok" {
-			return context.WithValue(ctx, LoggedInUserKey{}, fmt.Sprint(claims["username"])), nil
+		if role == claims["role"].(string) {
+			fmt.Println(role)
+			return context.WithValue(ctx, LoggedInUserKey{}, claims["username"].(string)), nil
 		}
 	}
 
-	return ctx, status.Errorf(codes.PermissionDenied, "Unauthorized")
+	return ctx, status.Errorf(codes.PermissionDenied, "Forbidden")
 }
 
 func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims jwt.MapClaims, err error) {
