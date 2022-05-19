@@ -9,6 +9,14 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+//func NewUserClient(address string) userGw.UserServiceClient {
+//	conn, err := getConnection(address)
+//	if err != nil {
+//		log.Fatalf("Failed to start gRPC connection to User service: %v", err)
+//	}
+//	return userGw.NewUserServiceClient(conn)
+//}
+
 func NewPostClient(address string) postGw.PostServiceClient {
 	conn, err := getConnection(address)
 	if err != nil {

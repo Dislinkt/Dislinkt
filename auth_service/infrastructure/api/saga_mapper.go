@@ -11,6 +11,7 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 		Id:       uuid.UUID{},
 		Username: command.User.Username,
 		Password: command.User.Password,
+		UserRole: int(command.User.UserRole),
 	}
 	return userD
 }

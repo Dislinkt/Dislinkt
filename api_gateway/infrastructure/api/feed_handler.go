@@ -24,6 +24,7 @@ func NewUserFeedHandler(c *config.Config) *UserFeedHandler {
 	}
 }
 
+//
 //func (handler *UserFeedHandler) Init(mux *runtime.ServeMux) {
 //	err := mux.HandlePath("GET", "/user/{userId}/feed", handler.GetUserFeed)
 //	if err != nil {
@@ -31,6 +32,7 @@ func NewUserFeedHandler(c *config.Config) *UserFeedHandler {
 //	}
 //}
 
+//func (handler *UserFeedHandler) GetUserFeed(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 func (handler *UserFeedHandler) GetUserFeed(ctx *gin.Context) {
 	//id := pathParams["userId"]
 	id := ctx.Param("id")

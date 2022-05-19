@@ -7,7 +7,6 @@ import (
 	"github.com/dislinkt/api_gateway/pkg/feed"
 	"github.com/dislinkt/api_gateway/pkg/post"
 	"github.com/dislinkt/api_gateway/pkg/user"
-	//	"github.com/dislinkt/api_gateway/startup"
 	"github.com/gin-gonic/gin"
 
 	cfg "github.com/dislinkt/api_gateway/startup/config"

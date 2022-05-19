@@ -18,8 +18,11 @@ func RegisterRoutes(r *gin.Engine, c *config.Config, authSvc *auth.ServiceClient
 	routes.GET("", svc.GetAll)
 	routes.GET("/:id", svc.GetOne)
 	routes.Use(a.AuthRequired)
-	routes.PUT("/:id", svc.UpdateUser)
-	routes.PATCH("/:id", svc.PatchUser)
+	{
+		routes.PUT("/:id", a.Authorize, svc.UpdateUser)
+		routes.PATCH("/:id", a.Authorize, svc.PatchUser)
+	}
+
 }
 
 func (svc *ServiceClient) GetAll(ctx *gin.Context) {

@@ -90,7 +90,6 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 	UserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
-
 	user := mapNewUser(request.User)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)

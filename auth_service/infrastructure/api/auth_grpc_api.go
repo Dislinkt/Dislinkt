@@ -20,21 +20,6 @@ func NewAuthHandler(service *application.AuthService) *AuthHandler {
 	}
 }
 
-//func (handler *AuthHandler) GetAll(ctx context.Context, request *pb.GetAllRequest) (*pb.GetAllResponse, error) {
-//	users, err := handler.service.GetAll()
-//	if err != nil || *users == nil {
-//		return nil, err
-//	}
-//	response := &pb.GetAllResponse{
-//		Users: []*pb.User{},
-//	}
-//	for _, user := range *users {
-//		current := mapUser(&user)
-//		response.Users = append(response.Users, current)
-//	}
-//	return response, nil
-//}
-
 func (handler *AuthHandler) AuthenticateUser(ctx context.Context, request *pb.LoginRequest) (*pb.JwtTokenResponse, error) {
 	loginRequest := mapLoginRequest(request.UserData)
 	token, err := handler.service.AuthenticateUser(loginRequest)
@@ -49,12 +34,13 @@ func (handler *AuthHandler) AuthenticateUser(ctx context.Context, request *pb.Lo
 func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateRequest) (*pb.ValidateResponse, error) {
 	token := mapValidationRequest(req)
 	claims, err := handler.service.ValidateToken(token)
+	username, _ := claims["username"].(string)
+	role, _ := claims["role"].(string)
 
 	if err != nil {
 		return &pb.ValidateResponse{
 			Status: http.StatusUnauthorized,
 			Error:  err.Error(),
-			Token:  token,
 		}, nil
 	}
 
@@ -69,12 +55,14 @@ func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateR
 
 	if claims != nil {
 		return &pb.ValidateResponse{
-			Status: http.StatusOK,
-			Token:  token,
+			Status:   http.StatusOK,
+			Username: username,
+			Role:     role,
 		}, nil
 	}
 	return &pb.ValidateResponse{
-		Status: http.StatusOK,
-		Token:  token,
+		Status:   http.StatusOK,
+		Username: username,
+		Role:     role,
 	}, nil
 }

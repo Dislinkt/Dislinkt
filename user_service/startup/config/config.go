@@ -21,6 +21,10 @@ type Config struct {
 	RegisterUserCommandSubject string
 	RegisterUserReplySubject   string
 	JaegerServiceName          string
+	EmailSender                string
+	EmailPassword              string
+	EmailHost                  string
+	EmailPort                  string
 }
 
 func NewConfig() *Config {
@@ -45,5 +49,9 @@ func NewConfig() *Config {
 		RegisterUserCommandSubject: os.Getenv("REGISTER_USER_COMMAND_SUBJECT"),
 		RegisterUserReplySubject:   os.Getenv("REGISTER_USER_REPLY_SUBJECT"),
 		JaegerServiceName:          os.Getenv("JAEGER_SERVICE_NAME"),
+		EmailSender:                os.Getenv("EMAIL_SENDER"),
+		EmailHost:                  os.Getenv("EMAIL_HOST"),
+		EmailPassword:              os.Getenv("EMAIL_PASSWORD"),
+		EmailPort:                  os.Getenv("EMAIL_PORT"),
 	}
 }

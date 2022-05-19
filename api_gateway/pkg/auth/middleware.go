@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -17,7 +18,7 @@ func InitAuthMiddleware(svc *ServiceClient) AuthMiddlewareConfig {
 	return AuthMiddlewareConfig{svc}
 }
 
-func (c *AuthMiddlewareConfig) AuthRequired(ctx *gin.Context) {
+func (config *AuthMiddlewareConfig) AuthRequired(ctx *gin.Context) {
 	authorization := ctx.Request.Header.Get("authorization")
 
 	if authorization == "" {
@@ -32,7 +33,7 @@ func (c *AuthMiddlewareConfig) AuthRequired(ctx *gin.Context) {
 		return
 	}
 
-	res, err := c.svc.Client.ValidateToken(context.Background(), &pb.ValidateRequest{
+	res, err := config.svc.Client.ValidateToken(context.Background(), &pb.ValidateRequest{
 		Jwt: &pb.JwtToken{Jwt: token[1]},
 	})
 
@@ -41,7 +42,32 @@ func (c *AuthMiddlewareConfig) AuthRequired(ctx *gin.Context) {
 		return
 	}
 
-	//ctx.Set("userId", res.UserId)
-
+	ctx.Set("role", res.Role)
 	ctx.Next()
+}
+
+func (config *AuthMiddlewareConfig) Authorize(ctx *gin.Context) {
+	val, existed := ctx.Get("role")
+	fmt.Println(val.(string))
+	accessible := AccessibleRoles()
+	accessibleRoles, ok := accessible[ctx.FullPath()]
+	// u mapi ne postoje role za ovu metodu => javno dostupna putanja
+	if !ok {
+		ctx.Next()
+	}
+
+	if !existed {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	for _, role := range accessibleRoles {
+		if role == "ok" {
+			ctx.Next()
+		}
+	}
+
+	ctx.AbortWithStatus(http.StatusForbidden)
+	return
+
 }

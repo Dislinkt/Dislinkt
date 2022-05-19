@@ -1,5 +1,13 @@
 package register_user
 
+type Role int
+
+const (
+	Regular Role = iota
+	Admin
+	Agent
+)
+
 type Gender int
 
 const (
@@ -18,6 +26,7 @@ type User struct {
 	Gender      Gender
 	DateOfBirth string
 	Password    string
+	UserRole    Role
 	Biography   string
 	Private     bool
 }
