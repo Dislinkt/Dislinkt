@@ -5,6 +5,7 @@ go 1.18
 replace github.com/dislinkt/common => ../common
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.46.0
@@ -18,7 +19,8 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/klauspost/compress v1.15.3 // indirect
-	github.com/nats-io/nats-server/v2 v2.7.4 // indirect
+	github.com/minio/highwayhash v1.0.2 // indirect
+	github.com/nats-io/jwt/v2 v2.2.1-0.20220113022732-58e87895b296 // indirect
 	github.com/nats-io/nats.go v1.15.0 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect

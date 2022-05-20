@@ -2,6 +2,8 @@ package startup
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dislinkt/common/interceptor"
 	postProto "github.com/dislinkt/common/proto/post_service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
@@ -57,7 +59,13 @@ func (server *Server) startGrpcServer(postHandler *api.PostHandler) {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	grpcServer := grpc.NewServer()
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
+	if err != nil {
+		log.Fatalf("failed to parse public key: %v", err)
+	}
+
+	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), publicKey)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	postProto.RegisterPostServiceServer(grpcServer, postHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)

@@ -2,6 +2,8 @@ package startup
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dislinkt/common/interceptor"
 	"log"
 	"net"
 
@@ -101,7 +103,13 @@ func (server *Server) startGrpcServer(connectionHandler *api.ConnectionHandler) 
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	grpcServer := grpc.NewServer()
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
+	if err != nil {
+		log.Fatalf("failed to parse public key: %v", err)
+	}
+
+	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), publicKey)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	connection.RegisterConnectionServiceServer(grpcServer, connectionHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
