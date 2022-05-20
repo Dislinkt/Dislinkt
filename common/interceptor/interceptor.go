@@ -43,8 +43,7 @@ func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string
 	accessibleRoles, ok := interceptor.accessibleRoles[method]
 	// u mapi ne postoje role za ovu metodu => javno dostupna putanja
 	if !ok {
-		fmt.Println("NEMA ROLE")
-		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
+		return ctx, nil
 	}
 
 	var values []string
