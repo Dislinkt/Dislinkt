@@ -17,15 +17,4 @@ func main() {
 	config := cfg.NewConfig()
 	server := startup.NewServer(config)
 	server.Start()
-
-	//r := gin.Default()
-	//
-	//authSvc := auth.RegisterRoutes(r, config)
-	//user.RegisterRoutes(r, config, authSvc)
-	//additional.RegisterRoutes(r, config, authSvc)
-	//connection.RegisterRoutes(r, config, authSvc)
-	//post.RegisterRoutes(r, config, authSvc)
-	//feed.RegisterRoutes(r, config, authSvc)
-	//
-	//r.Run(":8000")
 }

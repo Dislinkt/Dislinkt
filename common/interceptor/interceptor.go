@@ -131,10 +131,4 @@ func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims jwt.
 	return claims, nil
 }
 
-type UserClaims struct {
-	Username string `json:"username"`
-	Role     string `json:"role"`
-	jwt.StandardClaims
-}
-
 type LoggedInUserKey struct{}
