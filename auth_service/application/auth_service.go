@@ -42,13 +42,12 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 		return "", errors.New("invalid password")
 	}
 
-	expireTime := time.Now().Add(time.Hour).Unix() * 1000
+	expireTime := time.Now().Add(time.Hour).Unix()
 	token, err := generateToken(user, expireTime)
 	if err != nil {
 		return "", errors.New("invalid password")
 	}
 
-	//rolesString, _ := json.Marshal(user.Roles)
 	return token, err
 }
 

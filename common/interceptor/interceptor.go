@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -124,9 +125,9 @@ func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims jwt.
 		return nil, fmt.Errorf("Couldn't parse claims")
 	}
 
-	//if !claims.VerifyExpiresAt(time.Now().Local().Unix()) {
-	//	return nil, errors.New("JWT is expired")
-	//}
+	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
+		return nil, fmt.Errorf("JWT is expired")
+	}
 
 	return claims, nil
 }
