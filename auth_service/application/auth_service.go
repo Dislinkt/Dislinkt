@@ -48,6 +48,10 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 		return "", errors.New("invalid username")
 	}
 
+	if !user.Active {
+		return "", errors.New("user account not activated!")
+	}
+
 	if !equalPasswords(user.Password, loginRequest.Password) {
 		return "", errors.New("invalid password")
 	}
@@ -136,6 +140,10 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 	user, err := auth.userService.GetByEmail(request.Email)
 	if err != nil || user == nil {
 		return nil, errors.New("invalid username")
+	}
+
+	if !user.Active {
+		return nil, errors.New("user account not activated!")
 	}
 
 	if err != nil {
