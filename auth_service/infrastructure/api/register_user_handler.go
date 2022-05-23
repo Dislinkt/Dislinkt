@@ -31,7 +31,11 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 
 	switch command.Type {
 	case events.UpdateAuth:
-		uuid, err := handler.userService.Insert(mapCommandUser(command))
+		user := mapCommandUser(command)
+		if user == nil {
+			return
+		}
+		uuid, err := handler.userService.Insert(user)
 		reply.User.Id = uuid.String()
 		if err != nil {
 			reply.Type = events.AuthNotUpdated

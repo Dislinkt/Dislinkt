@@ -20,6 +20,20 @@ service AuthService{
       body: "jwt"
     };
   }
+
+  rpc PasswordlessLogin(PasswordlessLoginRequest) returns(PasswordlessLoginResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/passwordless-login",
+      body: "*"
+    };
+  }
+
+  rpc ConfirmEmailLogin(ConfirmEmailLoginRequest) returns(ConfirmEmailLoginResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/passwordless-confirm",
+      body: "*"
+    };
+  }
 }
 
 message LoginRequest {
@@ -46,4 +60,20 @@ message ValidateResponse {
   string error = 2;
   string username = 3;
   string role = 4;
+}
+
+message PasswordlessLoginRequest{
+  string email = 1;
+}
+
+message PasswordlessLoginResponse{
+  string success = 1;
+}
+
+message ConfirmEmailLoginRequest{
+  string token = 1;
+}
+
+message ConfirmEmailLoginResponse{
+  string token = 1;
 }

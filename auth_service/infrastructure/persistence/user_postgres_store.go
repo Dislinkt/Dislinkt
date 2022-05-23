@@ -61,3 +61,11 @@ func (store *UserPostgresStore) GetByUsername(username string) (user *domain.Use
 	fmt.Println(&foundUser)
 	return &foundUser, nil
 }
+
+func (store *UserPostgresStore) GetByEmail(email string) (user *domain.User, err error) {
+	foundUser := domain.User{}
+	if result := store.db.Where("email=?", email).First(&foundUser); result.Error != nil {
+		return nil, result.Error
+	}
+	return &foundUser, nil
+}

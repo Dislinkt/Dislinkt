@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthServiceClient interface {
 	AuthenticateUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error)
 	ValidateToken(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
+	PasswordlessLogin(ctx context.Context, in *PasswordlessLoginRequest, opts ...grpc.CallOption) (*PasswordlessLoginResponse, error)
+	ConfirmEmailLogin(ctx context.Context, in *ConfirmEmailLoginRequest, opts ...grpc.CallOption) (*ConfirmEmailLoginResponse, error)
 }
 
 type authServiceClient struct {
@@ -52,12 +54,32 @@ func (c *authServiceClient) ValidateToken(ctx context.Context, in *ValidateReque
 	return out, nil
 }
 
+func (c *authServiceClient) PasswordlessLogin(ctx context.Context, in *PasswordlessLoginRequest, opts ...grpc.CallOption) (*PasswordlessLoginResponse, error) {
+	out := new(PasswordlessLoginResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/PasswordlessLogin", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ConfirmEmailLogin(ctx context.Context, in *ConfirmEmailLoginRequest, opts ...grpc.CallOption) (*ConfirmEmailLoginResponse, error) {
+	out := new(ConfirmEmailLoginResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/ConfirmEmailLogin", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
 type AuthServiceServer interface {
 	AuthenticateUser(context.Context, *LoginRequest) (*JwtTokenResponse, error)
 	ValidateToken(context.Context, *ValidateRequest) (*ValidateResponse, error)
+	PasswordlessLogin(context.Context, *PasswordlessLoginRequest) (*PasswordlessLoginResponse, error)
+	ConfirmEmailLogin(context.Context, *ConfirmEmailLoginRequest) (*ConfirmEmailLoginResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -70,6 +92,12 @@ func (UnimplementedAuthServiceServer) AuthenticateUser(context.Context, *LoginRe
 }
 func (UnimplementedAuthServiceServer) ValidateToken(context.Context, *ValidateRequest) (*ValidateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
+}
+func (UnimplementedAuthServiceServer) PasswordlessLogin(context.Context, *PasswordlessLoginRequest) (*PasswordlessLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PasswordlessLogin not implemented")
+}
+func (UnimplementedAuthServiceServer) ConfirmEmailLogin(context.Context, *ConfirmEmailLoginRequest) (*ConfirmEmailLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmEmailLogin not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -120,6 +148,42 @@ func _AuthService_ValidateToken_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_PasswordlessLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PasswordlessLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).PasswordlessLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/PasswordlessLogin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).PasswordlessLogin(ctx, req.(*PasswordlessLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ConfirmEmailLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfirmEmailLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ConfirmEmailLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/ConfirmEmailLogin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ConfirmEmailLogin(ctx, req.(*ConfirmEmailLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +198,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ValidateToken",
 			Handler:    _AuthService_ValidateToken_Handler,
+		},
+		{
+			MethodName: "PasswordlessLogin",
+			Handler:    _AuthService_PasswordlessLogin_Handler,
+		},
+		{
+			MethodName: "ConfirmEmailLogin",
+			Handler:    _AuthService_ConfirmEmailLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
