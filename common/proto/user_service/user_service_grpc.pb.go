@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type UserServiceClient interface {
 	GetAll(ctx context.Context, in *SearchMessage, opts ...grpc.CallOption) (*GetAllResponse, error)
 	GetOne(ctx context.Context, in *GetOneMessage, opts ...grpc.CallOption) (*UserResponse, error)
+	GetMe(ctx context.Context, in *GetMeMessage, opts ...grpc.CallOption) (*GetMeResponse, error)
 	RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*RegisterUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	PatchUser(ctx context.Context, in *PatchUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -49,6 +50,15 @@ func (c *userServiceClient) GetAll(ctx context.Context, in *SearchMessage, opts 
 func (c *userServiceClient) GetOne(ctx context.Context, in *GetOneMessage, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/user_service_proto.UserService/GetOne", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetMe(ctx context.Context, in *GetMeMessage, opts ...grpc.CallOption) (*GetMeResponse, error) {
+	out := new(GetMeResponse)
+	err := c.cc.Invoke(ctx, "/user_service_proto.UserService/GetMe", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +98,7 @@ func (c *userServiceClient) PatchUser(ctx context.Context, in *PatchUserRequest,
 type UserServiceServer interface {
 	GetAll(context.Context, *SearchMessage) (*GetAllResponse, error)
 	GetOne(context.Context, *GetOneMessage) (*UserResponse, error)
+	GetMe(context.Context, *GetMeMessage) (*GetMeResponse, error)
 	RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
 	PatchUser(context.Context, *PatchUserRequest) (*UserResponse, error)
@@ -103,6 +114,9 @@ func (UnimplementedUserServiceServer) GetAll(context.Context, *SearchMessage) (*
 }
 func (UnimplementedUserServiceServer) GetOne(context.Context, *GetOneMessage) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOne not implemented")
+}
+func (UnimplementedUserServiceServer) GetMe(context.Context, *GetMeMessage) (*GetMeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMe not implemented")
 }
 func (UnimplementedUserServiceServer) RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
@@ -158,6 +172,24 @@ func _UserService_GetOne_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetOne(ctx, req.(*GetOneMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetMe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMeMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetMe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_service_proto.UserService/GetMe",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetMe(ctx, req.(*GetMeMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -230,6 +262,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOne",
 			Handler:    _UserService_GetOne_Handler,
+		},
+		{
+			MethodName: "GetMe",
+			Handler:    _UserService_GetMe_Handler,
 		},
 		{
 			MethodName: "RegisterUser",

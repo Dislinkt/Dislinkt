@@ -19,6 +19,11 @@ service UserService{
       get: "/user/{id}"
     };
   }
+  rpc GetMe(GetMeMessage) returns(GetMeResponse) {
+    option (google.api.http) = {
+      get: "/user/me"
+    };
+  }
   rpc RegisterUser(RegisterUserRequest) returns(RegisterUserResponse) {
     option (google.api.http) = {
       post: "/user"
@@ -37,6 +42,14 @@ service UserService{
       body: "*"
     };
   }
+}
+
+message GetMeMessage{
+
+}
+
+message GetMeResponse{
+  User user = 1;
 }
 
 message EmptyMessage {
@@ -62,7 +75,7 @@ message GetAllResponse {
 
 message UpdateUserRequest{
   string id = 1;
-  NewUser user = 2;
+  UpdateUser user = 2;
 }
 
 message UserResponse{
@@ -80,12 +93,18 @@ message NewUser{
   string surname = 2;
   string username = 3;
   string email = 4;
+  bool private = 5;
+  string password = 6;
+}
+
+message UpdateUser{
+  string name = 1;
+  string surname = 2;
+  string username = 3;
   string number = 5;
   Gender gender = 6;
   string date_of_birth = 7;
-  string password = 8;
-  string biography = 9;
-  bool private = 10;
+  string biography = 8;
 }
 
 enum UserRole{
@@ -103,13 +122,13 @@ message User {
   string number = 6;
   Gender gender = 7;
   string date_of_birth = 8;
-  string password = 9;
-  string biography = 11;
-  bool blocked = 12;
-  google.protobuf.Timestamp created_at = 13;
-  google.protobuf.Timestamp updated_at = 14;
-  bool private = 15;
-  UserRole user_role = 16;
+  string biography = 9;
+  bool blocked = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  bool private = 13;
+  UserRole user_role = 14;
+  Links links = 15;
 }
 
 message RegisterUserRequest {
@@ -118,6 +137,16 @@ message RegisterUserRequest {
 
 message RegisterUserResponse {
   User user = 1;
+}
+
+message Links{
+  string user = 1;
+  string posts = 2;
+  string connections = 3;
+  string educations = 4;
+  string positions = 5;
+  string skills = 6;
+  string interests = 7;
 }
 
 

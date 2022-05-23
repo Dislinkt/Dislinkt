@@ -2,10 +2,13 @@ package startup
 
 import (
 	"fmt"
-	saga "github.com/dislinkt/common/saga/messaging"
-	"github.com/dislinkt/common/saga/messaging/nats"
 	"log"
 	"net"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dislinkt/common/interceptor"
+	saga "github.com/dislinkt/common/saga/messaging"
+	"github.com/dislinkt/common/saga/messaging/nats"
 
 	"github.com/dislinkt/auth_service/application"
 	"github.com/dislinkt/auth_service/domain"
@@ -119,7 +122,13 @@ func (server *Server) startGrpcServer(authHandler *api.AuthHandler) {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	grpcServer := grpc.NewServer()
+
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
+	if err != nil {
+		log.Fatalf("failed to parse public key: %v", err)
+	}
+	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), publicKey)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	authProto.RegisterAuthServiceServer(grpcServer, authHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)

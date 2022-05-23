@@ -30,13 +30,18 @@ func (store *UserPostgresStore) Insert(user *domain.User) error {
 	return nil
 }
 
-func (store *UserPostgresStore) Update(user *domain.User) error {
+func (store *UserPostgresStore) Update(user *domain.User) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-DB")
 	// defer span.Finish()
-	if result := store.db.Save(&user); result.Error != nil {
-		return result.Error
+	result := store.db.Updates(&user)
+	if result.Error != nil {
+		return nil, result.Error
 	}
-	return nil
+	dbUser, err := store.FindByID(user.Id)
+	if err != nil {
+		return nil, result.Error
+	}
+	return dbUser, nil
 }
 
 func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
@@ -60,7 +65,7 @@ func (store *UserPostgresStore) FindByID(uuid uuid.UUID) (user *domain.User, err
 
 func (store *UserPostgresStore) FindByUsername(username string) (user *domain.User, err error) {
 	foundUser := domain.User{}
-	if result := store.db.Model(domain.User{Username: &username}).First(&foundUser); result.Error != nil {
+	if result := store.db.Where("username LIKE ?", username).Find(&foundUser); result.Error != nil {
 		return nil, result.Error
 	}
 	return &foundUser, nil

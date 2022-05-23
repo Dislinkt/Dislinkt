@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"time"
 
 	pb "github.com/dislinkt/common/proto/user_service"
@@ -10,6 +11,18 @@ import (
 )
 
 func mapUser(userD *domain.User) *pb.User {
+	id := userD.Id.String()
+
+	links := &pb.Links{
+		User:        "/user/" + id,
+		Interests:   "/interest/" + id,
+		Skills:      "/skill/" + id,
+		Positions:   "/position/" + id,
+		Educations:  "/education/" + id,
+		Posts:       "/post/" + id,
+		Connections: "/connection/" + id,
+	}
+
 	userPb := &pb.User{
 		Id:          userD.Id.String(),
 		Name:        userD.Name,
@@ -19,34 +32,50 @@ func mapUser(userD *domain.User) *pb.User {
 		Number:      userD.Number,
 		Gender:      mapGenderToPb(userD.Gender),
 		DateOfBirth: userD.DateOfBirth,
-		Password:    userD.Password,
 		UserRole:    mapUserRole(userD.UserRole),
 		Biography:   userD.Biography,
 		Blocked:     userD.Blocked,
 		CreatedAt:   timestamppb.New(userD.CreatedAt),
 		UpdatedAt:   timestamppb.New(userD.UpdatedAt),
 		Private:     userD.Private,
+		Links:       links,
 	}
 	return userPb
 }
 
 func mapNewUser(userPb *pb.NewUser) *domain.User {
+	fmt.Println("PROTO" + userPb.Password)
+	userD := &domain.User{
+		Id:        uuid.NewV4(),
+		Name:      userPb.Name,
+		Surname:   userPb.Surname,
+		Username:  &userPb.Username,
+		Email:     &userPb.Email,
+		UserRole:  domain.Regular,
+		Blocked:   false,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Private:   userPb.Private,
+		Password:  userPb.Password,
+	}
+	fmt.Println("DOMAIN: " + userD.Password)
+	return userD
+}
+
+func mapUpdateUser(userPb *pb.UpdateUser) *domain.User {
 	userD := &domain.User{
 		Id:          uuid.NewV4(),
 		Name:        userPb.Name,
 		Surname:     userPb.Surname,
 		Username:    &userPb.Username,
-		Email:       &userPb.Email,
 		Number:      userPb.Number,
 		Gender:      mapGenderToDomain(userPb.Gender),
 		DateOfBirth: userPb.DateOfBirth,
-		Password:    userPb.Password,
 		UserRole:    domain.Regular,
 		Biography:   userPb.Biography,
 		Blocked:     false,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
-		Private:     userPb.Private,
 	}
 	return userD
 }

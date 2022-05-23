@@ -232,7 +232,7 @@ message Skill{
 }
 
 
-// SKILL
+// INTEREST
 
 message UpdateInterestRequest{
   string userId = 1;
