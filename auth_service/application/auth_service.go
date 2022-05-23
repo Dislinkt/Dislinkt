@@ -42,13 +42,12 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 		return "", errors.New("invalid password")
 	}
 
-	expireTime := time.Now().Add(time.Hour).Unix() * 1000
+	expireTime := time.Now().Add(time.Hour).Unix()
 	token, err := generateToken(user, expireTime)
 	if err != nil {
 		return "", errors.New("invalid password")
 	}
 
-	//rolesString, _ := json.Marshal(user.Roles)
 	return token, err
 }
 
@@ -74,7 +73,7 @@ func generateToken(user *domain.User, expireTime int64) (string, error) {
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = user.Username
-	//	claims["roles"] = string(rolesString)
+	claims["role"] = string(getRoleString(user.UserRole))
 	claims["id"] = user.Id
 	claims["exp"] = expireTime
 	jwtToken, err := token.SignedString([]byte("Dislinkt"))
@@ -84,7 +83,20 @@ func generateToken(user *domain.User, expireTime int64) (string, error) {
 	return jwtToken, nil
 }
 
-func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.Claims, err error) {
+func getRoleString(role int) string {
+	switch role {
+	case 0:
+		return "Regular"
+	case 1:
+		return "Admin"
+	case 2:
+		return "Agent"
+	default:
+		return "Regular"
+	}
+}
+
+func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims, err error) {
 	token, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -98,13 +110,13 @@ func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.Claims, e
 		return
 	}
 
-	claims, ok := token.Claims.(jwt.Claims)
+	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if !ok {
 		return nil, errors.New("Couldn't parse claims")
 	}
 
-	//if claims.ExpiresAt < time.Now().Local().Unix() {
+	//if !claims.VerifyExpiresAt(time.Now().Local().Unix()) {
 	//	return nil, errors.New("JWT is expired")
 	//}
 

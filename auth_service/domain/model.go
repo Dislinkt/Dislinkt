@@ -8,6 +8,7 @@ type User struct {
 	Id       uuid.UUID `gorm:"index:idx_name,unique"`
 	Username string    `gorm:"unique"`
 	Password string
+	UserRole int
 }
 
 type LoginRequest struct {

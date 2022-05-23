@@ -36,6 +36,7 @@ func (o *RegisterUserOrchestrator) Start(user *domain.User) error {
 			Gender:      events.Gender(user.Gender),
 			DateOfBirth: user.DateOfBirth,
 			Password:    user.Password,
+			UserRole:    events.Role(user.UserRole),
 			Biography:   user.Biography,
 			Private:     user.Private,
 		},

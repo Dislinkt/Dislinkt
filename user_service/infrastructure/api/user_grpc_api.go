@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/dislinkt/common/interceptor"
 
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/application"
@@ -90,7 +91,8 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 	UserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
-
+	fmt.Println("*************************************************")
+	fmt.Println(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	user := mapNewUser(request.User)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)

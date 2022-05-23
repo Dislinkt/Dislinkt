@@ -12,11 +12,15 @@ require (
 )
 
 require (
+	github.com/casbin/casbin/v2 v2.47.1
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
+	github.com/gorilla/handlers v1.5.1
 	google.golang.org/protobuf v1.28.0
 )
 
 require (
+	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
