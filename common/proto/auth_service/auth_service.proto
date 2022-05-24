@@ -34,6 +34,13 @@ service AuthService{
       body: "*"
     };
   }
+
+  rpc ActivateAccount(ActivationRequest) returns(ActivationResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/activate-account",
+      body: "*"
+    };
+  }
 }
 
 message LoginRequest {
@@ -75,5 +82,13 @@ message ConfirmEmailLoginRequest{
 }
 
 message ConfirmEmailLoginResponse{
+  string token = 1;
+}
+
+message ActivationRequest {
+  string token = 1;
+}
+
+message ActivationResponse {
   string token = 1;
 }

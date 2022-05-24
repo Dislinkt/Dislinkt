@@ -3,11 +3,9 @@ package api
 import (
 	"github.com/dislinkt/auth_service/domain"
 	events "github.com/dislinkt/common/saga/register_user"
-	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"regexp"
 )
 
 func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
@@ -19,6 +17,7 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 		Id:       uuid.UUID{},
 		Username: command.User.Username,
 		Password: hashAndSalt,
+		Email:    command.User.Email,
 		UserRole: int(command.User.UserRole),
 		Active:   false,
 	}
@@ -26,11 +25,11 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
-	isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
-
-	if isWeak {
-		return "", errors.New("Password must contain minimum eight characters, at least one capital letter, one number and one special character")
-	}
+	//isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
+	//
+	//if isWeak {
+	//	return "", errors.New("Password must contain minimum eight characters, at least one capital letter, one number and one special character")
+	//}
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {

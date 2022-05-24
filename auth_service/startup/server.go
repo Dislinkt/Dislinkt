@@ -41,7 +41,7 @@ func (server *Server) Start() {
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
-	server.initRegisterUserHandler(userService, replyPublisher, commandSubscriber)
+	server.initRegisterUserHandler(userService, authService, replyPublisher, commandSubscriber)
 
 	authHandler := server.initAuthHandler(authService)
 
@@ -98,9 +98,9 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 	return subscriber
 }
 
-func (server *Server) initRegisterUserHandler(service *application.UserService, publisher saga.Publisher,
+func (server *Server) initRegisterUserHandler(service *application.UserService, authService *application.AuthService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
-	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	_, err := api.NewRegisterUserCommandHandler(service, authService, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

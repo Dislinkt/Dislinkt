@@ -53,3 +53,17 @@ func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 func (service *UserService) Delete(user *domain.User) error {
 	return service.store.Delete(user)
 }
+
+func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
+	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
+	// defer span.Finish()
+	//
+	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	_, err := service.store.FindByID(uuid)
+	if err != nil {
+		return err
+	}
+
+	user.Id = uuid
+	return service.store.Update(user)
+}

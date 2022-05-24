@@ -65,3 +65,7 @@ func (handler *AuthHandler) PasswordlessLogin(ctx context.Context, req *pb.Passw
 func (handler *AuthHandler) ConfirmEmailLogin(ctx context.Context, req *pb.ConfirmEmailLoginRequest) (*pb.ConfirmEmailLoginResponse, error) {
 	return handler.ConfirmEmailLogin(ctx, req)
 }
+
+func (handler *AuthHandler) ActivateAccount(ctx context.Context, req *pb.ActivationRequest) (*pb.ActivationResponse, error) {
+	return handler.ActivateAccount(ctx, req)
+}

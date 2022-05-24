@@ -3,6 +3,7 @@ package persistence
 import (
 	"fmt"
 	"github.com/dislinkt/auth_service/domain"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -59,6 +60,14 @@ func (store *UserPostgresStore) GetByUsername(username string) (user *domain.Use
 	}
 	fmt.Println(foundUser)
 	fmt.Println(&foundUser)
+	return &foundUser, nil
+}
+
+func (store *UserPostgresStore) FindByID(uuid uuid.UUID) (user *domain.User, err error) {
+	foundUser := domain.User{}
+	if result := store.db.First(&foundUser, uuid); result.Error != nil {
+		return nil, result.Error
+	}
 	return &foundUser, nil
 }
 

@@ -184,7 +184,7 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 }
 
 func passwordlessLoginMailMessage(token string) []byte {
-	urlRedirection := "http://localhost:3000/passwordless-login-validation/" + token
+	urlRedirection := "http://localhost:4200/passwordless-login-validation/" + token
 
 	subject := "Subject: Passwordless login\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
@@ -274,6 +274,216 @@ func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.Conf
 	}
 
 	return &pb.ConfirmEmailLoginResponse{
+		Token: request.Token,
+	}, nil
+}
+
+//func (service *AuthService) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+//	authId := ctx.Value(interceptor.LoggedInUserKey{}).(string)
+//	auth, err := service.store.FindById(authId)
+//	if err != nil {
+//		return &pb.ChangePasswordResponse{
+//			StatusCode: "500",
+//			Message:    "Auth credentials not found",
+//		}, errors.New("Auth credentials not found")
+//	}
+//
+//	if request.NewPassword != request.NewReenteredPassword {
+//		return &pb.ChangePasswordResponse{
+//			StatusCode: "500",
+//			Message:    "New passwords do not match",
+//		}, errors.New("New passwords do not match")
+//	}
+//
+//	oldMatched := auth.CheckPassword(request.OldPassword)
+//	if !oldMatched {
+//		return &pb.ChangePasswordResponse{
+//			StatusCode: "500",
+//			Message:    "Old password does not match",
+//		}, errors.New("Old password does not match")
+//	}
+//
+//	err = checkPasswordCriteria(request.NewPassword, auth.Username)
+//	if err != nil {
+//		return &pb.ChangePasswordResponse{
+//			StatusCode: "500",
+//			Message:    err.Error(),
+//		}, err
+//	}
+//
+//	hashedPassword, err := auth.HashPassword(request.NewPassword)
+//	if err != nil || hashedPassword == "" {
+//		return &pb.ChangePasswordResponse{
+//			StatusCode: "500",
+//			Message:    err.Error(),
+//		}, err
+//	}
+//
+//	err = service.store.UpdatePassword(authId, hashedPassword)
+//	if err != nil {
+//		return &pb.ChangePasswordResponse{
+//			StatusCode: "500",
+//			Message:    err.Error(),
+//		}, err
+//	}
+//	return &pb.ChangePasswordResponse{
+//		StatusCode: "200",
+//		Message:    "New password updated",
+//	}, nil
+//}
+//
+//func sendMail(emailTo string, message []byte) error {
+//	from := config.NewConfig().EmailFrom
+//	emailPassword := config.NewConfig().EmailPassword
+//	to := []string{emailTo}
+//
+//	host := config.NewConfig().EmailHost
+//	port := config.NewConfig().EmailPort
+//	smtpAddress := host + ":" + port
+//
+//	authMail := smtp.PlainAuth("", from, emailPassword, host)
+//
+//	errSendingMail := smtp.SendMail(smtpAddress, authMail, from, to, message)
+//	if errSendingMail != nil {
+//		fmt.Println("err:  ", errSendingMail)
+//		return errSendingMail
+//	}
+//	return nil
+//}
+func (auth *AuthService) SendActivationMail(username string) error {
+	fmt.Println("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+	user, err := auth.userService.GetByUsername(username)
+	if err != nil || user == nil {
+		return errors.New("invalid username")
+	}
+
+	expireTime := time.Now().Add(time.Hour).Unix()
+	token, err := generateToken(user, expireTime)
+
+	message := verificationMailMessage(token)
+
+	from := config.NewConfig().EmailSender
+	emailPassword := config.NewConfig().EmailPassword
+	to := []string{user.Email}
+
+	host := config.NewConfig().EmailHost
+	port := config.NewConfig().EmailPort
+	smtpAddress := host + ":" + port
+	fmt.Println("POOOOKUPIO ENV***************************")
+	fmt.Println(smtpAddress + " ******** " + host + " ********* " + port)
+	fmt.Println("***********************************")
+	fmt.Println("FROM " + from + " EMAIL PASS " + emailPassword + " TO " + user.Email)
+	authMail := smtp.PlainAuth("", from, emailPassword, host)
+	fmt.Println("ODRADIO SMTP PLAIN AUTH")
+	errSendingMail := smtp.SendMail(smtpAddress, authMail, from, to, message)
+	if errSendingMail != nil {
+		fmt.Println("err:  ", errSendingMail)
+		return errSendingMail
+	}
+	fmt.Println("MAIL POSLAT")
+	return nil
+}
+
+func verificationMailMessage(token string) []byte {
+	// TODO SD: port se moze izvuci iz env var - 4200
+	urlRedirection := "http://localhost:8000/activate-account/" + token
+	fmt.Println("MAIL MESSAGE")
+
+	subject := "Subject: Account activation\n"
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	body := "<html><body style=\"background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;\">\n" +
+		"    <!-- HIDDEN PREHEADER TEXT -->\n" +
+		"    <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\"> We're thrilled to have you here! Get ready to dive into your new account.\n" +
+		"    </div>\n" +
+		"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n" +
+		"        <!-- LOGO -->\n" +
+		"        <tr>\n" +
+		"            <td bgcolor=\"#FFA73B\" align=\"center\">\n" +
+		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
+		"                    <tr>\n" +
+		"                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\n" +
+		"                    </tr>\n" +
+		"                </table>\n" +
+		"            </td>\n" +
+		"        </tr>\n" +
+		"        <tr>\n" +
+		"            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\n" +
+		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
+		"                    <tr>\n" +
+		"                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\n" +
+		"                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">Welcome to Dislinkt!</h1> <img src=\" https://img.icons8.com/cotton/100/000000/security-checked--v3.png\" width=\"125\" height=\"120\" style=\"display: block; border: 0px;\" />\n" +
+		"                        </td>\n" +
+		"                    </tr>\n" +
+		"                </table>\n" +
+		"            </td>\n" +
+		"        </tr>\n" +
+		"        <tr>\n" +
+		"            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\n" +
+		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
+		"                    <tr>\n" +
+		"                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\n" +
+		"                            <p style=\"margin: 0;\">First, you need to activate your account. Just press the button below.</p>\n" +
+		"                        </td>\n" +
+		"                    </tr>\n" +
+		"                    <tr>\n" +
+		"                        <td bgcolor=\"#ffffff\" align=\"left\">\n" +
+		"                            <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n" +
+		"                                <tr>\n" +
+		"                                    <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 20px 30px 60px 30px;\">\n" +
+		"                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n" +
+		"                                            <tr>\n" +
+		"                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><a href=\"" + urlRedirection + "\" target=\"_blank\" style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\">Activate Account</a></td>\n" +
+		"                                            </tr>\n" +
+		"                                        </table>\n" +
+		"                                    </td>\n" +
+		"                                </tr>\n" +
+		"                            </table>\n" +
+		"                        </td>\n" +
+		"                    </tr> \n" +
+		"    </table>\n" +
+		"    <br> <br>\n" +
+		"</body>" +
+		"</html>"
+	message := []byte(subject + mime + body)
+	return message
+}
+
+func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.ActivationRequest) (*pb.ActivationResponse, error) {
+	token, err := jwt.Parse(request.Token, func(token *jwt.Token) (interface{}, error) {
+		//Make sure that the token method conform to "SigningMethodHMAC"
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte("Dislinkt"), nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't parse token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if !ok {
+		return nil, fmt.Errorf("Couldn't parse claims")
+	}
+
+	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
+		return nil, fmt.Errorf("JWT is expired")
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("Invalid token: %w", err)
+	}
+
+	user, err := auth.userService.GetByEmail(claims["username"].(string))
+	if err != nil || user == nil {
+		return nil, errors.New("invalid username")
+	}
+
+	user.Active = true
+	auth.userService.Update(user.Id, user)
+
+	return &pb.ActivationResponse{
 		Token: request.Token,
 	}, nil
 }
