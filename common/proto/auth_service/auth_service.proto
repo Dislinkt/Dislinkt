@@ -41,6 +41,13 @@ service AuthService{
       body: "*"
     };
   }
+
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/changePassword"
+      body: "*"
+    };
+  }
 }
 
 message LoginRequest {
@@ -91,4 +98,15 @@ message ActivationRequest {
 
 message ActivationResponse {
   string token = 1;
+}
+
+message ChangePasswordRequest {
+  string oldPassword = 1;
+  string newPassword = 2;
+  string newReenteredPassword = 3;
+}
+
+message ChangePasswordResponse {
+  string message = 1;
+  string statusCode = 2;
 }
