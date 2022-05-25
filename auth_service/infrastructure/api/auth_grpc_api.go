@@ -59,13 +59,17 @@ func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateR
 }
 
 func (handler *AuthHandler) PasswordlessLogin(ctx context.Context, req *pb.PasswordlessLoginRequest) (*pb.PasswordlessLoginResponse, error) {
-	return handler.PasswordlessLogin(ctx, req)
+	return handler.service.PasswordlessLogin(ctx, req)
 }
 
 func (handler *AuthHandler) ConfirmEmailLogin(ctx context.Context, req *pb.ConfirmEmailLoginRequest) (*pb.ConfirmEmailLoginResponse, error) {
-	return handler.ConfirmEmailLogin(ctx, req)
+	return handler.service.ConfirmEmailLogin(ctx, req)
 }
 
 func (handler *AuthHandler) ActivateAccount(ctx context.Context, req *pb.ActivationRequest) (*pb.ActivationResponse, error) {
-	return handler.ActivateAccount(ctx, req)
+	return handler.service.ActivateAccount(ctx, req)
+}
+
+func (handler *AuthHandler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+	return handler.service.ChangePassword(ctx, req)
 }

@@ -7,13 +7,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/auth_service/startup/config"
+	"github.com/dislinkt/common/interceptor"
+	pb "github.com/dislinkt/common/proto/auth_service"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
 	"net/smtp"
-
-	pb "github.com/dislinkt/common/proto/auth_service"
 
 	//	"github.com/nats-io/jwt/v2"
 	"time"
@@ -28,12 +28,6 @@ type JwtWrapper struct {
 	Issuer          string
 	ExpirationHours int64
 }
-
-//type jwtClaims struct {
-//	jwt.StandardClaims
-//	Id    int64
-//	Email string
-//}
 
 func NewAuthService(userService *UserService) *AuthService {
 	return &AuthService{
@@ -166,7 +160,7 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 		return nil, status.Errorf(codes.Internal, "Could not generate JWT token")
 	}
 
-	message := passwordlessLoginMailMessage(token)
+	message := passwordlessLoginMailMessage(token, user.Username)
 
 	// Authentication.
 	authentication := smtp.PlainAuth("", from, password, smtpHost)
@@ -183,62 +177,14 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 	}, nil
 }
 
-func passwordlessLoginMailMessage(token string) []byte {
+func passwordlessLoginMailMessage(token string, username string) []byte {
 	urlRedirection := "http://localhost:4200/passwordless-login-validation/" + token
 
 	subject := "Subject: Passwordless login\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body := "<html><body style=\"background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;\">\n" +
-		"    <!-- HIDDEN PREHEADER TEXT -->\n" +
-		"    <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\"> We're thrilled to have you here! Get ready to dive into your new account.\n" +
-		"    </div>\n" +
-		"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n" +
-		"        <!-- LOGO -->\n" +
-		"        <tr>\n" +
-		"            <td bgcolor=\"#FFA73B\" align=\"center\">\n" +
-		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
-		"                    <tr>\n" +
-		"                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\n" +
-		"                    </tr>\n" +
-		"                </table>\n" +
-		"            </td>\n" +
-		"        </tr>\n" +
-		"        <tr>\n" +
-		"            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\n" +
-		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
-		"                    <tr>\n" +
-		"                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\n" +
-		"                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">Dislinkt</h1> <img src=\" https://img.icons8.com/cotton/100/000000/security-checked--v3.png\" width=\"125\" height=\"120\" style=\"display: block; border: 0px;\" />\n" +
-		"                        </td>\n" +
-		"                    </tr>\n" +
-		"                </table>\n" +
-		"            </td>\n" +
-		"        </tr>\n" +
-		"        <tr>\n" +
-		"            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\n" +
-		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
-		"                    <tr>\n" +
-		"                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\n" +
-		"                            <p style=\"margin: 0;\">Someone tried to sign in to your account without password. Was that you?</p>\n" +
-		"                        </td>\n" +
-		"                    </tr>\n" +
-		"                    <tr>\n" +
-		"                        <td bgcolor=\"#ffffff\" align=\"left\">\n" +
-		"                            <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n" +
-		"                                <tr>\n" +
-		"                                    <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 20px 30px 60px 30px;\">\n" +
-		"                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n" +
-		"                                            <tr>\n" +
-		"                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><a href=\"" + urlRedirection + "\" target=\"_blank\" style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\">Yes! Login</a></td>\n" +
-		"                                            </tr>\n" +
-		"                                        </table>\n" +
-		"                                    </td>\n" +
-		"                                </tr>\n" +
-		"                            </table>\n" +
-		"                        </td>\n" +
-		"                    </tr> \n" +
-		"    </table>\n" +
-		"    <br> <br>\n" +
+	body := "<html><body>\n" +
+		"Hello " + username + "! Click on link to log in: " + urlRedirection +
+		"<br> <br>\n" +
 		"</body>" +
 		"</html>"
 	message := []byte(subject + mime + body)
@@ -278,80 +224,63 @@ func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.Conf
 	}, nil
 }
 
-//func (service *AuthService) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
-//	authId := ctx.Value(interceptor.LoggedInUserKey{}).(string)
-//	auth, err := service.store.FindById(authId)
-//	if err != nil {
-//		return &pb.ChangePasswordResponse{
-//			StatusCode: "500",
-//			Message:    "Auth credentials not found",
-//		}, errors.New("Auth credentials not found")
-//	}
-//
-//	if request.NewPassword != request.NewReenteredPassword {
-//		return &pb.ChangePasswordResponse{
-//			StatusCode: "500",
-//			Message:    "New passwords do not match",
-//		}, errors.New("New passwords do not match")
-//	}
-//
-//	oldMatched := auth.CheckPassword(request.OldPassword)
-//	if !oldMatched {
-//		return &pb.ChangePasswordResponse{
-//			StatusCode: "500",
-//			Message:    "Old password does not match",
-//		}, errors.New("Old password does not match")
-//	}
-//
-//	err = checkPasswordCriteria(request.NewPassword, auth.Username)
-//	if err != nil {
-//		return &pb.ChangePasswordResponse{
-//			StatusCode: "500",
-//			Message:    err.Error(),
-//		}, err
-//	}
-//
-//	hashedPassword, err := auth.HashPassword(request.NewPassword)
-//	if err != nil || hashedPassword == "" {
-//		return &pb.ChangePasswordResponse{
-//			StatusCode: "500",
-//			Message:    err.Error(),
-//		}, err
-//	}
-//
-//	err = service.store.UpdatePassword(authId, hashedPassword)
-//	if err != nil {
-//		return &pb.ChangePasswordResponse{
-//			StatusCode: "500",
-//			Message:    err.Error(),
-//		}, err
-//	}
-//	return &pb.ChangePasswordResponse{
-//		StatusCode: "200",
-//		Message:    "New password updated",
-//	}, nil
-//}
-//
-//func sendMail(emailTo string, message []byte) error {
-//	from := config.NewConfig().EmailFrom
-//	emailPassword := config.NewConfig().EmailPassword
-//	to := []string{emailTo}
-//
-//	host := config.NewConfig().EmailHost
-//	port := config.NewConfig().EmailPort
-//	smtpAddress := host + ":" + port
-//
-//	authMail := smtp.PlainAuth("", from, emailPassword, host)
-//
-//	errSendingMail := smtp.SendMail(smtpAddress, authMail, from, to, message)
-//	if errSendingMail != nil {
-//		fmt.Println("err:  ", errSendingMail)
-//		return errSendingMail
-//	}
-//	return nil
-//}
+func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+	username := ctx.Value(interceptor.LoggedInUserKey{}).(string)
+	user, err := auth.userService.GetByUsername(username)
+	if err != nil {
+		return &pb.ChangePasswordResponse{
+			StatusCode: "500",
+			Message:    "User not found",
+		}, errors.New("User not found")
+	}
+
+	if request.NewPassword != request.NewReenteredPassword {
+		return &pb.ChangePasswordResponse{
+			StatusCode: "500",
+			Message:    "New passwords do not match",
+		}, errors.New("New passwords do not match")
+	}
+
+	oldMatched := equalPasswords(user.Password, request.OldPassword)
+	if !oldMatched {
+		return &pb.ChangePasswordResponse{
+			StatusCode: "500",
+			Message:    "Old password does not match",
+		}, errors.New("Old password does not match")
+	}
+
+	hashedNewPassword, err := HashAndSaltPasswordIfStrongAndMatching(request.NewPassword)
+	if err != nil || hashedNewPassword == "" {
+		return &pb.ChangePasswordResponse{
+			StatusCode: "500",
+			Message:    err.Error(),
+		}, err
+	}
+
+	user.Password = hashedNewPassword
+	auth.userService.Update(user.Id, user)
+
+	return &pb.ChangePasswordResponse{
+		StatusCode: "200",
+		Message:    "New password updated",
+	}, nil
+}
+
+func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
+	//isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
+	//
+	//if isWeak {
+	//	return "", errors.New("Password must contain minimum eight characters, at least one capital letter, one number and one special character")
+	//}
+	pwd := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash), err
+}
+
 func (auth *AuthService) SendActivationMail(username string) error {
-	fmt.Println("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
 	user, err := auth.userService.GetByUsername(username)
 	if err != nil || user == nil {
 		return errors.New("invalid username")
@@ -360,7 +289,7 @@ func (auth *AuthService) SendActivationMail(username string) error {
 	expireTime := time.Now().Add(time.Hour).Unix()
 	token, err := generateToken(user, expireTime)
 
-	message := verificationMailMessage(token)
+	message := verificationMailMessage(token, username)
 
 	from := config.NewConfig().EmailSender
 	emailPassword := config.NewConfig().EmailPassword
@@ -369,79 +298,25 @@ func (auth *AuthService) SendActivationMail(username string) error {
 	host := config.NewConfig().EmailHost
 	port := config.NewConfig().EmailPort
 	smtpAddress := host + ":" + port
-	fmt.Println("POOOOKUPIO ENV***************************")
-	fmt.Println(smtpAddress + " ******** " + host + " ********* " + port)
-	fmt.Println("***********************************")
-	fmt.Println("FROM " + from + " EMAIL PASS " + emailPassword + " TO " + user.Email)
 	authMail := smtp.PlainAuth("", from, emailPassword, host)
-	fmt.Println("ODRADIO SMTP PLAIN AUTH")
 	errSendingMail := smtp.SendMail(smtpAddress, authMail, from, to, message)
 	if errSendingMail != nil {
 		fmt.Println("err:  ", errSendingMail)
 		return errSendingMail
 	}
-	fmt.Println("MAIL POSLAT")
 	return nil
 }
 
-func verificationMailMessage(token string) []byte {
+func verificationMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
-	urlRedirection := "http://localhost:8000/activate-account/" + token
+	urlRedirection := "http://localhost:4200/activate-account/" + token
 	fmt.Println("MAIL MESSAGE")
 
 	subject := "Subject: Account activation\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body := "<html><body style=\"background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;\">\n" +
-		"    <!-- HIDDEN PREHEADER TEXT -->\n" +
-		"    <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\"> We're thrilled to have you here! Get ready to dive into your new account.\n" +
-		"    </div>\n" +
-		"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n" +
-		"        <!-- LOGO -->\n" +
-		"        <tr>\n" +
-		"            <td bgcolor=\"#FFA73B\" align=\"center\">\n" +
-		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
-		"                    <tr>\n" +
-		"                        <td align=\"center\" valign=\"top\" style=\"padding: 40px 10px 40px 10px;\"> </td>\n" +
-		"                    </tr>\n" +
-		"                </table>\n" +
-		"            </td>\n" +
-		"        </tr>\n" +
-		"        <tr>\n" +
-		"            <td bgcolor=\"#FFA73B\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\n" +
-		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
-		"                    <tr>\n" +
-		"                        <td bgcolor=\"#ffffff\" align=\"center\" valign=\"top\" style=\"padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;\">\n" +
-		"                            <h1 style=\"font-size: 48px; font-weight: 400; margin: 2;\">Welcome to Dislinkt!</h1> <img src=\" https://img.icons8.com/cotton/100/000000/security-checked--v3.png\" width=\"125\" height=\"120\" style=\"display: block; border: 0px;\" />\n" +
-		"                        </td>\n" +
-		"                    </tr>\n" +
-		"                </table>\n" +
-		"            </td>\n" +
-		"        </tr>\n" +
-		"        <tr>\n" +
-		"            <td bgcolor=\"#f4f4f4\" align=\"center\" style=\"padding: 0px 10px 0px 10px;\">\n" +
-		"                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px;\">\n" +
-		"                    <tr>\n" +
-		"                        <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\n" +
-		"                            <p style=\"margin: 0;\">First, you need to activate your account. Just press the button below.</p>\n" +
-		"                        </td>\n" +
-		"                    </tr>\n" +
-		"                    <tr>\n" +
-		"                        <td bgcolor=\"#ffffff\" align=\"left\">\n" +
-		"                            <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n" +
-		"                                <tr>\n" +
-		"                                    <td bgcolor=\"#ffffff\" align=\"center\" style=\"padding: 20px 30px 60px 30px;\">\n" +
-		"                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n" +
-		"                                            <tr>\n" +
-		"                                                <td align=\"center\" style=\"border-radius: 3px;\" bgcolor=\"#FFA73B\"><a href=\"" + urlRedirection + "\" target=\"_blank\" style=\"font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #FFA73B; display: inline-block;\">Activate Account</a></td>\n" +
-		"                                            </tr>\n" +
-		"                                        </table>\n" +
-		"                                    </td>\n" +
-		"                                </tr>\n" +
-		"                            </table>\n" +
-		"                        </td>\n" +
-		"                    </tr> \n" +
-		"    </table>\n" +
-		"    <br> <br>\n" +
+	body := "<html><body>\n" +
+		"Hello " + username + "! Please confirm your account with click on link: " + urlRedirection +
+		"<br> <br>\n" +
 		"</body>" +
 		"</html>"
 	message := []byte(subject + mime + body)
@@ -475,7 +350,7 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 		return nil, fmt.Errorf("Invalid token: %w", err)
 	}
 
-	user, err := auth.userService.GetByEmail(claims["username"].(string))
+	user, err := auth.userService.GetByUsername(claims["username"].(string))
 	if err != nil || user == nil {
 		return nil, errors.New("invalid username")
 	}
