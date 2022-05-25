@@ -23,12 +23,6 @@ type AuthService struct {
 	userService *UserService
 }
 
-type JwtWrapper struct {
-	SecretKey       string
-	Issuer          string
-	ExpirationHours int64
-}
-
 func NewAuthService(userService *UserService) *AuthService {
 	return &AuthService{
 		userService: userService,
