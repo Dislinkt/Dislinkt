@@ -26,4 +26,12 @@ type AdditionalUserStore interface {
 	InsertInterest(uuid string, interest *Interest) (*Interest, error)
 	UpdateUserInterest(id string, interest *Interest) error
 	DeleteUserInterest(id string) error
+
+	// ENTITES
+	InsertFieldOfStudy(filedOfStudies []*FieldOfStudy) ([]*FieldOfStudy, error)
+	GetAllFieldOfStudy() ([]*FieldOfStudy, error)
+	InsertSkills(skills []*Skill) ([]*Skill, error)
+	GetSkills() (skills []*Skill, err error)
+	InsertIndustires(industries []*Industry) ([]*Industry, error)
+	GetIndustries() (industries []*Industry, err error)
 }

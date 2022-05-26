@@ -158,6 +158,7 @@ services:
     networks:
       - network
 
+
   auth_db:
     image: postgres
     container_name: auth_db
@@ -217,7 +218,31 @@ services:
       - 4222:4222
       - 6222:6222
 
+  postman:
+    image: postman/newman_ubuntu1404:4.5.5
+    build:
+      context: .
+      dockerfile: initCalls/Dockerfile
+    entrypoint: [ "" ]
+    volumes:
+      - /initCalls:/etc/newman
+    command: >
+      newman run /initCalls/src/INSERT_DATA.postman_collection.json
+      -r cli
+      --delay-request 5000
+      --timeout-request 5000
+    depends_on:
+      - additional_user_service
+      - connection_service
+      - auth_service
+      - post_service
+      - api_gateway
+      - user_service
+    networks:
+      - network
+
 networks:
   network:
     driver: bridge
 #  jaeger-demo:
+

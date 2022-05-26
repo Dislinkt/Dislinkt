@@ -2,10 +2,12 @@ package startup
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/dislinkt/common/interceptor"
 	"log"
 	"net"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dislinkt/common/interceptor"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/dislinkt/additional_user_service/application"
 	"github.com/dislinkt/additional_user_service/domain"
@@ -50,6 +52,8 @@ func (server *Server) Start() {
 	server.initRegisterUserHandler(additionalUserService, replyPublisher, commandSubscriber)
 
 	additionalUserHandler := server.initAdditionalUserHandler(additionalUserService)
+
+	server.initData(additionalUserService, additionalUserStore)
 
 	server.startGrpcServer(additionalUserHandler)
 }
@@ -120,4 +124,89 @@ func (server *Server) startGrpcServer(additionalUserHandler *api.AdditionalUserH
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
+}
+
+func (server *Server) initData(service *application.AdditionalUserService, store domain.AdditionalUserStore) {
+	var fields []*domain.FieldOfStudy
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Business Administration and Management, General"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Electrical and Electronics Engineering"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Accounting"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "English Language and Literature/Letters"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Political Science and Government"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Computer and Information Sciences and Support Services"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Communication and Media Studies"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Human Resources Management/Personnel Administration/General"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Architecture"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Electronic, Electronics and Communications Engineering"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Liberal Arts and Sciences/Liberal Studies"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(),
+		Name: "International Relations and Affairs"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Computer Systems networking and Telecommunications"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Criminal Justice and Corrections"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Business, Management, Marketing, and Related Support Services"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Art/Art Studies, General"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Advertising"})
+	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Fine/Studio Arts, General"})
+	_, err := store.InsertFieldOfStudy(fields)
+	if err != nil {
+		return
+	}
+
+	var skills []*domain.Skill
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Communication"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Teamwork"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Critical Thinking"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Active Listening"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Active Learning"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Problem Solving"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Management"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Training"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Design"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Presentations"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Data Analysis"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Blogging"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Business"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Leadership"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Time Management"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Troubleshooting"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Operating System"})
+	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Online Marketing"})
+	_, err = store.InsertSkills(skills)
+	if err != nil {
+		return
+	}
+
+	var industries []*domain.Industry
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(),
+		Name: "IT Services and IT Consulting"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Hospitals and Health Care"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(),
+		Name: "Education Administration Programs"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Government Administration"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Advertising Services"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Accounting"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Oil and Gas"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(),
+		Name: "Wellness and Fitness Services"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Food and Beverage Services"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Appliances, Electrical, " +
+		"and Electronics Manufacturing"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(),
+		Name: "Business Consulting and Services"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Transportation, " +
+		"Logistics and Storage"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Retail Apparel and Fashion"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(),
+		Name: "Food and Beverage Manufacturing"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Staffing and Recruiting"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Architecture and Planning"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Travel Arrangements"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Armed Forces"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Airlines and Aviation"})
+	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Blogs"})
+	_, err = store.InsertIndustires(industries)
+	if err != nil {
+		return
+	}
+
 }

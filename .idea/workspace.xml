@@ -5,30 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de4c83c8-1760-4cca-8cc9-6726fe2f70f9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/auth_service/startup/config/accessible_roles.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/initCalls/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/initCalls/src/INSERT_DATA.postman_collection.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/startup/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/startup/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/application/additional_user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/application/additional_user_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/domain/additional_user_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/domain/additional_user_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/domain/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/domain/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/persistence/additional_user_mongo_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/persistence/additional_user_mongo_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/startup/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/startup/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/additional_user_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api_gateway/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth_service/infrastructure/api/register_user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/infrastructure/api/register_user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.gw.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.gw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/connection_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/connection_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/post_service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/post_service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/application/register_user_orchestrator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/application/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/application/user_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/domain/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/domain/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/domain/user_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/domain/user_store.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/saga_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/saga_mapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/user_grpc_api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/persistence/user_postgres_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/persistence/user_postgres_store.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/startup/config/accessible_roles.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/startup/config/accessible_roles.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/connection_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/connection_service/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/startup/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/startup/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,6 +84,13 @@
       <recent name="D:\XML\Dislinkt\auth_service\infrastructure\api" />
       <recent name="C:\Users\User\Desktop\XML-projekat\Dislinkt\connection_service" />
       <recent name="C:\Users\User\Desktop\XML-projekat\Dislinkt\common\proto\connection_service" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\user1\Desktop\GIT\Dislink\Dislinkt\initCalls\src" />
+      <recent name="C:\Users\user1\Desktop\GIT\Dislink\Dislinkt\newman\src" />
+      <recent name="C:\Users\user1\Desktop\GIT\Dislink\Dislinkt\newman" />
+      <recent name="C:\Users\user1\Desktop\GIT\Dislink\Dislinkt" />
+      <recent name="C:\Users\user1\Desktop\GIT\Dislink\Dislinkt\user_service\startup" />
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build main.go">

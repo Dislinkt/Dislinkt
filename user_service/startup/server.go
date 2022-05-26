@@ -2,11 +2,11 @@ package startup
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/dislinkt/common/interceptor"
 	"log"
 	"net"
 
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dislinkt/common/interceptor"
 	userProto "github.com/dislinkt/common/proto/user_service"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
@@ -56,6 +56,7 @@ func (server *Server) Start() {
 	userHandler := server.initUserHandler(userService)
 
 	server.startGrpcServer(userHandler)
+
 }
 
 func (server *Server) initUserClient() *gorm.DB {
@@ -143,7 +144,7 @@ func (server *Server) startGrpcServer(userHandler *api.UserHandler) {
 
 	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), publicKey)
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
-	//grpcServer := grpc.NewServer()
+	// grpcServer := grpc.NewServer()
 	userProto.RegisterUserServiceServer(grpcServer, userHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)

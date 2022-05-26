@@ -2,10 +2,11 @@ package startup
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/dislinkt/common/interceptor"
 	"log"
 	"net"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dislinkt/common/interceptor"
 
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"

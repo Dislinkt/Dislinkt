@@ -2,13 +2,14 @@ package startup
 
 import (
 	"fmt"
+	"log"
+	"net"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dislinkt/common/interceptor"
 	postProto "github.com/dislinkt/common/proto/post_service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
-	"log"
-	"net"
 	"post_service/application"
 	"post_service/domain"
 	"post_service/infrastructure/api"
@@ -30,6 +31,7 @@ func (server *Server) Start() {
 
 	postService := server.initPostService(postStore)
 	postHandler := server.initPostHandler(postService)
+
 	server.startGrpcServer(postHandler)
 }
 

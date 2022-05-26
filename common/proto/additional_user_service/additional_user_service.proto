@@ -8,6 +8,21 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 service AdditionalUserService{
+  rpc GetFieldOfStudies(Get) returns(GetFieldOfStudiesResponse) {
+    option (google.api.http) = {
+      get: "/fieldOfStudies"
+    };
+  }
+  rpc GetSkills(Get) returns(GetSkillsResponse) {
+    option (google.api.http) = {
+      get: "/skills"
+    };
+  }
+  rpc GetIndustries(Get) returns(GetIndustriesResponse) {
+    option (google.api.http) = {
+      get: "/industries"
+    };
+  }
   //EDUCATION
   rpc NewEducation(NewEducationRequest) returns(EducationResponse) {
     option (google.api.http) = {
@@ -63,18 +78,18 @@ service AdditionalUserService{
       body: "skill"
     };
   }
-  rpc GetAllSkill(GetAllSkillRequest) returns(AllSkillResponse) {
+  rpc GetUserSkills(GetUserSkillsRequest) returns(UserSkillResponse) {
     option (google.api.http) = {
       get: "/user/{id}/skill"
     };
   }
-  rpc UpdateSkill(UpdateSkillRequest) returns(AllSkillResponse) {
+  rpc UpdateSkill(UpdateSkillRequest) returns(UserSkillResponse) {
     option (google.api.http) = {
       put: "/user/{userId}/skill/{skillId}"
       body: "skill"
     };
   }
-  rpc DeleteSkill(EmptyRequest) returns(AllSkillResponse) {
+  rpc DeleteSkill(EmptyRequest) returns(UserSkillResponse) {
     option (google.api.http) = {
       delete: "/user/{userId}/skill/{additionId}"
     };
@@ -103,6 +118,24 @@ service AdditionalUserService{
       delete: "/user/{userId}/interest/{additionId}"
     };
   }
+}
+
+
+
+message Get{
+
+}
+
+message GetFieldOfStudiesResponse{
+  repeated string fields = 1;
+}
+
+message GetSkillsResponse{
+  repeated string skills = 1;
+}
+
+message GetIndustriesResponse{
+  repeated string industries = 1;
 }
 
 message EmptyRequest{
@@ -205,11 +238,11 @@ message UpdateSkillRequest{
   NewSkill skill = 3;
 }
 
-message GetAllSkillRequest{
+message GetUserSkillsRequest{
   string id = 1;
 }
 
-message AllSkillResponse{
+message UserSkillResponse{
   repeated Skill skills = 1;
 }
 

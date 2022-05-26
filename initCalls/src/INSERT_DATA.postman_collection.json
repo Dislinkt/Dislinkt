@@ -1,0 +1,511 @@
+{
+	"info": {
+		"_postman_id": "14c91c2a-e638-4ce9-97df-34b8d69cb777",
+		"name": "INSERT DATA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15733498"
+	},
+	"item": [
+		{
+			"name": "ADD USER",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"id_kristin\", jsonData['user']['id'])"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n     \"name\": \"Kristin\",\r\n    \"surname\": \"Bell\",\r\n    \"username\": \"kristin_bell\",\r\n    \"email\": \"kristin.bell@gmail.com\",\r\n    \"password\":\"Lozinka1\",\r\n    \"number\":\"123456789\",\r\n    \"gender\": 2,\r\n    \"date_of_birth\": \"1999-06-26\",\r\n    \"biography\": \"It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\",\r\n    \"private\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ADD USER",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"id_anabel\", jsonData['user']['id'])"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n     \"name\": \"Anabel\",\r\n    \"surname\": \"Rosa\",\r\n    \"username\": \"anabel_rosa\",\r\n    \"email\": \"anabel.rosa@gmail.com\",\r\n    \"password\":\"Lozinka1\",\r\n    \"number\":\"123456789\",\r\n    \"gender\": 2,\r\n    \"date_of_birth\": \"1999-06-26\",\r\n    \"biography\": \"It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\",\r\n    \"private\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ADD USER",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"id_andrew\", jsonData['user']['id'])"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n     \"name\": \"Andrew\",\r\n    \"surname\": \"Montgomery\",\r\n    \"username\": \"andrew_montgomery\",\r\n    \"email\": \"andrew.montgomery@gmail.com\",\r\n    \"password\":\"Lozinka1\",\r\n    \"number\":\"123456789\",\r\n    \"gender\": 1,\r\n    \"date_of_birth\": \"1999-06-26\",\r\n    \"biography\": \"It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\",\r\n    \"private\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOG IN",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"token\", jsonData['jwt']['jwt'])"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\":\"Lozinka1\",\r\n    \"username\":\"kristin_bell\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/auth/login",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POSITION",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\":\"Freelance Content Writer and Editor\",\r\n    \"company_name\": \"RP Writing and Editing\",\r\n    \"industry\": \"Blogs\",\r\n    \"start-date\": \"2022-04-04\",\r\n    \"end-date\":\"2022-04-04\",\r\n    \"current\": false\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/{{id_kristin}}/position",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"{{id_kristin}}",
+						"position"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EDUCATION",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"school\":\"University of Michigan\",\r\n    \"degree\":\"Bachelor's degree\",\r\n    \"field_of_study\": \"Business, Management, Marketing, and Related Support Services\",\r\n    \"start_date\": \"2022-04-04\",\r\n    \"end_date\":\"2022-04-04\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/{{id_kristin}}/education",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"{{id_kristin}}",
+						"education"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SKILL",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Blogging\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/{{id_kristin}}/skill",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"{{id_kristin}}",
+						"skill"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"12\",\r\n    \"userId\": \"{{id_kristin}}\",\r\n    \"postText\": \"Like other unicorns going public, the company is losing billions - last year, both its revenue and losses doubled.\",\r\n    \"imagePaths\": [],\r\n    \"datePosted\": \"\",\r\n    \"reactions\": [],\r\n    \"comments\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/post",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Copy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"12\",\r\n    \"userId\": \"{{id_anabel}}\",\r\n    \"postText\": \"It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum..\",\r\n    \"imagePaths\": [],\r\n    \"datePosted\": \"\",\r\n    \"reactions\": [],\r\n    \"comments\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/post",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Copy 2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"12\",\r\n    \"userId\": \"{{id_andrew}}\",\r\n    \"postText\": \"It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.\",\r\n    \"imagePaths\": [],\r\n    \"datePosted\": \"\",\r\n    \"reactions\": [],\r\n    \"comments\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/post",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CONNECTION",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"BaseUserUUID\":\"{{id_kristin}}\",\r\n    \"ConnectUserUUID\":\"{{id_andrew}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/connection",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"connection"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CONNECTION",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"BaseUserUUID\":\"{{id_kristin}}\",\r\n    \"ConnectUserUUID\":\"{{id_anabel}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/connection",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"connection"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id_kristin",
+			"value": ""
+		},
+		{
+			"key": "id_anabel",
+			"value": ""
+		},
+		{
+			"key": "id_andrew",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "baseURL",
+			"value": "api_gateway:8000",
+			"type": "string"
+		}
+	]
+}
