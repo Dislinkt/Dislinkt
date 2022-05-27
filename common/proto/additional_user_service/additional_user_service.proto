@@ -127,16 +127,17 @@ message Get{
 }
 
 message GetFieldOfStudiesResponse{
-  repeated string fields = 1;
+  repeated Skill fields = 1;
 }
 
 message GetSkillsResponse{
-  repeated string skills = 1;
+  repeated Skill skills = 1;
 }
 
 message GetIndustriesResponse{
-  repeated string industries = 1;
+  repeated Skill industries = 1;
 }
+
 
 message EmptyRequest{
   string userId = 1;

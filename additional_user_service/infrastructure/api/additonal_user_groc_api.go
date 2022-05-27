@@ -20,7 +20,7 @@ func NewProductHandler(service *application.AdditionalUserService) *AdditionalUs
 }
 
 func (handler *AdditionalUserHandler) GetIndustries(ctx context.Context, request *pb.Get) (*pb.
-GetIndustriesResponse, error) {
+	GetIndustriesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -38,7 +38,7 @@ GetIndustriesResponse, error) {
 }
 
 func (handler *AdditionalUserHandler) GetSkills(ctx context.Context, request *pb.Get) (*pb.
-GetSkillsResponse, error) {
+	GetSkillsResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -56,7 +56,7 @@ GetSkillsResponse, error) {
 }
 
 func (handler *AdditionalUserHandler) GetFieldOfStudies(ctx context.Context, request *pb.Get) (*pb.
-GetFieldOfStudiesResponse, error) {
+	GetFieldOfStudiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -76,7 +76,7 @@ GetFieldOfStudiesResponse, error) {
 // EDUCATION
 
 func (handler *AdditionalUserHandler) NewEducation(ctx context.Context, request *pb.NewEducationRequest) (*pb.
-EducationResponse, error) {
+	EducationResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -131,7 +131,7 @@ func (handler *AdditionalUserHandler) UpdateEducation(ctx context.Context, reque
 }
 
 func (handler *AdditionalUserHandler) DeleteEducation(ctx context.Context, request *pb.EmptyRequest) (*pb.
-AllEducationResponse, error) {
+	AllEducationResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -151,7 +151,7 @@ AllEducationResponse, error) {
 // POSITION
 
 func (handler *AdditionalUserHandler) NewPosition(ctx context.Context, request *pb.NewPositionRequest) (*pb.
-PositionResponse, error) {
+	PositionResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -206,7 +206,7 @@ func (handler *AdditionalUserHandler) UpdatePosition(ctx context.Context, reques
 }
 
 func (handler *AdditionalUserHandler) DeletePosition(ctx context.Context, request *pb.EmptyRequest) (*pb.
-AllPositionResponse, error) {
+	AllPositionResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -226,7 +226,7 @@ AllPositionResponse, error) {
 // SKILL
 
 func (handler *AdditionalUserHandler) NewSkill(ctx context.Context, request *pb.NewSkillRequest) (*pb.
-SkillResponse, error) {
+	SkillResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -282,7 +282,7 @@ func (handler *AdditionalUserHandler) UpdateSkill(ctx context.Context, request *
 }
 
 func (handler *AdditionalUserHandler) DeleteSkill(ctx context.Context, request *pb.EmptyRequest) (*pb.
-UserSkillResponse, error) {
+	UserSkillResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -302,7 +302,7 @@ UserSkillResponse, error) {
 // INTEREST
 
 func (handler *AdditionalUserHandler) NewInterest(ctx context.Context, request *pb.NewInterestRequest) (*pb.
-InterestResponse, error) {
+	InterestResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -357,7 +357,7 @@ func (handler *AdditionalUserHandler) UpdateInterest(ctx context.Context, reques
 }
 
 func (handler *AdditionalUserHandler) DeleteInterest(ctx context.Context, request *pb.EmptyRequest) (*pb.
-AllInterestResponse, error) {
+	AllInterestResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 

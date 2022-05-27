@@ -14,13 +14,13 @@ func mapUser(userD *domain.User) *pb.User {
 	id := userD.Id.String()
 
 	links := &pb.Links{
-		User:        "/user/" + id,
-		Interests:   "/interest/" + id,
-		Skills:      "/skill/" + id,
-		Positions:   "/position/" + id,
-		Educations:  "/education/" + id,
+		User:        "/user/me",
+		Interests:   "/user/" + id + "/interest",
+		Skills:      "/user/" + id + "/skill",
+		Positions:   "/user/" + id + "/position",
+		Educations:  "/user/" + id + "/education",
 		Posts:       "/post/" + id,
-		Connections: "/connection/" + id,
+		Connections: "/connection/user/" + id,
 	}
 
 	userPb := &pb.User{

@@ -229,8 +229,8 @@ services:
     command: >
       newman run /initCalls/src/INSERT_DATA.postman_collection.json
       -r cli
-      --delay-request 5000
-      --timeout-request 5000
+      --delay-request 7000
+      --timeout-request 10000
     depends_on:
       - additional_user_service
       - connection_service

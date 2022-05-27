@@ -145,26 +145,26 @@ func mapInterests(interests *map[string]domain.Interest) []*pb.Interest {
 	return interestsPb
 }
 
-func mapFieldsOfStudies(fields []*domain.FieldOfStudy) []string {
-	var stringFields []string
+func mapFieldsOfStudies(fields []*domain.FieldOfStudy) []*pb.Skill {
+	var stringFields []*pb.Skill
 	for _, f := range fields {
-		stringFields = append(stringFields, f.Name)
+		stringFields = append(stringFields, &pb.Skill{Id: f.Id.String(), Name: f.Name})
 	}
 	return stringFields
 }
 
-func mapSkills(skills []*domain.Skill) []string {
-	var stringSkills []string
+func mapSkills(skills []*domain.Skill) []*pb.Skill {
+	var stringSkills []*pb.Skill
 	for _, s := range skills {
-		stringSkills = append(stringSkills, s.Name)
+		stringSkills = append(stringSkills, &pb.Skill{Id: s.Id.String(), Name: s.Name})
 	}
 	return stringSkills
 }
 
-func mapIndustries(industries []*domain.Industry) []string {
-	var stringIndustries []string
+func mapIndustries(industries []*domain.Industry) []*pb.Skill {
+	var stringIndustries []*pb.Skill
 	for _, i := range industries {
-		stringIndustries = append(stringIndustries, i.Name)
+		stringIndustries = append(stringIndustries, &pb.Skill{Id: i.Id.String(), Name: i.Name})
 	}
 	return stringIndustries
 }
