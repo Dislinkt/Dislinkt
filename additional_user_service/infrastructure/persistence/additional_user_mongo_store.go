@@ -19,6 +19,7 @@ const (
 	COLLECTION_FIELD_OF_STUDY = "field_of_study"
 	COLLECTION_SKILLS         = "skills"
 	COLLECTION_INDUSTRIES     = "industries"
+	COLLECTION_DEGREES        = "degrees"
 )
 
 type AdditionalUserMongoDBStore struct {
@@ -26,6 +27,7 @@ type AdditionalUserMongoDBStore struct {
 	fieldOfStudy *mongo.Collection
 	skills       *mongo.Collection
 	industries   *mongo.Collection
+	degrees      *mongo.Collection
 }
 
 func NewAdditionalUserMongoDBStore(client *mongo.Client) domain.AdditionalUserStore {
@@ -33,16 +35,50 @@ func NewAdditionalUserMongoDBStore(client *mongo.Client) domain.AdditionalUserSt
 	fieldOfStudy := client.Database(DATABASE).Collection(COLLECTION_FIELD_OF_STUDY)
 	skills := client.Database(DATABASE).Collection(COLLECTION_SKILLS)
 	industries := client.Database(DATABASE).Collection(COLLECTION_INDUSTRIES)
+	degrees := client.Database(DATABASE).Collection(COLLECTION_DEGREES)
 	return &AdditionalUserMongoDBStore{
 		users:        users,
 		fieldOfStudy: fieldOfStudy,
 		skills:       skills,
 		industries:   industries,
+		degrees:      degrees,
 	}
 }
 
-func (store *AdditionalUserMongoDBStore) InsertIndustires(industries []*domain.Industry) ([]*domain.Industry, error) {
-	fmt.Println("InsertIndustires")
+func (store *AdditionalUserMongoDBStore) InsertDegrees(degrees []*domain.Degree) ([]*domain.Degree, error) {
+	fmt.Println("InsertDegree")
+	fmt.Println(degrees)
+	for _, i := range degrees {
+		_, err := store.degrees.InsertOne(context.TODO(), i)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return degrees, nil
+}
+
+func (store *AdditionalUserMongoDBStore) GetDegrees() (degrees []*domain.Degree, err error) {
+	cursor, err := store.degrees.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+	var allDegrees []*domain.Degree
+	for cursor.Next(context.TODO()) {
+		var degree domain.Degree
+		if err = cursor.Decode(&degree); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(degree)
+		allDegrees = append(allDegrees, &degree)
+	}
+	fmt.Println(allDegrees)
+	return allDegrees, nil
+}
+
+func (store *AdditionalUserMongoDBStore) InsertIndustries(industries []*domain.Industry) ([]*domain.Industry, error) {
+	fmt.Println("InsertIndustries")
 	fmt.Println(industries)
 	for _, i := range industries {
 		_, err := store.industries.InsertOne(context.TODO(), i)

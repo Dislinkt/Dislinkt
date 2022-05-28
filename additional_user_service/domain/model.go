@@ -64,3 +64,8 @@ type Industry struct {
 	Id   primitive.ObjectID `bson:"_id"`
 	Name string             `bson:"name"`
 }
+
+type Degree struct {
+	Id   primitive.ObjectID `bson:"_id"`
+	Name string             `bson:"name"`
+}

@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdditionalUserServiceClient interface {
 	GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
+	GetDegrees(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
 	GetSkills(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
 	GetIndustries(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
 	//EDUCATION
@@ -58,6 +59,15 @@ func NewAdditionalUserServiceClient(cc grpc.ClientConnInterface) AdditionalUserS
 func (c *additionalUserServiceClient) GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
 	out := new(GetEntitiesResponse)
 	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetFieldOfStudies", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *additionalUserServiceClient) GetDegrees(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
+	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetDegrees", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -231,6 +241,7 @@ func (c *additionalUserServiceClient) DeleteInterest(ctx context.Context, in *Em
 // for forward compatibility
 type AdditionalUserServiceServer interface {
 	GetFieldOfStudies(context.Context, *Get) (*GetEntitiesResponse, error)
+	GetDegrees(context.Context, *Get) (*GetEntitiesResponse, error)
 	GetSkills(context.Context, *Get) (*GetEntitiesResponse, error)
 	GetIndustries(context.Context, *Get) (*GetEntitiesResponse, error)
 	//EDUCATION
@@ -262,6 +273,9 @@ type UnimplementedAdditionalUserServiceServer struct {
 
 func (UnimplementedAdditionalUserServiceServer) GetFieldOfStudies(context.Context, *Get) (*GetEntitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFieldOfStudies not implemented")
+}
+func (UnimplementedAdditionalUserServiceServer) GetDegrees(context.Context, *Get) (*GetEntitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDegrees not implemented")
 }
 func (UnimplementedAdditionalUserServiceServer) GetSkills(context.Context, *Get) (*GetEntitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSkills not implemented")
@@ -344,6 +358,24 @@ func _AdditionalUserService_GetFieldOfStudies_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdditionalUserServiceServer).GetFieldOfStudies(ctx, req.(*Get))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdditionalUserService_GetDegrees_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Get)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdditionalUserServiceServer).GetDegrees(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/additional_user_service_proto.AdditionalUserService/GetDegrees",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdditionalUserServiceServer).GetDegrees(ctx, req.(*Get))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -682,6 +714,10 @@ var AdditionalUserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFieldOfStudies",
 			Handler:    _AdditionalUserService_GetFieldOfStudies_Handler,
+		},
+		{
+			MethodName: "GetDegrees",
+			Handler:    _AdditionalUserService_GetDegrees_Handler,
 		},
 		{
 			MethodName: "GetSkills",

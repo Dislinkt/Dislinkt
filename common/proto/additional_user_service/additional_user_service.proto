@@ -13,6 +13,11 @@ service AdditionalUserService{
       get: "/fieldOfStudies"
     };
   }
+  rpc GetDegrees(Get) returns(GetEntitiesResponse) {
+    option (google.api.http) = {
+      get: "/degrees"
+    };
+  }
   rpc GetSkills(Get) returns(GetEntitiesResponse) {
     option (google.api.http) = {
       get: "/skills"

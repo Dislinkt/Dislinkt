@@ -32,6 +32,8 @@ type AdditionalUserStore interface {
 	GetAllFieldOfStudy() ([]*FieldOfStudy, error)
 	InsertSkills(skills []*Skill) ([]*Skill, error)
 	GetSkills() (skills []*Skill, err error)
-	InsertIndustires(industries []*Industry) ([]*Industry, error)
+	InsertIndustries(industries []*Industry) ([]*Industry, error)
 	GetIndustries() (industries []*Industry, err error)
+	InsertDegrees(degrees []*Degree) ([]*Degree, error)
+	GetDegrees() (degrees []*Degree, err error)
 }

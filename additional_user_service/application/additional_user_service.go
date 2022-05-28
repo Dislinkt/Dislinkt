@@ -256,3 +256,11 @@ func (service *AdditionalUserService) GetIndustries() ([]*domain.Industry, error
 	}
 	return industries, nil
 }
+
+func (service *AdditionalUserService) GetDegrees() ([]*domain.Degree, error) {
+	degrees, err := service.store.GetDegrees()
+	if err != nil {
+		return nil, nil
+	}
+	return degrees, nil
+}

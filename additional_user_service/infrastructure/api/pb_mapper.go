@@ -185,3 +185,11 @@ func mapIndustries(industries []*domain.Industry) []*pb.Skill {
 	}
 	return stringIndustries
 }
+
+func mapDegrees(degrees []*domain.Degree) []*pb.Skill {
+	var stringDegrees []*pb.Skill
+	for _, d := range degrees {
+		stringDegrees = append(stringDegrees, &pb.Skill{Id: d.Id.String(), Name: d.Name})
+	}
+	return stringDegrees
+}

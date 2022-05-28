@@ -204,7 +204,21 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Armed Forces"})
 	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Airlines and Aviation"})
 	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Blogs"})
-	_, err = store.InsertIndustires(industries)
+	_, err = store.InsertIndustries(industries)
+	if err != nil {
+		return
+	}
+
+	var degrees []*domain.Degree
+	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(),
+		Name: "Doctoral degree"})
+	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(), Name: "Professional degree"})
+	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(),
+		Name: "Master's degree"})
+	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(), Name: "Bachelor's degree"})
+	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(), Name: "Associate's degree"})
+	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(), Name: "High school diploma"})
+	_, err = store.InsertDegrees(degrees)
 	if err != nil {
 		return
 	}
