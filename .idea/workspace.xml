@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="de4c83c8-1760-4cca-8cc9-6726fe2f70f9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/auth_service/application/auth_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/application/auth_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth_service/infrastructure/api/auth_grpc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth_service/infrastructure/api/auth_grpc_api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service.pb.gw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/auth_service/auth_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/auth_service/auth_service_grpc.pb.go" afterDir="false" />
-    </list>
+    <list default="true" id="31df58a7-eb86-402a-a32b-5e9e753173bc" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
