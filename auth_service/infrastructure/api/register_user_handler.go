@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/dislinkt/auth_service/application"
 	saga "github.com/dislinkt/common/saga/messaging"
 	events "github.com/dislinkt/common/saga/register_user"
@@ -8,14 +9,16 @@ import (
 
 type CreateUserCommandHandler struct {
 	userService       *application.UserService
+	authService       *application.AuthService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
 }
 
-func NewRegisterUserCommandHandler(userService *application.UserService, publisher saga.Publisher,
+func NewRegisterUserCommandHandler(userService *application.UserService, authService *application.AuthService, publisher saga.Publisher,
 	subscriber saga.Subscriber) (*CreateUserCommandHandler, error) {
 	o := &CreateUserCommandHandler{
 		userService:       userService,
+		authService:       authService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
 	}
@@ -31,9 +34,21 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 
 	switch command.Type {
 	case events.UpdateAuth:
-		uuid, err := handler.userService.Insert(mapCommandUser(command))
+		user := mapCommandUser(command)
+		if user == nil {
+			return
+		}
+		uuid, err := handler.userService.Insert(user)
+
 		reply.User.Id = uuid.String()
 		if err != nil {
+			reply.Type = events.AuthNotUpdated
+			return
+		}
+
+		errSendingMail := handler.authService.SendActivationMail(user.Username)
+		if errSendingMail != nil {
+			fmt.Println("ERROR SENDING MAIL")
 			reply.Type = events.AuthNotUpdated
 			return
 		}

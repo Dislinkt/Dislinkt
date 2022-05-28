@@ -44,15 +44,6 @@ func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateR
 		}, nil
 	}
 
-	//var user domain.User
-
-	//if result := handler.userDB.Where(&domain.User{Email: claims.Email}).First(&user); result.Error != nil {
-	//	return &pb.ValidateResponse{
-	//		Status: http.StatusNotFound,
-	//		Error:  "User not found",
-	//	}, nil
-	//}
-
 	if claims != nil {
 		return &pb.ValidateResponse{
 			Status:   http.StatusOK,
@@ -65,4 +56,28 @@ func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateR
 		Username: username,
 		Role:     role,
 	}, nil
+}
+
+func (handler *AuthHandler) PasswordlessLogin(ctx context.Context, req *pb.PasswordlessLoginRequest) (*pb.PasswordlessLoginResponse, error) {
+	return handler.service.PasswordlessLogin(ctx, req)
+}
+
+func (handler *AuthHandler) ConfirmEmailLogin(ctx context.Context, req *pb.ConfirmEmailLoginRequest) (*pb.ConfirmEmailLoginResponse, error) {
+	return handler.service.ConfirmEmailLogin(ctx, req)
+}
+
+func (handler *AuthHandler) ActivateAccount(ctx context.Context, req *pb.ActivationRequest) (*pb.ActivationResponse, error) {
+	return handler.service.ActivateAccount(ctx, req)
+}
+
+func (handler *AuthHandler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+	return handler.service.ChangePassword(ctx, req)
+}
+
+func (handler *AuthHandler) RecoverAccount(ctx context.Context, req *pb.RecoverAccountRequest) (*pb.RecoverAccountResponse, error) {
+	return handler.service.RecoverAccount(ctx, req)
+}
+
+func (handler *AuthHandler) SendAccountRecoveryMail(ctx context.Context, req *pb.AccountRecoveryMailRequest) (*pb.AccountRecoveryMailResponse, error) {
+	return handler.service.SendAccountRecoveryMail(ctx, req)
 }

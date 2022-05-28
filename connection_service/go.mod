@@ -5,6 +5,7 @@ go 1.18
 replace github.com/dislinkt/common => ../common
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	github.com/neo4j/neo4j-go-driver/v4 v4.4.2
 	google.golang.org/grpc v1.46.0

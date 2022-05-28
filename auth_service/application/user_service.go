@@ -28,6 +28,16 @@ func (service *UserService) GetByUsername(username string) (*domain.User, error)
 	return user, err
 }
 
+func (service *UserService) GetByEmail(email string) (*domain.User, error) {
+	user, err := service.store.GetByEmail(email)
+
+	if err != nil {
+		return nil, errors.New("invalid user")
+	}
+
+	return user, err
+}
+
 func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
 	// defer span.Finish()
@@ -42,4 +52,18 @@ func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 
 func (service *UserService) Delete(user *domain.User) error {
 	return service.store.Delete(user)
+}
+
+func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
+	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
+	// defer span.Finish()
+	//
+	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	_, err := service.store.FindByID(uuid)
+	if err != nil {
+		return err
+	}
+
+	user.Id = uuid
+	return service.store.Update(user)
 }

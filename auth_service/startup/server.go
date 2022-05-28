@@ -2,6 +2,8 @@ package startup
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dislinkt/common/interceptor"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
 	"log"
@@ -41,7 +43,7 @@ func (server *Server) Start() {
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
-	server.initRegisterUserHandler(userService, replyPublisher, commandSubscriber)
+	server.initRegisterUserHandler(userService, authService, replyPublisher, commandSubscriber)
 
 	authHandler := server.initAuthHandler(authService)
 
@@ -98,9 +100,9 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 	return subscriber
 }
 
-func (server *Server) initRegisterUserHandler(service *application.UserService, publisher saga.Publisher,
+func (server *Server) initRegisterUserHandler(service *application.UserService, authService *application.AuthService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
-	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	_, err := api.NewRegisterUserCommandHandler(service, authService, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -119,7 +121,14 @@ func (server *Server) startGrpcServer(authHandler *api.AuthHandler) {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	grpcServer := grpc.NewServer()
+
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
+	if err != nil {
+		log.Fatalf("failed to parse public key: %v", err)
+	}
+
+	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), publicKey)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	authProto.RegisterAuthServiceServer(grpcServer, authHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
