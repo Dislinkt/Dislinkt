@@ -13,8 +13,8 @@ import (
 // EDUCATION
 
 func mapNewEducation(educationPb *pb.NewEducation) *domain.Education {
-	startDate, _ := time.Parse("2006-01-02", educationPb.StartDate)
-	endDate, _ := time.Parse("2006-01-02", educationPb.EndDate)
+	startDate, _ := time.Parse(time.RFC3339, educationPb.StartDate)
+	endDate, _ := time.Parse(time.RFC3339, educationPb.EndDate)
 
 	educationD := &domain.Education{
 		Degree:       educationPb.Degree,
