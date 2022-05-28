@@ -356,3 +356,112 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 		Token: request.Token,
 	}, nil
 }
+
+func (auth *AuthService) SendAccountRecoveryMail(ctx context.Context, request *pb.AccountRecoveryMailRequest) (*pb.AccountRecoveryMailResponse, error) {
+	user, err := auth.userService.GetByEmail(request.Email)
+	if err != nil || user == nil {
+		return nil, errors.New("invalid email")
+	}
+
+	expireTime := time.Now().Add(time.Hour).Unix()
+	token, err := generateToken(user, expireTime)
+
+	message := recoverAccountMailMessage(token, user.Username)
+
+	from := config.NewConfig().EmailSender
+	emailPassword := config.NewConfig().EmailPassword
+	to := []string{user.Email}
+
+	host := config.NewConfig().EmailHost
+	port := config.NewConfig().EmailPort
+	smtpAddress := host + ":" + port
+	authMail := smtp.PlainAuth("", from, emailPassword, host)
+	errSendingMail := smtp.SendMail(smtpAddress, authMail, from, to, message)
+	if errSendingMail != nil {
+		fmt.Println("err:  ", errSendingMail)
+		return nil, errSendingMail
+	}
+	return &pb.AccountRecoveryMailResponse{
+		Success: "Email Sent Successfully! Check your email.",
+	}, nil
+}
+
+func recoverAccountMailMessage(token string, username string) []byte {
+	// TODO SD: port se moze izvuci iz env var - 4200
+	urlRedirection := "http://localhost:4200/recover-account/" + token
+
+	subject := "Subject: Account activation\n"
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	body := "<html><body>\n" +
+		"Hello " + username + "! Recover your account with click on link: " + urlRedirection +
+		"<br> <br>\n" +
+		"</body>" +
+		"</html>"
+	message := []byte(subject + mime + body)
+	return message
+}
+
+func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.RecoverAccountRequest) (*pb.RecoverAccountResponse, error) {
+	token, err := jwt.Parse(request.Token, func(token *jwt.Token) (interface{}, error) {
+		//Make sure that the token method conform to "SigningMethodHMAC"
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte("Dislinkt"), nil
+	})
+	if err != nil {
+		return &pb.RecoverAccountResponse{
+			StatusCode: "500",
+			Message:    "Could not parse token",
+		}, errors.New("Could not parse token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return &pb.RecoverAccountResponse{
+			StatusCode: "403",
+			Message:    "Could not parse claims",
+		}, errors.New("Could not parse claims")
+	}
+
+	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
+		return nil, fmt.Errorf("JWT is expired")
+	}
+	if err != nil {
+		return &pb.RecoverAccountResponse{
+			StatusCode: "403",
+			Message:    "Token expired",
+		}, errors.New("Token expired")
+	}
+
+	user, err := auth.userService.GetByUsername(claims["username"].(string))
+	if err != nil {
+		return &pb.RecoverAccountResponse{
+			StatusCode: "500",
+			Message:    "User not found",
+		}, errors.New("User not found")
+	}
+
+	if request.NewPassword != request.NewReenteredPassword {
+		return &pb.RecoverAccountResponse{
+			StatusCode: "500",
+			Message:    "New passwords do not match",
+		}, errors.New("New passwords do not match")
+	}
+
+	hashedNewPassword, err := HashAndSaltPasswordIfStrongAndMatching(request.NewPassword)
+	if err != nil || hashedNewPassword == "" {
+		return &pb.RecoverAccountResponse{
+			StatusCode: "500",
+			Message:    err.Error(),
+		}, err
+	}
+
+	user.Password = hashedNewPassword
+	auth.userService.Update(user.Id, user)
+
+	return &pb.RecoverAccountResponse{
+		StatusCode: "200",
+		Message:    "User account recovered",
+	}, nil
+}

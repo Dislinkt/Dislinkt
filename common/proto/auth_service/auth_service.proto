@@ -44,10 +44,25 @@ service AuthService{
 
   rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
     option (google.api.http) = {
-      post: "/api/auth/changePassword"
+      post: "/api/auth/change-password"
       body: "*"
     };
   }
+
+  rpc RecoverAccount(RecoverAccountRequest) returns (RecoverAccountResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/recover-account"
+      body: "*"
+    };
+  }
+
+  rpc SendAccountRecoveryMail(AccountRecoveryMailRequest) returns(AccountRecoveryMailResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/send-account-recover-mail",
+      body: "*"
+    };
+  }
+
 }
 
 message LoginRequest {
@@ -109,4 +124,23 @@ message ChangePasswordRequest {
 message ChangePasswordResponse {
   string message = 1;
   string statusCode = 2;
+}
+
+message RecoverAccountRequest {
+  string token = 1;
+  string newPassword = 2;
+  string newReenteredPassword = 3;
+}
+
+message RecoverAccountResponse {
+  string message = 1;
+  string statusCode = 2;
+}
+
+message AccountRecoveryMailRequest{
+  string email = 1;
+}
+
+message AccountRecoveryMailResponse{
+  string success = 1;
 }

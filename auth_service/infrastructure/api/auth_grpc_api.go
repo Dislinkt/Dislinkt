@@ -73,3 +73,11 @@ func (handler *AuthHandler) ActivateAccount(ctx context.Context, req *pb.Activat
 func (handler *AuthHandler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
 	return handler.service.ChangePassword(ctx, req)
 }
+
+func (handler *AuthHandler) RecoverAccount(ctx context.Context, req *pb.RecoverAccountRequest) (*pb.RecoverAccountResponse, error) {
+	return handler.service.RecoverAccount(ctx, req)
+}
+
+func (handler *AuthHandler) SendAccountRecoveryMail(ctx context.Context, req *pb.AccountRecoveryMailRequest) (*pb.AccountRecoveryMailResponse, error) {
+	return handler.service.SendAccountRecoveryMail(ctx, req)
+}
