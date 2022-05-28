@@ -8,17 +8,17 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 service AdditionalUserService{
-  rpc GetFieldOfStudies(Get) returns(GetFieldOfStudiesResponse) {
+  rpc GetFieldOfStudies(Get) returns(GetEntitiesResponse) {
     option (google.api.http) = {
       get: "/fieldOfStudies"
     };
   }
-  rpc GetSkills(Get) returns(GetSkillsResponse) {
+  rpc GetSkills(Get) returns(GetEntitiesResponse) {
     option (google.api.http) = {
       get: "/skills"
     };
   }
-  rpc GetIndustries(Get) returns(GetIndustriesResponse) {
+  rpc GetIndustries(Get) returns(GetEntitiesResponse) {
     option (google.api.http) = {
       get: "/industries"
     };
@@ -126,16 +126,8 @@ message Get{
 
 }
 
-message GetFieldOfStudiesResponse{
-  repeated Skill fields = 1;
-}
-
-message GetSkillsResponse{
-  repeated Skill skills = 1;
-}
-
-message GetIndustriesResponse{
-  repeated Skill industries = 1;
+message GetEntitiesResponse{
+  repeated Skill entities = 1;
 }
 
 

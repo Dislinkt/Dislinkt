@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dislinkt/additional_user_service/domain"
@@ -51,9 +52,25 @@ func mapEducations(educations *map[string]domain.Education) []*pb.Education {
 // POSITION
 
 func mapNewPosition(positionPb *pb.NewPosition) *domain.Position {
-	startDate, _ := time.Parse("2006-01-02", positionPb.StartDate)
-	endDate, _ := time.Parse("2006-01-02", positionPb.EndDate)
+	fmt.Println("START: " + positionPb.StartDate)
+	fmt.Println("END: " + positionPb.EndDate)
 
+	startDate, _ := time.Parse(time.RFC3339, positionPb.StartDate)
+	endDate, _ := time.Parse(time.RFC3339, positionPb.EndDate)
+
+	fmt.Println("PARSED " + startDate.String())
+	fmt.Println("PARSED " + endDate.String())
+
+	json, err := primitive.NewDateTimeFromTime(startDate).MarshalJSON()
+	if err != nil {
+		return nil
+	}
+	marshalJSON, err := primitive.NewDateTimeFromTime(endDate).MarshalJSON()
+	if err != nil {
+		return nil
+	}
+	fmt.Println("PRIMITIVE " + string(json))
+	fmt.Println("PRIMITIVE " + string(marshalJSON))
 	positionD := &domain.Position{
 		Title:       positionPb.Title,
 		CompanyName: positionPb.CompanyName,

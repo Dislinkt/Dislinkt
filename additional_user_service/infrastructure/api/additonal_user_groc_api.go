@@ -20,7 +20,7 @@ func NewProductHandler(service *application.AdditionalUserService) *AdditionalUs
 }
 
 func (handler *AdditionalUserHandler) GetIndustries(ctx context.Context, request *pb.Get) (*pb.
-	GetIndustriesResponse, error) {
+	GetEntitiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -32,13 +32,13 @@ func (handler *AdditionalUserHandler) GetIndustries(ctx context.Context, request
 		return nil, err
 	}
 
-	return &pb.GetIndustriesResponse{
-		Industries: mapIndustries(industries),
+	return &pb.GetEntitiesResponse{
+		Entities: mapIndustries(industries),
 	}, nil
 }
 
 func (handler *AdditionalUserHandler) GetSkills(ctx context.Context, request *pb.Get) (*pb.
-	GetSkillsResponse, error) {
+	GetEntitiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -50,13 +50,13 @@ func (handler *AdditionalUserHandler) GetSkills(ctx context.Context, request *pb
 		return nil, err
 	}
 
-	return &pb.GetSkillsResponse{
-		Skills: mapSkills(skills),
+	return &pb.GetEntitiesResponse{
+		Entities: mapSkills(skills),
 	}, nil
 }
 
 func (handler *AdditionalUserHandler) GetFieldOfStudies(ctx context.Context, request *pb.Get) (*pb.
-	GetFieldOfStudiesResponse, error) {
+	GetEntitiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -68,8 +68,8 @@ func (handler *AdditionalUserHandler) GetFieldOfStudies(ctx context.Context, req
 		return nil, err
 	}
 
-	return &pb.GetFieldOfStudiesResponse{
-		Fields: mapFieldsOfStudies(fields),
+	return &pb.GetEntitiesResponse{
+		Entities: mapFieldsOfStudies(fields),
 	}, nil
 }
 

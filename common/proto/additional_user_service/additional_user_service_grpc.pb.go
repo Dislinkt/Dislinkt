@@ -22,9 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdditionalUserServiceClient interface {
-	GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetFieldOfStudiesResponse, error)
-	GetSkills(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetSkillsResponse, error)
-	GetIndustries(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetIndustriesResponse, error)
+	GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
+	GetSkills(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
+	GetIndustries(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
 	//EDUCATION
 	NewEducation(ctx context.Context, in *NewEducationRequest, opts ...grpc.CallOption) (*EducationResponse, error)
 	GetAllEducation(ctx context.Context, in *GetAllEducationRequest, opts ...grpc.CallOption) (*AllEducationResponse, error)
@@ -55,8 +55,8 @@ func NewAdditionalUserServiceClient(cc grpc.ClientConnInterface) AdditionalUserS
 	return &additionalUserServiceClient{cc}
 }
 
-func (c *additionalUserServiceClient) GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetFieldOfStudiesResponse, error) {
-	out := new(GetFieldOfStudiesResponse)
+func (c *additionalUserServiceClient) GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
 	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetFieldOfStudies", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *additionalUserServiceClient) GetFieldOfStudies(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *additionalUserServiceClient) GetSkills(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetSkillsResponse, error) {
-	out := new(GetSkillsResponse)
+func (c *additionalUserServiceClient) GetSkills(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
 	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetSkills", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -73,8 +73,8 @@ func (c *additionalUserServiceClient) GetSkills(ctx context.Context, in *Get, op
 	return out, nil
 }
 
-func (c *additionalUserServiceClient) GetIndustries(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetIndustriesResponse, error) {
-	out := new(GetIndustriesResponse)
+func (c *additionalUserServiceClient) GetIndustries(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
 	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetIndustries", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -230,9 +230,9 @@ func (c *additionalUserServiceClient) DeleteInterest(ctx context.Context, in *Em
 // All implementations must embed UnimplementedAdditionalUserServiceServer
 // for forward compatibility
 type AdditionalUserServiceServer interface {
-	GetFieldOfStudies(context.Context, *Get) (*GetFieldOfStudiesResponse, error)
-	GetSkills(context.Context, *Get) (*GetSkillsResponse, error)
-	GetIndustries(context.Context, *Get) (*GetIndustriesResponse, error)
+	GetFieldOfStudies(context.Context, *Get) (*GetEntitiesResponse, error)
+	GetSkills(context.Context, *Get) (*GetEntitiesResponse, error)
+	GetIndustries(context.Context, *Get) (*GetEntitiesResponse, error)
 	//EDUCATION
 	NewEducation(context.Context, *NewEducationRequest) (*EducationResponse, error)
 	GetAllEducation(context.Context, *GetAllEducationRequest) (*AllEducationResponse, error)
@@ -260,13 +260,13 @@ type AdditionalUserServiceServer interface {
 type UnimplementedAdditionalUserServiceServer struct {
 }
 
-func (UnimplementedAdditionalUserServiceServer) GetFieldOfStudies(context.Context, *Get) (*GetFieldOfStudiesResponse, error) {
+func (UnimplementedAdditionalUserServiceServer) GetFieldOfStudies(context.Context, *Get) (*GetEntitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFieldOfStudies not implemented")
 }
-func (UnimplementedAdditionalUserServiceServer) GetSkills(context.Context, *Get) (*GetSkillsResponse, error) {
+func (UnimplementedAdditionalUserServiceServer) GetSkills(context.Context, *Get) (*GetEntitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSkills not implemented")
 }
-func (UnimplementedAdditionalUserServiceServer) GetIndustries(context.Context, *Get) (*GetIndustriesResponse, error) {
+func (UnimplementedAdditionalUserServiceServer) GetIndustries(context.Context, *Get) (*GetEntitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIndustries not implemented")
 }
 func (UnimplementedAdditionalUserServiceServer) NewEducation(context.Context, *NewEducationRequest) (*EducationResponse, error) {

@@ -8,14 +8,10 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_gateway/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/startup/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.gw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/initCalls/src/INSERT_DATA.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/initCalls/src/INSERT_DATA.postman_collection.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
