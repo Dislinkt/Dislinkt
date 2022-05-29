@@ -2,7 +2,6 @@ package interceptor
 
 import (
 	"context"
-	"crypto/rsa"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"strings"
@@ -15,14 +14,14 @@ import (
 )
 
 type AuthInterceptor struct {
-	accessibleRoles map[string][]string
-	publicKey       *rsa.PublicKey
+	accessiblePermissions map[string]string
+	publicKey             string
 }
 
-func NewAuthInterceptor(accessibleRoles map[string][]string, publicKey *rsa.PublicKey) *AuthInterceptor {
+func NewAuthInterceptor(accessiblePermissions map[string]string, publicKey string) *AuthInterceptor {
 	return &AuthInterceptor{
-		accessibleRoles: accessibleRoles,
-		publicKey:       publicKey,
+		accessiblePermissions: accessiblePermissions,
+		publicKey:             publicKey,
 	}
 }
 
@@ -41,7 +40,7 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 
 func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string) (context.Context, error) {
 	fmt.Println("USAOOOOOOOOOO")
-	accessibleRoles, ok := interceptor.accessibleRoles[method]
+	accessiblePermission, ok := interceptor.accessiblePermissions[method]
 	// u mapi ne postoje role za ovu metodu => javno dostupna putanja
 	if !ok {
 		return ctx, nil
@@ -73,53 +72,31 @@ func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string
 		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
 	}
 
-	fmt.Println(claims["role"].(string))
-	for _, role := range accessibleRoles {
-		if role == claims["role"].(string) {
+	fmt.Println("PEEEEEEEEEEEERMISSIOOOONS")
+	for _, role := range claims.Permissions {
+		if role == accessiblePermission {
 			fmt.Println(role)
-			return context.WithValue(ctx, LoggedInUserKey{}, claims["username"].(string)), nil
+			return context.WithValue(ctx, LoggedInUserKey{}, claims.Username), nil
 		}
 	}
 
 	return ctx, status.Errorf(codes.PermissionDenied, "Forbidden")
 }
 
-func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims jwt.MapClaims, err error) {
-	//token, err := jwt.ParseWithClaims(
-	//	accessToken,
-	//	&UserClaims{},
-	//	func(token *jwt.Token) (interface{}, error) {
-	//		_, ok := token.Method.(*jwt.SigningMethodRSA)
-	//		if !ok {
-	//			return nil, fmt.Errorf("Unexpected token signing method")
-	//		}
-	//
-	//		return interceptor.publicKey, nil
-	//	},
-	//)
-	//if err != nil {
-	//	return nil, fmt.Errorf("Invalid token: %w", err)
-	//}
-	//claims, ok := token.Claims.(*UserClaims)
-	//if !ok {
-	//	return nil, fmt.Errorf("Invalid token claims")
-	//}
-	//
-	//return claims, nil
-	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims *Claims, err error) {
+	token, err := jwt.ParseWithClaims(accessToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		//return []byte(os.Getenv("ACCESS_SECRET")), nil
-		return []byte("Dislinkt"), nil
+		return []byte(interceptor.publicKey), nil
 	})
 
 	if err != nil {
 		return
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(*Claims)
 
 	if !ok {
 		return nil, fmt.Errorf("Couldn't parse claims")
@@ -130,6 +107,13 @@ func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims jwt.
 	}
 
 	return claims, nil
+}
+
+type Claims struct {
+	Username    string   `json:"username"`
+	Role        string   `json:"role"`
+	Permissions []string `json:"permissions"`
+	jwt.StandardClaims
 }
 
 type LoggedInUserKey struct{}

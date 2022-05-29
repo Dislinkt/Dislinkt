@@ -2,7 +2,6 @@ package startup
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/dislinkt/common/interceptor"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
@@ -36,10 +35,11 @@ const (
 func (server *Server) Start() {
 	postgresClient := server.initUserClient()
 	userStore := server.initUserStore(postgresClient)
+	permissionStore := server.initPermissionStore(postgresClient)
 
 	userService := server.initUserService(userStore)
 
-	authService := server.initAuthService(userService)
+	authService := server.initAuthService(userService, permissionStore)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
@@ -76,6 +76,21 @@ func (server *Server) initUserStore(client *gorm.DB) domain.UserStore {
 	return store
 }
 
+func (server *Server) initPermissionStore(client *gorm.DB) domain.PermissionStore {
+	store, err := persistence.NewPermissionPostgresStore(client)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, permission := range permissions {
+		err := store.Insert(permission)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return store
+}
+
 func (server *Server) initUserService(store domain.UserStore) *application.UserService {
 	return application.NewUserService(store)
 }
@@ -108,8 +123,8 @@ func (server *Server) initRegisterUserHandler(service *application.UserService, 
 	}
 }
 
-func (server *Server) initAuthService(userService *application.UserService) *application.AuthService {
-	return application.NewAuthService(userService)
+func (server *Server) initAuthService(userService *application.UserService, store domain.PermissionStore) *application.AuthService {
+	return application.NewAuthService(userService, store)
 }
 
 func (server *Server) initAuthHandler(service *application.AuthService) *api.AuthHandler {
@@ -122,12 +137,12 @@ func (server *Server) startGrpcServer(authHandler *api.AuthHandler) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
-	if err != nil {
-		log.Fatalf("failed to parse public key: %v", err)
-	}
+	//publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
+	//if err != nil {
+	//	log.Fatalf("failed to parse public key: %v", err)
+	//}
 
-	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), publicKey)
+	interceptor := interceptor.NewAuthInterceptor(config.AccessiblePermissions(), server.config.PublicKey)
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	authProto.RegisterAuthServiceServer(grpcServer, authHandler)
 	if err := grpcServer.Serve(listener); err != nil {

@@ -80,8 +80,8 @@ func (server *Server) initCustomHandlers() {
 }
 
 func (server *Server) Start() {
-	//crtPath, _ := filepath.Abs("../server.crt")
-	//keyPath, _ := filepath.Abs("../server.key")
+	//crtPath, _ := filepath.Abs("./server.crt")
+	//keyPath, _ := filepath.Abs("./server.key")
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**", "http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
