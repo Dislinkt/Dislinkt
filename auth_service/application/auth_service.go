@@ -75,7 +75,7 @@ func generateToken(user *domain.User, expireTime int64) (string, error) {
 	claims["role"] = string(getRoleString(user.UserRole))
 	claims["id"] = user.Id
 	claims["exp"] = expireTime
-	jwtToken, err := token.SignedString([]byte("Dislinkt"))
+	jwtToken, err := token.SignedString([]byte(config.NewConfig().PublicKey))
 	if err != nil {
 		return "", err
 	}
@@ -101,8 +101,7 @@ func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		//return []byte(os.Getenv("ACCESS_SECRET")), nil
-		return []byte("Dislinkt"), nil
+		return []byte(config.NewConfig().PublicKey), nil
 	})
 
 	if err != nil {
@@ -192,7 +191,7 @@ func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.Conf
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("Dislinkt"), nil
+		return []byte(config.NewConfig().PublicKey), nil
 	})
 
 	if err != nil {
@@ -323,7 +322,7 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("Dislinkt"), nil
+		return []byte(config.NewConfig().PublicKey), nil
 	})
 
 	if err != nil {
@@ -407,7 +406,7 @@ func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.Recover
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("Dislinkt"), nil
+		return []byte(config.NewConfig().PublicKey), nil
 	})
 	if err != nil {
 		return &pb.RecoverAccountResponse{

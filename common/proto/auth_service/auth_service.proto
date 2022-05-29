@@ -23,7 +23,7 @@ service AuthService{
 
   rpc PasswordlessLogin(PasswordlessLoginRequest) returns(PasswordlessLoginResponse) {
     option (google.api.http) = {
-      post: "/api/auth/passwordless-login",
+      put: "/api/auth/passwordless-login",
       body: "*"
     };
   }
@@ -37,14 +37,14 @@ service AuthService{
 
   rpc ActivateAccount(ActivationRequest) returns(ActivationResponse) {
     option (google.api.http) = {
-      post: "/api/auth/activate-account",
+      put: "/api/auth/activate-account",
       body: "*"
     };
   }
 
   rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
     option (google.api.http) = {
-      post: "/api/auth/change-password"
+      put: "/api/auth/change-password"
       body: "*"
     };
   }
@@ -58,7 +58,7 @@ service AuthService{
 
   rpc SendAccountRecoveryMail(AccountRecoveryMailRequest) returns(AccountRecoveryMailResponse) {
     option (google.api.http) = {
-      post: "/api/auth/send-account-recover-mail",
+      put: "/api/auth/send-account-recover-mail",
       body: "*"
     };
   }

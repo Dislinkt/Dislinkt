@@ -2,7 +2,6 @@ package interceptor
 
 import (
 	"context"
-	"crypto/rsa"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"strings"
@@ -16,10 +15,10 @@ import (
 
 type AuthInterceptor struct {
 	accessibleRoles map[string][]string
-	publicKey       *rsa.PublicKey
+	publicKey       string
 }
 
-func NewAuthInterceptor(accessibleRoles map[string][]string, publicKey *rsa.PublicKey) *AuthInterceptor {
+func NewAuthInterceptor(accessibleRoles map[string][]string, publicKey string) *AuthInterceptor {
 	return &AuthInterceptor{
 		accessibleRoles: accessibleRoles,
 		publicKey:       publicKey,
@@ -85,34 +84,12 @@ func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string
 }
 
 func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims jwt.MapClaims, err error) {
-	//token, err := jwt.ParseWithClaims(
-	//	accessToken,
-	//	&UserClaims{},
-	//	func(token *jwt.Token) (interface{}, error) {
-	//		_, ok := token.Method.(*jwt.SigningMethodRSA)
-	//		if !ok {
-	//			return nil, fmt.Errorf("Unexpected token signing method")
-	//		}
-	//
-	//		return interceptor.publicKey, nil
-	//	},
-	//)
-	//if err != nil {
-	//	return nil, fmt.Errorf("Invalid token: %w", err)
-	//}
-	//claims, ok := token.Claims.(*UserClaims)
-	//if !ok {
-	//	return nil, fmt.Errorf("Invalid token claims")
-	//}
-	//
-	//return claims, nil
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		//return []byte(os.Getenv("ACCESS_SECRET")), nil
-		return []byte("Dislinkt"), nil
+		return []byte(interceptor.publicKey), nil
 	})
 
 	if err != nil {
