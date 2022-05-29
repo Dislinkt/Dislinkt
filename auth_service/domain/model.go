@@ -17,3 +17,9 @@ type LoginRequest struct {
 	Username string `bson:"password"`
 	Password string `bson:"password"`
 }
+
+type Permission struct {
+	Id   uint `gorm:"primaryKey;auto_increment:true"`
+	Role int
+	Name string `gorm:"unique"`
+}

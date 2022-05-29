@@ -103,7 +103,7 @@ func (server *Server) startGrpcServer(connectionHandler *api.ConnectionHandler) 
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), server.config.PublicKey)
+	interceptor := interceptor.NewAuthInterceptor(config.AccessiblePermissions(), server.config.PublicKey)
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	connection.RegisterConnectionServiceServer(grpcServer, connectionHandler)
 	if err := grpcServer.Serve(listener); err != nil {

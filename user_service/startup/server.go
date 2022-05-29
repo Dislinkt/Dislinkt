@@ -135,7 +135,7 @@ func (server *Server) startGrpcServer(userHandler *api.UserHandler) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	interceptor := interceptor.NewAuthInterceptor(config.AccessibleRoles(), server.config.PublicKey)
+	interceptor := interceptor.NewAuthInterceptor(config.AccessiblePermissions(), server.config.PublicKey)
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	//grpcServer := grpc.NewServer()
 	userProto.RegisterUserServiceServer(grpcServer, userHandler)

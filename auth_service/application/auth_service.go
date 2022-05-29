@@ -20,12 +20,21 @@ import (
 )
 
 type AuthService struct {
-	userService *UserService
+	userService     *UserService
+	permissionStore domain.PermissionStore
 }
 
-func NewAuthService(userService *UserService) *AuthService {
+type Claims struct {
+	Username    string   `json:"username"`
+	Role        string   `json:"role"`
+	Permissions []string `json:"permissions"`
+	jwt.StandardClaims
+}
+
+func NewAuthService(userService *UserService, permissionStore domain.PermissionStore) *AuthService {
 	return &AuthService{
-		userService: userService,
+		userService:     userService,
+		permissionStore: permissionStore,
 	}
 }
 
@@ -45,7 +54,7 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 	}
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := generateToken(user, expireTime)
+	token, err := auth.generateToken(user, expireTime)
 	if err != nil {
 		return "", errors.New("invalid password")
 	}
@@ -66,15 +75,33 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 	return true
 }
 
-func generateToken(user *domain.User, expireTime int64) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
+func (auth *AuthService) generateToken(user *domain.User, expireTime int64) (string, error) {
 	//	rolesString, _ := json.Marshal(user.Roles)
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["username"] = user.Username
-	claims["role"] = string(getRoleString(user.UserRole))
-	claims["id"] = user.Id
-	claims["exp"] = expireTime
+	var permissionNames []string
+	permissions, err := auth.permissionStore.GetAllByRole(user.UserRole)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for _, permission := range *permissions {
+		permissionNames = append(permissionNames, permission.Name)
+	}
+
+	claims := Claims{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   user.Id.String(),
+			ExpiresAt: expireTime,
+		},
+		Username:    user.Username,
+		Role:        getRoleString(user.UserRole),
+		Permissions: permissionNames,
+	}
+
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		claims,
+	)
+	fmt.Println(config.NewConfig().PublicKey)
 	jwtToken, err := token.SignedString([]byte(config.NewConfig().PublicKey))
 	if err != nil {
 		return "", err
@@ -114,9 +141,9 @@ func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims
 		return nil, errors.New("Couldn't parse claims")
 	}
 
-	//if !claims.VerifyExpiresAt(time.Now().Local().Unix()) {
-	//	return nil, errors.New("JWT is expired")
-	//}
+	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
+		return nil, errors.New("JWT is expired")
+	}
 
 	return claims, nil
 
@@ -148,7 +175,7 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 	smtpPort := config.NewConfig().EmailPort
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := generateToken(user, expireTime)
+	token, err := auth.generateToken(user, expireTime)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not generate JWT token")
 	}
@@ -186,7 +213,7 @@ func passwordlessLoginMailMessage(token string, username string) []byte {
 
 func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.ConfirmEmailLoginRequest) (*pb.ConfirmEmailLoginResponse, error) {
 
-	token, err := jwt.Parse(request.Token, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -195,10 +222,10 @@ func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.Conf
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't parse token")
+		return nil, err
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(*Claims)
 
 	if !ok {
 		return nil, fmt.Errorf("Couldn't parse claims")
@@ -206,10 +233,6 @@ func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.Conf
 
 	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
 		return nil, fmt.Errorf("JWT is expired")
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("Invalid token: %w", err)
 	}
 
 	return &pb.ConfirmEmailLoginResponse{
@@ -280,7 +303,7 @@ func (auth *AuthService) SendActivationMail(username string) error {
 	}
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := generateToken(user, expireTime)
+	token, err := auth.generateToken(user, expireTime)
 
 	message := verificationMailMessage(token, username)
 
@@ -317,7 +340,7 @@ func verificationMailMessage(token string, username string) []byte {
 }
 
 func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.ActivationRequest) (*pb.ActivationResponse, error) {
-	token, err := jwt.Parse(request.Token, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -326,10 +349,10 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't parse token")
+		return nil, err
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(*Claims)
 
 	if !ok {
 		return nil, fmt.Errorf("Couldn't parse claims")
@@ -339,11 +362,7 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 		return nil, fmt.Errorf("JWT is expired")
 	}
 
-	if err != nil {
-		return nil, fmt.Errorf("Invalid token: %w", err)
-	}
-
-	user, err := auth.userService.GetByUsername(claims["username"].(string))
+	user, err := auth.userService.GetByUsername(claims.Username)
 	if err != nil || user == nil {
 		return nil, errors.New("invalid username")
 	}
@@ -363,7 +382,7 @@ func (auth *AuthService) SendAccountRecoveryMail(ctx context.Context, request *p
 	}
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := generateToken(user, expireTime)
+	token, err := auth.generateToken(user, expireTime)
 
 	message := recoverAccountMailMessage(token, user.Username)
 
@@ -401,39 +420,29 @@ func recoverAccountMailMessage(token string, username string) []byte {
 }
 
 func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.RecoverAccountRequest) (*pb.RecoverAccountResponse, error) {
-	token, err := jwt.Parse(request.Token, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(config.NewConfig().PublicKey), nil
 	})
+
 	if err != nil {
-		return &pb.RecoverAccountResponse{
-			StatusCode: "500",
-			Message:    "Could not parse token",
-		}, errors.New("Could not parse token")
+		return nil, err
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(*Claims)
+
 	if !ok {
-		return &pb.RecoverAccountResponse{
-			StatusCode: "403",
-			Message:    "Could not parse claims",
-		}, errors.New("Could not parse claims")
+		return nil, fmt.Errorf("Couldn't parse claims")
 	}
 
 	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
 		return nil, fmt.Errorf("JWT is expired")
 	}
-	if err != nil {
-		return &pb.RecoverAccountResponse{
-			StatusCode: "403",
-			Message:    "Token expired",
-		}, errors.New("Token expired")
-	}
 
-	user, err := auth.userService.GetByUsername(claims["username"].(string))
+	user, err := auth.userService.GetByUsername(claims.Username)
 	if err != nil {
 		return &pb.RecoverAccountResponse{
 			StatusCode: "500",
