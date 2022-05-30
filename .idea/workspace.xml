@@ -6,17 +6,22 @@
   <component name="ChangeListManager">
     <list default="true" id="de4c83c8-1760-4cca-8cc9-6726fe2f70f9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/application/additional_user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/application/additional_user_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/domain/additional_user_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/domain/additional_user_store.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/domain/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/domain/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/additonal_user_groc_api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/infrastructure/persistence/additional_user_mongo_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/infrastructure/persistence/additional_user_mongo_store.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/additional_user_service/startup/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/additional_user_service/startup/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.pb.gw.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/additional_user_service/additional_user_service_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api_gateway/domain/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/domain/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api_gateway/infrastructure/api/feed_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/api_gateway/infrastructure/api/feed_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/post_service/post_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/post_service/post_service.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/post_service/post_service.pb.gw.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/post_service/post_service.pb.gw.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/post_service/post_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/post_service/post_service.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/post_service/post_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/post_service/post_service_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/proto/user_service/user_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/common/proto/user_service/user_service.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/initCalls/src/INSERT_DATA.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/initCalls/src/INSERT_DATA.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/application/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/application/post_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/domain/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/domain/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/domain/post_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/domain/post_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/infrastructure/api/pb_mapper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/infrastructure/api/post_grpc_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/infrastructure/api/post_grpc_api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post_service/infrastructure/persistence/post_mongodb_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/post_service/infrastructure/persistence/post_mongodb_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/user_service/infrastructure/api/pb_mapper.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,25 +57,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/user1/Desktop/GIT/Dislink/Dislinkt/auth_service/startup/config&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;go.vgo&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "C:/Users/user1/Desktop/GIT/Dislink/Dislinkt/post_service/domain",
+    "settings.editor.selected.configurable": "go.vgo"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\user1\Desktop\GIT\Dislink\Dislinkt\post_service\domain" />
       <recent name="C:\Users\user1\Desktop\GIT\Dislink\Dislinkt\auth_service\startup\config" />
       <recent name="D:\XML\Dislinkt\auth_service\infrastructure\api" />
       <recent name="C:\Users\User\Desktop\XML-projekat\Dislinkt\connection_service" />

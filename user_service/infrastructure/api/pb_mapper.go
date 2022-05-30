@@ -21,6 +21,7 @@ func mapUser(userD *domain.User) *pb.User {
 		Educations:  "/user/" + id + "/education",
 		Posts:       "/post/" + id,
 		Connections: "/connection/user/" + id,
+		Feed:        "/user/" + id + "/feed",
 	}
 
 	userPb := &pb.User{

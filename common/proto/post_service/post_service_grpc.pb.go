@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostServiceClient interface {
+	GetRecent(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error)
 	GetAllByUserId(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error)
 	GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetMultipleResponse, error)
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Empty, error)
@@ -36,6 +37,15 @@ type postServiceClient struct {
 
 func NewPostServiceClient(cc grpc.ClientConnInterface) PostServiceClient {
 	return &postServiceClient{cc}
+}
+
+func (c *postServiceClient) GetRecent(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error) {
+	out := new(GetMultipleResponse)
+	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/getRecent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *postServiceClient) GetAllByUserId(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error) {
@@ -96,6 +106,7 @@ func (c *postServiceClient) DislikePost(ctx context.Context, in *ReactionRequest
 // All implementations must embed UnimplementedPostServiceServer
 // for forward compatibility
 type PostServiceServer interface {
+	GetRecent(context.Context, *GetRequest) (*GetMultipleResponse, error)
 	GetAllByUserId(context.Context, *GetRequest) (*GetMultipleResponse, error)
 	GetAll(context.Context, *Empty) (*GetMultipleResponse, error)
 	CreatePost(context.Context, *CreatePostRequest) (*Empty, error)
@@ -109,6 +120,9 @@ type PostServiceServer interface {
 type UnimplementedPostServiceServer struct {
 }
 
+func (UnimplementedPostServiceServer) GetRecent(context.Context, *GetRequest) (*GetMultipleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecent not implemented")
+}
 func (UnimplementedPostServiceServer) GetAllByUserId(context.Context, *GetRequest) (*GetMultipleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllByUserId not implemented")
 }
@@ -138,6 +152,24 @@ type UnsafePostServiceServer interface {
 
 func RegisterPostServiceServer(s grpc.ServiceRegistrar, srv PostServiceServer) {
 	s.RegisterService(&PostService_ServiceDesc, srv)
+}
+
+func _PostService_GetRecent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).GetRecent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/post_service_proto.PostService/getRecent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).GetRecent(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _PostService_GetAllByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -255,6 +287,10 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "post_service_proto.PostService",
 	HandlerType: (*PostServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "getRecent",
+			Handler:    _PostService_GetRecent_Handler,
+		},
 		{
 			MethodName: "getAllByUserId",
 			Handler:    _PostService_GetAllByUserId_Handler,

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	pb "github.com/dislinkt/common/proto/post_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"post_service/application"
@@ -14,6 +15,20 @@ type PostHandler struct {
 
 func NewPostHandler(service *application.PostService) *PostHandler {
 	return &PostHandler{service: service}
+}
+
+func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
+	id := request.Id
+	posts, err := handler.service.GetRecent(id)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetMultipleResponse{Posts: []*pb.Post{}}
+	for _, post := range posts {
+		current := mapPost(post)
+		response.Posts = append(response.Posts, current)
+	}
+	return response, nil
 }
 
 func (handler *PostHandler) GetAllByUserId(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {

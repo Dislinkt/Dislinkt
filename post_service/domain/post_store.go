@@ -11,4 +11,5 @@ type PostStore interface {
 	CreateComment(post *Post, comment *Comment) error
 	LikePost(post *Post, username string) error
 	DislikePost(post *Post, username string) error
+	GetRecent(uuid string) ([]*Post, error)
 }

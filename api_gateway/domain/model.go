@@ -4,7 +4,6 @@ type Post struct {
 	UserId     string
 	PostText   string
 	ImagePaths []string
-	Links      []string
 	DatePosted string
 	Reactions  []Reaction
 	Comments   []Comment

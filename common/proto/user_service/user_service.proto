@@ -147,6 +147,7 @@ message Links{
   string positions = 5;
   string skills = 6;
   string interests = 7;
+  string feed = 8;
 }
 
 
