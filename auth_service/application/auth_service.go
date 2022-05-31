@@ -514,12 +514,60 @@ func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITo
 }
 
 func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
+	claims, err := auth.VerifyApiToken(request.ApiToken)
+	if err != nil {
+		return nil, nil
+	}
+
+	user, err := auth.userService.GetByUsername(claims.Username)
+	if user == nil {
+		fmt.Println("nema usera")
+		return nil, nil
+	}
+
+	if !equalTokens(user.ApiToken, request.ApiToken) {
+		fmt.Println("Greska hash")
+		return nil, nil
+	}
+
 	return &pb.JobPostingDtoResponse{
 		Position: &pb.EmployeePositionDto{
 			Name:      request.Position.Name,
 			Seniority: request.Position.Seniority,
 		},
+		Username:      user.Username,
+		Message:       "Token found",
+		Duration:      request.Duration,
+		DatePosted:    request.DatePosted,
+		Preconditions: request.Preconditions,
+		Description:   request.Description,
 	}, nil
+}
+
+func (interceptor *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims, err error) {
+	token, err := jwt.ParseWithClaims(apiToken, &ApiTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		//Make sure that the token method conform to "SigningMethodHMAC"
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(config.NewConfig().PublicKey), nil
+	})
+
+	if err != nil {
+		return
+	}
+
+	claims, ok := token.Claims.(*ApiTokenClaims)
+
+	if !ok {
+		return nil, fmt.Errorf("Couldn't parse claims")
+	}
+
+	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
+		return nil, fmt.Errorf("JWT is expired")
+	}
+
+	return claims, nil
 }
 
 //func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
@@ -534,4 +582,17 @@ func HashAndSaltApiToken(apiToken string) (string, error) {
 		log.Println(err)
 	}
 	return string(hash), err
+}
+
+func equalTokens(hashedTok string, tokenRequest string) bool {
+
+	byteHash := []byte(hashedTok)
+	plainPwd := []byte(tokenRequest)
+	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
 }
