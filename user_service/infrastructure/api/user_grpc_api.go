@@ -122,14 +122,17 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	updatedUser, err := handler.service.Update(parsedUUID, user)
+	fmt.Println(parsedUUID)
+	user.Id = parsedUUID
+	dbUser, err := handler.service.StartUpdate(user)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
+	user.Email = dbUser.Email
 
 	return &pb.UserResponse{
-		User: mapUser(updatedUser),
+		User: mapUser(user),
 	}, nil
 }
 

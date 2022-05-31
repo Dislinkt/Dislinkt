@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/dislinkt/additional_user_service/application"
+	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	events "github.com/dislinkt/common/saga/register_user"
 )
 
 type CreateUserCommandHandler struct {
@@ -40,7 +40,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 			return
 		}
 		reply.Type = events.AdditionalServiceUpdated
-		//reply.Type = events.RegistrationApproved
+		// reply.Type = events.RegistrationApproved
 	case events.RollbackAdditional:
 		fmt.Println("additional handler-rollback")
 		err := handler.additionalService.DeleteDocument(command.User.Id)

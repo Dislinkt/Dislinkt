@@ -27,7 +27,8 @@ func NewServer(config *config.Config) *Server {
 }
 
 const (
-	QueueGroup = "post_service"
+	QueueGroupRegister = "post_service_register"
+	QueueGroupUpdate   = "post_service_update"
 )
 
 func (server *Server) Start() {
@@ -37,9 +38,13 @@ func (server *Server) Start() {
 	postService := server.initPostService(postStore)
 	postHandler := server.initPostHandler(postService)
 
-	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
+	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroupRegister)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
 	server.initRegisterUserHandler(postService, replyPublisher, commandSubscriber)
+
+	updateCommandSubscriber := server.initSubscriber(server.config.UpdateUserCommandSubject, QueueGroupUpdate)
+	updateReplyPublisher := server.initPublisher(server.config.UpdateUserReplySubject)
+	server.initUpdateUserHandler(postService, updateReplyPublisher, updateCommandSubscriber)
 
 	server.startGrpcServer(postHandler)
 }
@@ -88,6 +93,13 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 func (server *Server) initRegisterUserHandler(service *application.PostService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initUpdateUserHandler(service *application.PostService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewUpdateUserCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

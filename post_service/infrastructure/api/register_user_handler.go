@@ -3,8 +3,8 @@ package api
 import (
 	"fmt"
 
+	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	events "github.com/dislinkt/common/saga/register_user"
 	"post_service/application"
 )
 

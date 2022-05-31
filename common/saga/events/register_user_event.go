@@ -1,4 +1,4 @@
-package register_user
+package events
 
 type Role int
 

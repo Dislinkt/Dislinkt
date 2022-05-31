@@ -1,8 +1,8 @@
 package application
 
 import (
+	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	events "github.com/dislinkt/common/saga/register_user"
 	"github.com/dislinkt/user_service/domain"
 )
 

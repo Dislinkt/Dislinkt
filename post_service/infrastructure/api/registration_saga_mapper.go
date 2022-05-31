@@ -1,7 +1,7 @@
 package api
 
 // Moja pretpostavka sta ce ti trebati :)
-// func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
+// func mapPostCommandUser(command *events.RegisterUserCommand) *domain.User {
 // 	id, _ := uuid.FromString(command.User.Id)
 // 	userD := &domain.User{
 // 		Id:          id,

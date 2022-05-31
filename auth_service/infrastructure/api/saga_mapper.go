@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/dislinkt/auth_service/domain"
-	events "github.com/dislinkt/common/saga/register_user"
+	"github.com/dislinkt/common/saga/events"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
