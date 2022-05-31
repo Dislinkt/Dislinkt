@@ -41,6 +41,8 @@ const (
 	RollbackAdditional
 	UpdateConnectionNode
 	RollbackConnectionNode
+	UpdatePost
+	RollbackPost
 	UpdateAuth
 	RollbackAuth
 	ApproveRegistration
@@ -64,6 +66,9 @@ const (
 	ConnectionsUpdated
 	ConnectionsNotUpdated
 	ConnectionsRolledBack
+	PostUpdated
+	PostNotUpdated
+	PostRolledBack
 	AuthUpdated
 	AuthNotUpdated
 	AuthRolledBack

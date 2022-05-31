@@ -65,17 +65,23 @@ func (o *RegisterUserOrchestrator) nextCommandType(reply events.RegisterUserRepl
 	case events.AdditionalServiceRolledBack:
 		return events.RollbackUser
 	case events.ConnectionsUpdated:
-		return events.UpdateAuth
+		return events.UpdatePost
 	case events.ConnectionsNotUpdated:
 		return events.RollbackAdditional
 	case events.ConnectionsRolledBack:
 		return events.RollbackAdditional
+	case events.PostUpdated:
+		return events.UpdateAuth
+	case events.PostNotUpdated:
+		return events.RollbackConnectionNode
+	case events.PostRolledBack:
+		return events.RollbackConnectionNode
 	case events.AuthUpdated:
 		return events.ApproveRegistration
 	case events.AuthNotUpdated:
-		return events.RollbackConnectionNode
+		return events.RollbackPost
 	case events.AuthRolledBack:
-		return events.RollbackConnectionNode
+		return events.RollbackPost
 
 	default:
 		return events.UnknownCommand

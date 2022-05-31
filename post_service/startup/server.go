@@ -7,6 +7,8 @@ import (
 
 	"github.com/dislinkt/common/interceptor"
 	postProto "github.com/dislinkt/common/proto/post_service"
+	saga "github.com/dislinkt/common/saga/messaging"
+	"github.com/dislinkt/common/saga/messaging/nats"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"post_service/application"
@@ -24,12 +26,20 @@ func NewServer(config *config.Config) *Server {
 	return &Server{config: config}
 }
 
+const (
+	QueueGroup = "post_service"
+)
+
 func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	postStore := server.initPostStore(mongoClient)
 
 	postService := server.initPostService(postStore)
 	postHandler := server.initPostHandler(postService)
+
+	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
+	server.initRegisterUserHandler(postService, replyPublisher, commandSubscriber)
 
 	server.startGrpcServer(postHandler)
 }
@@ -53,6 +63,34 @@ func (server *Server) initPostService(store domain.PostStore) *application.PostS
 
 func (server *Server) initPostHandler(service *application.PostService) *api.PostHandler {
 	return api.NewPostHandler(service)
+}
+
+func (server *Server) initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewNATSPublisher(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return publisher
+}
+
+func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewNATSSubscriber(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return subscriber
+}
+
+func (server *Server) initRegisterUserHandler(service *application.PostService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) startGrpcServer(postHandler *api.PostHandler) {
