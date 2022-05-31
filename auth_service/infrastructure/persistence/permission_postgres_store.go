@@ -20,6 +20,15 @@ func NewPermissionPostgresStore(db *gorm.DB) (domain.PermissionStore, error) {
 	}, nil
 }
 
+func (store *PermissionPostgresStore) DeleteAll() error {
+	//TODO implement me
+	result := store.db.Exec("DELETE FROM permissions")
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func (store *PermissionPostgresStore) Insert(permission *domain.Permission) error {
 	fmt.Println("TU SAM")
 	result := store.db.Create(permission)

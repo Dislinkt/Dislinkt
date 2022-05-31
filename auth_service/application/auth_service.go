@@ -31,6 +31,11 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+type ApiTokenClaims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
+
 func NewAuthService(userService *UserService, permissionStore domain.PermissionStore) *AuthService {
 	return &AuthService{
 		userService:     userService,
@@ -472,4 +477,61 @@ func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.Recover
 		StatusCode: "200",
 		Message:    "User account recovered",
 	}, nil
+}
+
+func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITokenRequest) (*pb.NewAPITokenResponse, error) {
+	fmt.Println("Auth Service GenerateAPIToken")
+	user, err := auth.userService.GetByUsername(request.Username)
+	fmt.Println(user)
+	expireTime := time.Now().Add(time.Hour * 4).Unix()
+	claims := ApiTokenClaims{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   user.Id.String(),
+			ExpiresAt: expireTime,
+		},
+		Username: user.Username,
+	}
+
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		claims,
+	)
+
+	fmt.Println(config.NewConfig().PublicKey)
+	jwtToken, err := token.SignedString([]byte(config.NewConfig().PublicKey))
+
+	user.ApiToken, err = HashAndSaltApiToken(jwtToken)
+
+	err = auth.userService.Update(user.Id, user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.NewAPITokenResponse{
+		Token: jwtToken,
+	}, nil
+}
+
+func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
+	return &pb.JobPostingDtoResponse{
+		Position: &pb.EmployeePositionDto{
+			Name:      request.Position.Name,
+			Seniority: request.Position.Seniority,
+		},
+	}, nil
+}
+
+//func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
+//
+//}
+
+func HashAndSaltApiToken(apiToken string) (string, error) {
+
+	pwd := []byte(apiToken)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash), err
 }

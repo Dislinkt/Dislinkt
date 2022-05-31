@@ -30,6 +30,8 @@ type AuthServiceClient interface {
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 	RecoverAccount(ctx context.Context, in *RecoverAccountRequest, opts ...grpc.CallOption) (*RecoverAccountResponse, error)
 	SendAccountRecoveryMail(ctx context.Context, in *AccountRecoveryMailRequest, opts ...grpc.CallOption) (*AccountRecoveryMailResponse, error)
+	CreateNewAPIToken(ctx context.Context, in *APITokenRequest, opts ...grpc.CallOption) (*NewAPITokenResponse, error)
+	CheckApiToken(ctx context.Context, in *JobPostingDtoRequest, opts ...grpc.CallOption) (*JobPostingDtoResponse, error)
 }
 
 type authServiceClient struct {
@@ -112,6 +114,24 @@ func (c *authServiceClient) SendAccountRecoveryMail(ctx context.Context, in *Acc
 	return out, nil
 }
 
+func (c *authServiceClient) CreateNewAPIToken(ctx context.Context, in *APITokenRequest, opts ...grpc.CallOption) (*NewAPITokenResponse, error) {
+	out := new(NewAPITokenResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/CreateNewAPIToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) CheckApiToken(ctx context.Context, in *JobPostingDtoRequest, opts ...grpc.CallOption) (*JobPostingDtoResponse, error) {
+	out := new(JobPostingDtoResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/CheckApiToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -124,6 +144,8 @@ type AuthServiceServer interface {
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	RecoverAccount(context.Context, *RecoverAccountRequest) (*RecoverAccountResponse, error)
 	SendAccountRecoveryMail(context.Context, *AccountRecoveryMailRequest) (*AccountRecoveryMailResponse, error)
+	CreateNewAPIToken(context.Context, *APITokenRequest) (*NewAPITokenResponse, error)
+	CheckApiToken(context.Context, *JobPostingDtoRequest) (*JobPostingDtoResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -154,6 +176,12 @@ func (UnimplementedAuthServiceServer) RecoverAccount(context.Context, *RecoverAc
 }
 func (UnimplementedAuthServiceServer) SendAccountRecoveryMail(context.Context, *AccountRecoveryMailRequest) (*AccountRecoveryMailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendAccountRecoveryMail not implemented")
+}
+func (UnimplementedAuthServiceServer) CreateNewAPIToken(context.Context, *APITokenRequest) (*NewAPITokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNewAPIToken not implemented")
+}
+func (UnimplementedAuthServiceServer) CheckApiToken(context.Context, *JobPostingDtoRequest) (*JobPostingDtoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckApiToken not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -312,6 +340,42 @@ func _AuthService_SendAccountRecoveryMail_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_CreateNewAPIToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(APITokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).CreateNewAPIToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/CreateNewAPIToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).CreateNewAPIToken(ctx, req.(*APITokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_CheckApiToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JobPostingDtoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).CheckApiToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/CheckApiToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).CheckApiToken(ctx, req.(*JobPostingDtoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -350,6 +414,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendAccountRecoveryMail",
 			Handler:    _AuthService_SendAccountRecoveryMail_Handler,
+		},
+		{
+			MethodName: "CreateNewAPIToken",
+			Handler:    _AuthService_CreateNewAPIToken_Handler,
+		},
+		{
+			MethodName: "CheckApiToken",
+			Handler:    _AuthService_CheckApiToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
