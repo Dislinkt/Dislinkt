@@ -28,7 +28,7 @@ service PostService{
         body: "Post"
       };
     }
-    rpc createComment(CreateCommentRequest) returns (Empty) {
+    rpc createComment(CreateCommentRequest) returns (CreateCommentResponse) {
       option (google.api.http) = {
         post: "/post/{PostId}/comment"
         body: "Comment"
@@ -71,6 +71,10 @@ message CreateCommentRequest {
   Comment Comment = 2;
 }
 
+message CreateCommentResponse {
+  Comment Comment = 1;
+}
+
 message ReactionRequest {
   string PostId = 1;
   string Username = 2;
@@ -84,6 +88,7 @@ message Post {
   string DatePosted = 6;
   repeated Reaction Reactions = 7;
   repeated Comment Comments = 8;
+  Links Links = 9;
 }
 
 message Reaction {
@@ -100,4 +105,10 @@ enum ReactionType {
 message Comment {
   string Username = 1;
   string CommentText = 2;
+}
+
+message Links{
+  string Comment = 1;
+  string Like = 2;
+  string Dislike = 3;
 }

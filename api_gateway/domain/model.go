@@ -7,6 +7,7 @@ type Post struct {
 	DatePosted string
 	Reactions  []Reaction
 	Comments   []Comment
+	Links      Links
 }
 
 type Comment struct {
@@ -17,4 +18,10 @@ type Comment struct {
 type Reaction struct {
 	Username string
 	Reaction int
+}
+
+type Links struct {
+	Comment string
+	Like    string
+	Dislike string
 }

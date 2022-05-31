@@ -83,7 +83,7 @@ func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePo
 	return &pb.Empty{}, nil
 }
 
-func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.CreateCommentRequest) (*pb.Empty, error) {
+func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
 	objectId, err := primitive.ObjectIDFromHex(request.PostId)
 	if err != nil {
 		return nil, err
@@ -98,7 +98,9 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 		return nil, err
 	}
 
-	return &pb.Empty{}, nil
+	return &pb.CreateCommentResponse{
+		Comment: request.Comment,
+	}, nil
 }
 
 func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRequest) (*pb.Empty, error) {

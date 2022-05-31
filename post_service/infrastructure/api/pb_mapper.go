@@ -11,11 +11,20 @@ import (
 )
 
 func mapPost(post *domain.Post) *pb.Post {
+	id := post.Id.Hex()
+
+	links := &pb.Links{
+		Comment: "/post/" + id + "/comment",
+		Like:    "/post/" + id + "/like",
+		Dislike: "/post/" + id + "/dislike",
+	}
+
 	postPb := &pb.Post{
-		Id:         post.Id.Hex(),
+		Id:         id,
 		UserId:     post.UserId,
 		PostText:   post.PostText,
 		DatePosted: post.DatePosted.String(),
+		Links:      links,
 	}
 	postPb.ImagePaths = convertByteToBase64(post.ImagePaths)
 	for _, reaction := range post.Reactions {

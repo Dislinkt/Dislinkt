@@ -26,7 +26,7 @@ type PostServiceClient interface {
 	GetAllByUserId(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error)
 	GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetMultipleResponse, error)
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Empty, error)
-	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*Empty, error)
+	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error)
 	LikePost(ctx context.Context, in *ReactionRequest, opts ...grpc.CallOption) (*Empty, error)
 	DislikePost(ctx context.Context, in *ReactionRequest, opts ...grpc.CallOption) (*Empty, error)
 }
@@ -75,8 +75,8 @@ func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostReques
 	return out, nil
 }
 
-func (c *postServiceClient) CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *postServiceClient) CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error) {
+	out := new(CreateCommentResponse)
 	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/createComment", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ type PostServiceServer interface {
 	GetAllByUserId(context.Context, *GetRequest) (*GetMultipleResponse, error)
 	GetAll(context.Context, *Empty) (*GetMultipleResponse, error)
 	CreatePost(context.Context, *CreatePostRequest) (*Empty, error)
-	CreateComment(context.Context, *CreateCommentRequest) (*Empty, error)
+	CreateComment(context.Context, *CreateCommentRequest) (*CreateCommentResponse, error)
 	LikePost(context.Context, *ReactionRequest) (*Empty, error)
 	DislikePost(context.Context, *ReactionRequest) (*Empty, error)
 	mustEmbedUnimplementedPostServiceServer()
@@ -132,7 +132,7 @@ func (UnimplementedPostServiceServer) GetAll(context.Context, *Empty) (*GetMulti
 func (UnimplementedPostServiceServer) CreatePost(context.Context, *CreatePostRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
 }
-func (UnimplementedPostServiceServer) CreateComment(context.Context, *CreateCommentRequest) (*Empty, error) {
+func (UnimplementedPostServiceServer) CreateComment(context.Context, *CreateCommentRequest) (*CreateCommentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateComment not implemented")
 }
 func (UnimplementedPostServiceServer) LikePost(context.Context, *ReactionRequest) (*Empty, error) {

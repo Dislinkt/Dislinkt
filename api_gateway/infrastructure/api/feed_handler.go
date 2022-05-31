@@ -90,6 +90,7 @@ func loadUserPosts(postsPb []*postGw.Post) []domain.Post {
 		post.DatePosted = postPb.DatePosted
 		post.Reactions = loadPostReactions(postPb.Reactions)
 		post.Comments = loadPostComments(postPb.Comments)
+		post.Links = domain.Links{Comment: postPb.Links.Comment, Dislike: postPb.Links.Dislike, Like: postPb.Links.Like}
 
 		posts = append(posts, post)
 	}
