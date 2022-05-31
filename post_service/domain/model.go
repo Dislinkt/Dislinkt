@@ -1,16 +1,16 @@
 package domain
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Post struct {
 	Id         primitive.ObjectID `bson:"_id"`
 	UserId     string             `bson:"user_id"`
 	PostText   string             `bson:"post_text"`
-	ImagePaths []string           `bson:"image_paths"`
-	Links      []string           `bson:"links"`
+	ImagePaths [][]byte           `bson:"image_paths"`
 	DatePosted time.Time          `bson:"date_posted"`
 	Reactions  []Reaction         `bson:"reactions"`
 	Comments   []Comment          `bson:"comments"`

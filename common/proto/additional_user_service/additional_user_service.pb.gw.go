@@ -31,6 +31,78 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
+func request_AdditionalUserService_GetFieldOfStudies_0(ctx context.Context, marshaler runtime.Marshaler, client AdditionalUserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetFieldOfStudies(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_AdditionalUserService_GetFieldOfStudies_0(ctx context.Context, marshaler runtime.Marshaler, server AdditionalUserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetFieldOfStudies(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_AdditionalUserService_GetDegrees_0(ctx context.Context, marshaler runtime.Marshaler, client AdditionalUserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetDegrees(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_AdditionalUserService_GetDegrees_0(ctx context.Context, marshaler runtime.Marshaler, server AdditionalUserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetDegrees(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_AdditionalUserService_GetSkills_0(ctx context.Context, marshaler runtime.Marshaler, client AdditionalUserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetSkills(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_AdditionalUserService_GetSkills_0(ctx context.Context, marshaler runtime.Marshaler, server AdditionalUserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetSkills(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_AdditionalUserService_GetIndustries_0(ctx context.Context, marshaler runtime.Marshaler, client AdditionalUserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetIndustries(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_AdditionalUserService_GetIndustries_0(ctx context.Context, marshaler runtime.Marshaler, server AdditionalUserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Get
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetIndustries(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_AdditionalUserService_NewEducation_0(ctx context.Context, marshaler runtime.Marshaler, client AdditionalUserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq NewEducationRequest
 	var metadata runtime.ServerMetadata
@@ -659,8 +731,8 @@ func local_request_AdditionalUserService_NewSkill_0(ctx context.Context, marshal
 
 }
 
-func request_AdditionalUserService_GetAllSkill_0(ctx context.Context, marshaler runtime.Marshaler, client AdditionalUserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetAllSkillRequest
+func request_AdditionalUserService_GetUserSkills_0(ctx context.Context, marshaler runtime.Marshaler, client AdditionalUserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetUserSkillsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -680,13 +752,13 @@ func request_AdditionalUserService_GetAllSkill_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	msg, err := client.GetAllSkill(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetUserSkills(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_AdditionalUserService_GetAllSkill_0(ctx context.Context, marshaler runtime.Marshaler, server AdditionalUserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetAllSkillRequest
+func local_request_AdditionalUserService_GetUserSkills_0(ctx context.Context, marshaler runtime.Marshaler, server AdditionalUserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetUserSkillsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -706,7 +778,7 @@ func local_request_AdditionalUserService_GetAllSkill_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	msg, err := server.GetAllSkill(ctx, &protoReq)
+	msg, err := server.GetUserSkills(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -1157,6 +1229,102 @@ func local_request_AdditionalUserService_DeleteInterest_0(ctx context.Context, m
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAdditionalUserServiceHandlerFromEndpoint instead.
 func RegisterAdditionalUserServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server AdditionalUserServiceServer) error {
 
+	mux.Handle("GET", pattern_AdditionalUserService_GetFieldOfStudies_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetFieldOfStudies", runtime.WithHTTPPathPattern("/fieldOfStudies"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_AdditionalUserService_GetFieldOfStudies_0(ctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetFieldOfStudies_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_AdditionalUserService_GetDegrees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetDegrees", runtime.WithHTTPPathPattern("/degrees"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_AdditionalUserService_GetDegrees_0(ctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetDegrees_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_AdditionalUserService_GetSkills_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetSkills", runtime.WithHTTPPathPattern("/skills"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_AdditionalUserService_GetSkills_0(ctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetSkills_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_AdditionalUserService_GetIndustries_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetIndustries", runtime.WithHTTPPathPattern("/industries"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_AdditionalUserService_GetIndustries_0(ctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetIndustries_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_AdditionalUserService_NewEducation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1373,19 +1541,19 @@ func RegisterAdditionalUserServiceHandlerServer(ctx context.Context, mux *runtim
 
 	})
 
-	mux.Handle("GET", pattern_AdditionalUserService_GetAllSkill_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdditionalUserService_GetUserSkills_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetAllSkill", runtime.WithHTTPPathPattern("/user/{id}/skill"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetUserSkills", runtime.WithHTTPPathPattern("/user/{id}/skill"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AdditionalUserService_GetAllSkill_0(ctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AdditionalUserService_GetUserSkills_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -1393,7 +1561,7 @@ func RegisterAdditionalUserServiceHandlerServer(ctx context.Context, mux *runtim
 			return
 		}
 
-		forward_AdditionalUserService_GetAllSkill_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdditionalUserService_GetUserSkills_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1581,6 +1749,90 @@ func RegisterAdditionalUserServiceHandler(ctx context.Context, mux *runtime.Serv
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "AdditionalUserServiceClient" to call the correct interceptors.
 func RegisterAdditionalUserServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AdditionalUserServiceClient) error {
+
+	mux.Handle("GET", pattern_AdditionalUserService_GetFieldOfStudies_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetFieldOfStudies", runtime.WithHTTPPathPattern("/fieldOfStudies"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AdditionalUserService_GetFieldOfStudies_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetFieldOfStudies_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_AdditionalUserService_GetDegrees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetDegrees", runtime.WithHTTPPathPattern("/degrees"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AdditionalUserService_GetDegrees_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetDegrees_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_AdditionalUserService_GetSkills_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetSkills", runtime.WithHTTPPathPattern("/skills"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AdditionalUserService_GetSkills_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetSkills_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_AdditionalUserService_GetIndustries_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetIndustries", runtime.WithHTTPPathPattern("/industries"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AdditionalUserService_GetIndustries_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdditionalUserService_GetIndustries_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
 
 	mux.Handle("POST", pattern_AdditionalUserService_NewEducation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -1771,24 +2023,24 @@ func RegisterAdditionalUserServiceHandlerClient(ctx context.Context, mux *runtim
 
 	})
 
-	mux.Handle("GET", pattern_AdditionalUserService_GetAllSkill_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AdditionalUserService_GetUserSkills_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetAllSkill", runtime.WithHTTPPathPattern("/user/{id}/skill"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/additional_user_service_proto.AdditionalUserService/GetUserSkills", runtime.WithHTTPPathPattern("/user/{id}/skill"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AdditionalUserService_GetAllSkill_0(ctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AdditionalUserService_GetUserSkills_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AdditionalUserService_GetAllSkill_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AdditionalUserService_GetUserSkills_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1922,6 +2174,14 @@ func RegisterAdditionalUserServiceHandlerClient(ctx context.Context, mux *runtim
 }
 
 var (
+	pattern_AdditionalUserService_GetFieldOfStudies_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"fieldOfStudies"}, ""))
+
+	pattern_AdditionalUserService_GetDegrees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"degrees"}, ""))
+
+	pattern_AdditionalUserService_GetSkills_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"skills"}, ""))
+
+	pattern_AdditionalUserService_GetIndustries_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"industries"}, ""))
+
 	pattern_AdditionalUserService_NewEducation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"user", "id", "education"}, ""))
 
 	pattern_AdditionalUserService_GetAllEducation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"user", "id", "education"}, ""))
@@ -1940,7 +2200,7 @@ var (
 
 	pattern_AdditionalUserService_NewSkill_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"user", "id", "skill"}, ""))
 
-	pattern_AdditionalUserService_GetAllSkill_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"user", "id", "skill"}, ""))
+	pattern_AdditionalUserService_GetUserSkills_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"user", "id", "skill"}, ""))
 
 	pattern_AdditionalUserService_UpdateSkill_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"user", "userId", "skill", "skillId"}, ""))
 
@@ -1956,6 +2216,14 @@ var (
 )
 
 var (
+	forward_AdditionalUserService_GetFieldOfStudies_0 = runtime.ForwardResponseMessage
+
+	forward_AdditionalUserService_GetDegrees_0 = runtime.ForwardResponseMessage
+
+	forward_AdditionalUserService_GetSkills_0 = runtime.ForwardResponseMessage
+
+	forward_AdditionalUserService_GetIndustries_0 = runtime.ForwardResponseMessage
+
 	forward_AdditionalUserService_NewEducation_0 = runtime.ForwardResponseMessage
 
 	forward_AdditionalUserService_GetAllEducation_0 = runtime.ForwardResponseMessage
@@ -1974,7 +2242,7 @@ var (
 
 	forward_AdditionalUserService_NewSkill_0 = runtime.ForwardResponseMessage
 
-	forward_AdditionalUserService_GetAllSkill_0 = runtime.ForwardResponseMessage
+	forward_AdditionalUserService_GetUserSkills_0 = runtime.ForwardResponseMessage
 
 	forward_AdditionalUserService_UpdateSkill_0 = runtime.ForwardResponseMessage
 

@@ -2,11 +2,12 @@ package startup
 
 import (
 	"fmt"
+	"log"
+	"net"
+
 	"github.com/dislinkt/common/interceptor"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
-	"log"
-	"net"
 
 	"github.com/dislinkt/auth_service/application"
 	"github.com/dislinkt/auth_service/domain"
@@ -47,6 +48,13 @@ func (server *Server) Start() {
 
 	authHandler := server.initAuthHandler(authService)
 
+	for _, permission := range permissions {
+		err := permissionStore.Insert(permission)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	server.startGrpcServer(authHandler)
 }
 
@@ -80,13 +88,6 @@ func (server *Server) initPermissionStore(client *gorm.DB) domain.PermissionStor
 	store, err := persistence.NewPermissionPostgresStore(client)
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	for _, permission := range permissions {
-		err := store.Insert(permission)
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 	return store
 }
@@ -137,10 +138,10 @@ func (server *Server) startGrpcServer(authHandler *api.AuthHandler) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	//publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
-	//if err != nil {
+	// publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(server.config.PublicKey))
+	// if err != nil {
 	//	log.Fatalf("failed to parse public key: %v", err)
-	//}
+	// }
 
 	interceptor := interceptor.NewAuthInterceptor(config.AccessiblePermissions(), server.config.PublicKey)
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))

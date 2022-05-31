@@ -6,5 +6,6 @@ func AccessibleRoles() map[string][]string {
 	return map[string][]string{
 		userService + "UpdateUser": {"Regular"},
 		userService + "PatchUser":  {"Regular"},
+		userService + "GetMe":      {"Regular"},
 	}
 }

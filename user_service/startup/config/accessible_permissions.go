@@ -6,5 +6,6 @@ func AccessiblePermissions() map[string]string {
 	return map[string]string{
 		userService + "UpdateUser": "updateUserPermission",
 		userService + "PatchUser":  "patchUserPermission",
+		userService + "GetMe":      "getMePermission",
 	}
 }

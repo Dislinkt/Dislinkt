@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dislinkt/additional_user_service/domain"
@@ -12,8 +13,8 @@ import (
 // EDUCATION
 
 func mapNewEducation(educationPb *pb.NewEducation) *domain.Education {
-	startDate, _ := time.Parse("2006-01-02", educationPb.StartDate)
-	endDate, _ := time.Parse("2006-01-02", educationPb.EndDate)
+	startDate, _ := time.Parse(time.RFC3339, educationPb.StartDate)
+	endDate, _ := time.Parse(time.RFC3339, educationPb.EndDate)
 
 	educationD := &domain.Education{
 		Degree:       educationPb.Degree,
@@ -51,9 +52,25 @@ func mapEducations(educations *map[string]domain.Education) []*pb.Education {
 // POSITION
 
 func mapNewPosition(positionPb *pb.NewPosition) *domain.Position {
-	startDate, _ := time.Parse("2006-01-02", positionPb.StartDate)
-	endDate, _ := time.Parse("2006-01-02", positionPb.EndDate)
+	fmt.Println("START: " + positionPb.StartDate)
+	fmt.Println("END: " + positionPb.EndDate)
 
+	startDate, _ := time.Parse(time.RFC3339, positionPb.StartDate)
+	endDate, _ := time.Parse(time.RFC3339, positionPb.EndDate)
+
+	fmt.Println("PARSED " + startDate.String())
+	fmt.Println("PARSED " + endDate.String())
+
+	json, err := primitive.NewDateTimeFromTime(startDate).MarshalJSON()
+	if err != nil {
+		return nil
+	}
+	marshalJSON, err := primitive.NewDateTimeFromTime(endDate).MarshalJSON()
+	if err != nil {
+		return nil
+	}
+	fmt.Println("PRIMITIVE " + string(json))
+	fmt.Println("PRIMITIVE " + string(marshalJSON))
 	positionD := &domain.Position{
 		Title:       positionPb.Title,
 		CompanyName: positionPb.CompanyName,
@@ -106,7 +123,7 @@ func mapSkill(skill *domain.Skill) *pb.Skill {
 	return skillPb
 }
 
-func mapSkills(skills *map[string]domain.Skill) []*pb.Skill {
+func mapUserSkills(skills *map[string]domain.Skill) []*pb.Skill {
 	if skills == nil {
 		return nil
 	}
@@ -143,4 +160,36 @@ func mapInterests(interests *map[string]domain.Interest) []*pb.Interest {
 		interestsPb = append(interestsPb, mapInterest(&interest))
 	}
 	return interestsPb
+}
+
+func mapFieldsOfStudies(fields []*domain.FieldOfStudy) []*pb.Skill {
+	var stringFields []*pb.Skill
+	for _, f := range fields {
+		stringFields = append(stringFields, &pb.Skill{Id: f.Id.String(), Name: f.Name})
+	}
+	return stringFields
+}
+
+func mapSkills(skills []*domain.Skill) []*pb.Skill {
+	var stringSkills []*pb.Skill
+	for _, s := range skills {
+		stringSkills = append(stringSkills, &pb.Skill{Id: s.Id.String(), Name: s.Name})
+	}
+	return stringSkills
+}
+
+func mapIndustries(industries []*domain.Industry) []*pb.Skill {
+	var stringIndustries []*pb.Skill
+	for _, i := range industries {
+		stringIndustries = append(stringIndustries, &pb.Skill{Id: i.Id.String(), Name: i.Name})
+	}
+	return stringIndustries
+}
+
+func mapDegrees(degrees []*domain.Degree) []*pb.Skill {
+	var stringDegrees []*pb.Skill
+	for _, d := range degrees {
+		stringDegrees = append(stringDegrees, &pb.Skill{Id: d.Id.String(), Name: d.Name})
+	}
+	return stringDegrees
 }

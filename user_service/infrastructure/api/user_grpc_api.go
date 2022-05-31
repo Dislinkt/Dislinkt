@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+
 	"github.com/dislinkt/common/interceptor"
 
 	pb "github.com/dislinkt/common/proto/user_service"
@@ -44,6 +45,25 @@ func (handler *UserHandler) GetAll(ctx context.Context, request *pb.SearchMessag
 	for _, user := range *users {
 		current := mapUser(&user)
 		response.Users = append(response.Users, current)
+	}
+	return response, nil
+}
+
+func (handler *UserHandler) GetMe(ctx context.Context, request *pb.GetMeMessage) (*pb.GetMeResponse, error) {
+	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
+	// defer span.Finish()
+
+	// ctx = tracer.ContextWithSpan(context.Background(), span)
+	// users, err := handler.service.GetAll(ctx)
+
+	userName := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	fmt.Println("Get me: " + userName)
+	user, err := handler.service.FindByUsername(userName)
+	if err != nil || user == nil {
+		return nil, err
+	}
+	response := &pb.GetMeResponse{
+		User: mapUser(user),
 	}
 	return response, nil
 }
@@ -93,7 +113,7 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 	// defer span.Finish()
 	fmt.Println("*************************************************")
 	fmt.Println(ctx.Value(interceptor.LoggedInUserKey{}).(string))
-	user := mapNewUser(request.User)
+	user := mapUpdateUser(request.User)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
@@ -102,14 +122,14 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	err = handler.service.Update(parsedUUID, user)
+	updatedUser, err := handler.service.Update(parsedUUID, user)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
 
 	return &pb.UserResponse{
-		User: mapUser(user),
+		User: mapUser(updatedUser),
 	}, nil
 }
 

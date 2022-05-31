@@ -232,3 +232,35 @@ func (service *AdditionalUserService) DeleteUserInterest(uuid string, additionID
 	}
 	return userInterest.Interests, nil
 }
+
+func (service *AdditionalUserService) GetFieldOfStudies() ([]*domain.FieldOfStudy, error) {
+	study, err := service.store.GetAllFieldOfStudy()
+	if err != nil {
+		return nil, nil
+	}
+	return study, nil
+}
+
+func (service *AdditionalUserService) GetSkills() ([]*domain.Skill, error) {
+	skills, err := service.store.GetSkills()
+	if err != nil {
+		return nil, nil
+	}
+	return skills, nil
+}
+
+func (service *AdditionalUserService) GetIndustries() ([]*domain.Industry, error) {
+	industries, err := service.store.GetIndustries()
+	if err != nil {
+		return nil, nil
+	}
+	return industries, nil
+}
+
+func (service *AdditionalUserService) GetDegrees() ([]*domain.Degree, error) {
+	degrees, err := service.store.GetDegrees()
+	if err != nil {
+		return nil, nil
+	}
+	return degrees, nil
+}

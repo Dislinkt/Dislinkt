@@ -54,3 +54,18 @@ const (
 	Group2               = "GROUP_2"
 	Group3               = "GROUP_3"
 )
+
+type FieldOfStudy struct {
+	Id   primitive.ObjectID `bson:"_id"`
+	Name string             `bson:"name"`
+}
+
+type Industry struct {
+	Id   primitive.ObjectID `bson:"_id"`
+	Name string             `bson:"name"`
+}
+
+type Degree struct {
+	Id   primitive.ObjectID `bson:"_id"`
+	Name string             `bson:"name"`
+}

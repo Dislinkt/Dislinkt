@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+
 	"github.com/dislinkt/auth_service/application"
 	saga "github.com/dislinkt/common/saga/messaging"
 	events "github.com/dislinkt/common/saga/register_user"
@@ -34,6 +35,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 
 	switch command.Type {
 	case events.UpdateAuth:
+		fmt.Println("UpdateAuth")
 		user := mapCommandUser(command)
 		if user == nil {
 			return
@@ -54,6 +56,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		}
 		reply.Type = events.AuthUpdated
 	case events.RollbackAuth:
+		fmt.Println("RollbackAuth")
 		err := handler.userService.Delete(mapCommandUser(command))
 		if err != nil {
 			return

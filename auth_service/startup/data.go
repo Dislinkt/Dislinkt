@@ -128,4 +128,14 @@ var permissions = []*domain.Permission{
 		Role: 0,
 		Name: "deleteInterestPermission",
 	},
+	{
+		Id:   26,
+		Role: 0,
+		Name: "getMePermission",
+	},
+	{
+		Id:   27,
+		Role: 0,
+		Name: "getRecentPermission",
+	},
 }

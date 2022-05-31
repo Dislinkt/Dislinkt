@@ -4,6 +4,7 @@ import (
 	"time"
 
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 type Role int
@@ -31,11 +32,21 @@ type User struct {
 	Number      string
 	Gender      Gender
 	DateOfBirth string
-	Password    string
+	Password    string `gorm:"-"`
 	UserRole    Role
 	Biography   string
 	Blocked     bool
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Private     bool
+}
+
+func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
+	if tx.Statement.Changed("Username") {
+		tx.Statement.SetColumn("Username", u.Username)
+	}
+	if tx.Statement.Changed() {
+		tx.Statement.SetColumn("UpdatedAt", time.Now())
+	}
+	return nil
 }

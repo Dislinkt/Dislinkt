@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/dislinkt/api_gateway/domain"
 	"github.com/dislinkt/api_gateway/infrastructure/services"
 	"github.com/dislinkt/api_gateway/startup/config"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
-	//"github.com/gin-gonic/gin"
+	// "github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"net/http"
 )
 
 type UserFeedHandler struct {
@@ -34,14 +35,14 @@ func (handler *UserFeedHandler) Init(mux *runtime.ServeMux) {
 }
 
 func (handler *UserFeedHandler) GetUserFeed(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
-	//func (handler *UserFeedHandler) GetUserFeed(ctx *gin.Context) {
+	// func (handler *UserFeedHandler) GetUserFeed(ctx *gin.Context) {
 	id := pathParams["userId"]
-	//id := ctx.Param("id")
+	// id := ctx.Param("id")
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
-		//ctx.AbortWithError(http.StatusBadGateway, _)
-		//return
+		// ctx.AbortWithError(http.StatusBadGateway, _)
+		// return
 	}
 
 	postClient := services.NewPostClient(handler.postClientAddress)
@@ -49,7 +50,7 @@ func (handler *UserFeedHandler) GetUserFeed(w http.ResponseWriter, r *http.Reque
 	connections, err := connectionClient.GetAllConnectionForUser(context.TODO(), &connectionGw.GetConnectionRequest{Uuid: id})
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		//ctx.AbortWithError(http.StatusNotFound, err)
+		// ctx.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
@@ -59,23 +60,23 @@ func (handler *UserFeedHandler) GetUserFeed(w http.ResponseWriter, r *http.Reque
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
-			//ctx.AbortWithError(http.StatusBadRequest, err)
-			//return
+			// ctx.AbortWithError(http.StatusBadRequest, err)
+			// return
 		}
 		feed = append(feed, loadUserPosts(postsResponse.Posts)...)
 	}
 
-	//response := feed
+	// response := feed
 	response, err := json.Marshal(feed)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-		//ctx.AbortWithError(http.StatusInternalServerError, err)
-		//return
+		// ctx.AbortWithError(http.StatusInternalServerError, err)
+		// return
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
-	//ctx.JSON(http.StatusOK, &response)
+	// ctx.JSON(http.StatusOK, &response)
 }
 
 func loadUserPosts(postsPb []*postGw.Post) []domain.Post {
@@ -86,10 +87,10 @@ func loadUserPosts(postsPb []*postGw.Post) []domain.Post {
 		post.UserId = postPb.UserId
 		post.PostText = postPb.PostText
 		post.ImagePaths = postPb.ImagePaths
-		post.Links = postPb.Links
 		post.DatePosted = postPb.DatePosted
 		post.Reactions = loadPostReactions(postPb.Reactions)
 		post.Comments = loadPostComments(postPb.Comments)
+		post.Links = domain.Links{Comment: postPb.Links.Comment, Dislike: postPb.Links.Dislike, Like: postPb.Links.Like}
 
 		posts = append(posts, post)
 	}

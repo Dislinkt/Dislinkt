@@ -2,6 +2,8 @@ package persistence
 
 import (
 	"context"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,6 +22,12 @@ type PostMongoDBStore struct {
 func NewPostMongoDBStore(client *mongo.Client) domain.PostStore {
 	posts := client.Database(DATABASE).Collection(COLLECTION)
 	return &PostMongoDBStore{posts: posts}
+}
+
+func (store *PostMongoDBStore) GetRecent(uuid string) ([]*domain.Post, error) {
+
+	filter := bson.M{"user_id": uuid, "date_posted": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Date(time.Now().Year(), time.Now().Month()-1, time.Now().Day(), 0, 0, 0, 0, &time.Location{}))}}
+	return store.filter(filter)
 }
 
 func (store *PostMongoDBStore) Get(id primitive.ObjectID) (*domain.Post, error) {

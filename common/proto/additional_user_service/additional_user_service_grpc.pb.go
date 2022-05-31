@@ -22,6 +22,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdditionalUserServiceClient interface {
+	GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
+	GetDegrees(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
+	GetSkills(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
+	GetIndustries(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error)
 	//EDUCATION
 	NewEducation(ctx context.Context, in *NewEducationRequest, opts ...grpc.CallOption) (*EducationResponse, error)
 	GetAllEducation(ctx context.Context, in *GetAllEducationRequest, opts ...grpc.CallOption) (*AllEducationResponse, error)
@@ -34,9 +38,9 @@ type AdditionalUserServiceClient interface {
 	DeletePosition(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*AllPositionResponse, error)
 	// SKILL
 	NewSkill(ctx context.Context, in *NewSkillRequest, opts ...grpc.CallOption) (*SkillResponse, error)
-	GetAllSkill(ctx context.Context, in *GetAllSkillRequest, opts ...grpc.CallOption) (*AllSkillResponse, error)
-	UpdateSkill(ctx context.Context, in *UpdateSkillRequest, opts ...grpc.CallOption) (*AllSkillResponse, error)
-	DeleteSkill(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*AllSkillResponse, error)
+	GetUserSkills(ctx context.Context, in *GetUserSkillsRequest, opts ...grpc.CallOption) (*UserSkillResponse, error)
+	UpdateSkill(ctx context.Context, in *UpdateSkillRequest, opts ...grpc.CallOption) (*UserSkillResponse, error)
+	DeleteSkill(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*UserSkillResponse, error)
 	// INTEREST
 	NewInterest(ctx context.Context, in *NewInterestRequest, opts ...grpc.CallOption) (*InterestResponse, error)
 	GetAllInterest(ctx context.Context, in *GetAllInterestRequest, opts ...grpc.CallOption) (*AllInterestResponse, error)
@@ -50,6 +54,42 @@ type additionalUserServiceClient struct {
 
 func NewAdditionalUserServiceClient(cc grpc.ClientConnInterface) AdditionalUserServiceClient {
 	return &additionalUserServiceClient{cc}
+}
+
+func (c *additionalUserServiceClient) GetFieldOfStudies(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
+	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetFieldOfStudies", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *additionalUserServiceClient) GetDegrees(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
+	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetDegrees", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *additionalUserServiceClient) GetSkills(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
+	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetSkills", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *additionalUserServiceClient) GetIndustries(ctx context.Context, in *Get, opts ...grpc.CallOption) (*GetEntitiesResponse, error) {
+	out := new(GetEntitiesResponse)
+	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetIndustries", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *additionalUserServiceClient) NewEducation(ctx context.Context, in *NewEducationRequest, opts ...grpc.CallOption) (*EducationResponse, error) {
@@ -133,17 +173,17 @@ func (c *additionalUserServiceClient) NewSkill(ctx context.Context, in *NewSkill
 	return out, nil
 }
 
-func (c *additionalUserServiceClient) GetAllSkill(ctx context.Context, in *GetAllSkillRequest, opts ...grpc.CallOption) (*AllSkillResponse, error) {
-	out := new(AllSkillResponse)
-	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetAllSkill", in, out, opts...)
+func (c *additionalUserServiceClient) GetUserSkills(ctx context.Context, in *GetUserSkillsRequest, opts ...grpc.CallOption) (*UserSkillResponse, error) {
+	out := new(UserSkillResponse)
+	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/GetUserSkills", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *additionalUserServiceClient) UpdateSkill(ctx context.Context, in *UpdateSkillRequest, opts ...grpc.CallOption) (*AllSkillResponse, error) {
-	out := new(AllSkillResponse)
+func (c *additionalUserServiceClient) UpdateSkill(ctx context.Context, in *UpdateSkillRequest, opts ...grpc.CallOption) (*UserSkillResponse, error) {
+	out := new(UserSkillResponse)
 	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/UpdateSkill", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -151,8 +191,8 @@ func (c *additionalUserServiceClient) UpdateSkill(ctx context.Context, in *Updat
 	return out, nil
 }
 
-func (c *additionalUserServiceClient) DeleteSkill(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*AllSkillResponse, error) {
-	out := new(AllSkillResponse)
+func (c *additionalUserServiceClient) DeleteSkill(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*UserSkillResponse, error) {
+	out := new(UserSkillResponse)
 	err := c.cc.Invoke(ctx, "/additional_user_service_proto.AdditionalUserService/DeleteSkill", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -200,6 +240,10 @@ func (c *additionalUserServiceClient) DeleteInterest(ctx context.Context, in *Em
 // All implementations must embed UnimplementedAdditionalUserServiceServer
 // for forward compatibility
 type AdditionalUserServiceServer interface {
+	GetFieldOfStudies(context.Context, *Get) (*GetEntitiesResponse, error)
+	GetDegrees(context.Context, *Get) (*GetEntitiesResponse, error)
+	GetSkills(context.Context, *Get) (*GetEntitiesResponse, error)
+	GetIndustries(context.Context, *Get) (*GetEntitiesResponse, error)
 	//EDUCATION
 	NewEducation(context.Context, *NewEducationRequest) (*EducationResponse, error)
 	GetAllEducation(context.Context, *GetAllEducationRequest) (*AllEducationResponse, error)
@@ -212,9 +256,9 @@ type AdditionalUserServiceServer interface {
 	DeletePosition(context.Context, *EmptyRequest) (*AllPositionResponse, error)
 	// SKILL
 	NewSkill(context.Context, *NewSkillRequest) (*SkillResponse, error)
-	GetAllSkill(context.Context, *GetAllSkillRequest) (*AllSkillResponse, error)
-	UpdateSkill(context.Context, *UpdateSkillRequest) (*AllSkillResponse, error)
-	DeleteSkill(context.Context, *EmptyRequest) (*AllSkillResponse, error)
+	GetUserSkills(context.Context, *GetUserSkillsRequest) (*UserSkillResponse, error)
+	UpdateSkill(context.Context, *UpdateSkillRequest) (*UserSkillResponse, error)
+	DeleteSkill(context.Context, *EmptyRequest) (*UserSkillResponse, error)
 	// INTEREST
 	NewInterest(context.Context, *NewInterestRequest) (*InterestResponse, error)
 	GetAllInterest(context.Context, *GetAllInterestRequest) (*AllInterestResponse, error)
@@ -227,6 +271,18 @@ type AdditionalUserServiceServer interface {
 type UnimplementedAdditionalUserServiceServer struct {
 }
 
+func (UnimplementedAdditionalUserServiceServer) GetFieldOfStudies(context.Context, *Get) (*GetEntitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFieldOfStudies not implemented")
+}
+func (UnimplementedAdditionalUserServiceServer) GetDegrees(context.Context, *Get) (*GetEntitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDegrees not implemented")
+}
+func (UnimplementedAdditionalUserServiceServer) GetSkills(context.Context, *Get) (*GetEntitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSkills not implemented")
+}
+func (UnimplementedAdditionalUserServiceServer) GetIndustries(context.Context, *Get) (*GetEntitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIndustries not implemented")
+}
 func (UnimplementedAdditionalUserServiceServer) NewEducation(context.Context, *NewEducationRequest) (*EducationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewEducation not implemented")
 }
@@ -254,13 +310,13 @@ func (UnimplementedAdditionalUserServiceServer) DeletePosition(context.Context, 
 func (UnimplementedAdditionalUserServiceServer) NewSkill(context.Context, *NewSkillRequest) (*SkillResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewSkill not implemented")
 }
-func (UnimplementedAdditionalUserServiceServer) GetAllSkill(context.Context, *GetAllSkillRequest) (*AllSkillResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllSkill not implemented")
+func (UnimplementedAdditionalUserServiceServer) GetUserSkills(context.Context, *GetUserSkillsRequest) (*UserSkillResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserSkills not implemented")
 }
-func (UnimplementedAdditionalUserServiceServer) UpdateSkill(context.Context, *UpdateSkillRequest) (*AllSkillResponse, error) {
+func (UnimplementedAdditionalUserServiceServer) UpdateSkill(context.Context, *UpdateSkillRequest) (*UserSkillResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSkill not implemented")
 }
-func (UnimplementedAdditionalUserServiceServer) DeleteSkill(context.Context, *EmptyRequest) (*AllSkillResponse, error) {
+func (UnimplementedAdditionalUserServiceServer) DeleteSkill(context.Context, *EmptyRequest) (*UserSkillResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSkill not implemented")
 }
 func (UnimplementedAdditionalUserServiceServer) NewInterest(context.Context, *NewInterestRequest) (*InterestResponse, error) {
@@ -286,6 +342,78 @@ type UnsafeAdditionalUserServiceServer interface {
 
 func RegisterAdditionalUserServiceServer(s grpc.ServiceRegistrar, srv AdditionalUserServiceServer) {
 	s.RegisterService(&AdditionalUserService_ServiceDesc, srv)
+}
+
+func _AdditionalUserService_GetFieldOfStudies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Get)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdditionalUserServiceServer).GetFieldOfStudies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/additional_user_service_proto.AdditionalUserService/GetFieldOfStudies",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdditionalUserServiceServer).GetFieldOfStudies(ctx, req.(*Get))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdditionalUserService_GetDegrees_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Get)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdditionalUserServiceServer).GetDegrees(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/additional_user_service_proto.AdditionalUserService/GetDegrees",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdditionalUserServiceServer).GetDegrees(ctx, req.(*Get))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdditionalUserService_GetSkills_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Get)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdditionalUserServiceServer).GetSkills(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/additional_user_service_proto.AdditionalUserService/GetSkills",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdditionalUserServiceServer).GetSkills(ctx, req.(*Get))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdditionalUserService_GetIndustries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Get)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdditionalUserServiceServer).GetIndustries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/additional_user_service_proto.AdditionalUserService/GetIndustries",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdditionalUserServiceServer).GetIndustries(ctx, req.(*Get))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _AdditionalUserService_NewEducation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -450,20 +578,20 @@ func _AdditionalUserService_NewSkill_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdditionalUserService_GetAllSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllSkillRequest)
+func _AdditionalUserService_GetUserSkills_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserSkillsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdditionalUserServiceServer).GetAllSkill(ctx, in)
+		return srv.(AdditionalUserServiceServer).GetUserSkills(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/additional_user_service_proto.AdditionalUserService/GetAllSkill",
+		FullMethod: "/additional_user_service_proto.AdditionalUserService/GetUserSkills",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdditionalUserServiceServer).GetAllSkill(ctx, req.(*GetAllSkillRequest))
+		return srv.(AdditionalUserServiceServer).GetUserSkills(ctx, req.(*GetUserSkillsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -584,6 +712,22 @@ var AdditionalUserService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AdditionalUserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "GetFieldOfStudies",
+			Handler:    _AdditionalUserService_GetFieldOfStudies_Handler,
+		},
+		{
+			MethodName: "GetDegrees",
+			Handler:    _AdditionalUserService_GetDegrees_Handler,
+		},
+		{
+			MethodName: "GetSkills",
+			Handler:    _AdditionalUserService_GetSkills_Handler,
+		},
+		{
+			MethodName: "GetIndustries",
+			Handler:    _AdditionalUserService_GetIndustries_Handler,
+		},
+		{
 			MethodName: "NewEducation",
 			Handler:    _AdditionalUserService_NewEducation_Handler,
 		},
@@ -620,8 +764,8 @@ var AdditionalUserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AdditionalUserService_NewSkill_Handler,
 		},
 		{
-			MethodName: "GetAllSkill",
-			Handler:    _AdditionalUserService_GetAllSkill_Handler,
+			MethodName: "GetUserSkills",
+			Handler:    _AdditionalUserService_GetUserSkills_Handler,
 		},
 		{
 			MethodName: "UpdateSkill",

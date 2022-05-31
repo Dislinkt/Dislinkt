@@ -42,19 +42,23 @@ func (service *UserService) Insert(user *domain.User) error {
 	err := service.store.Insert(user)
 	return err
 }
-func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
+func (service *UserService) Update(uuid uuid.UUID, user *domain.User) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	_, err := service.store.FindByID(uuid)
+	dbUser, err := service.store.FindByID(uuid)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	user.Id = uuid
-	user.UpdatedAt = time.Now()
-	return service.store.Update(user)
+	user.Email = dbUser.Email
+	updatedUser, err := service.store.Update(user)
+	if err != nil {
+		return nil, err
+	}
+	return updatedUser, err
 }
 
 func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.User,
@@ -72,8 +76,11 @@ func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.
 	if err != nil {
 		return nil, err
 	}
-	err = service.store.Update(updatedUser)
-	return updatedUser, nil
+	dbUser, err := service.store.Update(updatedUser)
+	if err != nil {
+		return nil, err
+	}
+	return dbUser, nil
 }
 
 func updateField(paths []string, user *domain.User, requestUser *domain.User) (*domain.User, error) {

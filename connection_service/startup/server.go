@@ -2,9 +2,10 @@ package startup
 
 import (
 	"fmt"
-	"github.com/dislinkt/common/interceptor"
 	"log"
 	"net"
+
+	"github.com/dislinkt/common/interceptor"
 
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"

@@ -7,9 +7,14 @@ package post_service_proto;
 import "google/api/annotations.proto";
 
 service PostService{
+  rpc getRecent(GetRequest) returns(GetMultipleResponse) {
+    option (google.api.http) = {
+      get: "/post/{Id}/recent"
+    };
+  }
     rpc getAllByUserId(GetRequest) returns(GetMultipleResponse) {
       option (google.api.http) = {
-        get: "/post/{id}"
+        get: "/post/{Id}"
       };
     }
     rpc getAll(Empty) returns(GetMultipleResponse) {
@@ -20,71 +25,75 @@ service PostService{
     rpc createPost(CreatePostRequest) returns (Empty) {
       option (google.api.http) = {
         post: "/post"
-        body: "post"
+        body: "Post"
       };
     }
-    rpc createComment(CreateCommentRequest) returns (Empty) {
+    rpc createComment(CreateCommentRequest) returns (CreateCommentResponse) {
       option (google.api.http) = {
-        post: "/post/{postId}/comment"
-        body: "comment"
+        post: "/post/{PostId}/comment"
+        body: "Comment"
       };
     }
     rpc likePost(ReactionRequest) returns (Empty) {
       option (google.api.http) = {
-        post: "/post/{postId}/like"
+        post: "/post/{PostId}/like"
         body: "*"
       };
     }
     rpc dislikePost(ReactionRequest) returns (Empty) {
       option (google.api.http) = {
-        post: "/post/{postId}/dislike"
+        post: "/post/{PostId}/dislike"
         body: "*"
       };
     }
 }
 
 message GetRequest {
-  string id = 1;
+  string Id = 1;
 }
 
 message GetResponse {
-  Post post = 1;
+  Post Post = 1;
 }
 
 message GetMultipleResponse {
-  repeated Post posts = 1;
+  repeated Post Posts = 1;
 }
 
 message Empty {}
 
 message CreatePostRequest {
-  Post post = 1;
+  Post Post = 1;
 }
 
 message CreateCommentRequest {
-  string postId = 1;
-  Comment comment = 2;
+  string PostId = 1;
+  Comment Comment = 2;
+}
+
+message CreateCommentResponse {
+  Comment Comment = 1;
 }
 
 message ReactionRequest {
-  string postId = 1;
-  string username = 2;
+  string PostId = 1;
+  string Username = 2;
 }
 
 message Post {
-  string id = 1;
-  string userId = 2;
-  string postText = 3;
-  repeated string imagePaths = 4;
-  repeated string Links = 5;
-  string datePosted = 6;
-  repeated Reaction reactions = 7;
-  repeated Comment comments = 8;
+  string Id = 1;
+  string UserId = 2;
+  string PostText = 3;
+  repeated string ImagePaths = 4;
+  string DatePosted = 6;
+  repeated Reaction Reactions = 7;
+  repeated Comment Comments = 8;
+  Links Links = 9;
 }
 
 message Reaction {
-  string username = 1;
-  ReactionType reaction = 2;
+  string Username = 1;
+  ReactionType Reaction = 2;
 }
 
 enum ReactionType {
@@ -94,6 +103,12 @@ enum ReactionType {
 }
 
 message Comment {
-  string username = 1;
-  string commentText = 2;
+  string Username = 1;
+  string CommentText = 2;
+}
+
+message Links{
+  string Comment = 1;
+  string Like = 2;
+  string Dislike = 3;
 }

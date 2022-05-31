@@ -26,6 +26,12 @@ type Config struct {
 }
 
 func NewConfig() *Config {
+	// devEnv := flag.Bool("dev", false, "use dev environment variables")
+	// flag.Parse()
+	//
+	// if *devEnv {
+	// 	cfg.LoadEnv()
+	// }
 
 	return &Config{
 		Port:                       os.Getenv("AUTH_SERVICE_PORT"),

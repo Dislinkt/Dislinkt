@@ -44,3 +44,7 @@ func (service *PostService) LikePost(post *domain.Post, username string) error {
 func (service *PostService) DislikePost(post *domain.Post, username string) error {
 	return service.store.DislikePost(post, username)
 }
+
+func (service *PostService) GetRecent(uuid string) ([]*domain.Post, error) {
+	return service.store.GetRecent(uuid)
+}

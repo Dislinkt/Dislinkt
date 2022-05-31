@@ -2,6 +2,9 @@ package persistence
 
 import (
 	"context"
+	"fmt"
+	"log"
+
 	"github.com/dislinkt/additional_user_service/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,19 +14,163 @@ import (
 )
 
 const (
-	DATABASE   = "additional_user"
-	COLLECTION = "user"
+	DATABASE                  = "additional_user"
+	COLLECTION_USER           = "user"
+	COLLECTION_FIELD_OF_STUDY = "field_of_study"
+	COLLECTION_SKILLS         = "skills"
+	COLLECTION_INDUSTRIES     = "industries"
+	COLLECTION_DEGREES        = "degrees"
 )
 
 type AdditionalUserMongoDBStore struct {
-	users *mongo.Collection
+	users        *mongo.Collection
+	fieldOfStudy *mongo.Collection
+	skills       *mongo.Collection
+	industries   *mongo.Collection
+	degrees      *mongo.Collection
 }
 
 func NewAdditionalUserMongoDBStore(client *mongo.Client) domain.AdditionalUserStore {
-	users := client.Database(DATABASE).Collection(COLLECTION)
+	users := client.Database(DATABASE).Collection(COLLECTION_USER)
+	fieldOfStudy := client.Database(DATABASE).Collection(COLLECTION_FIELD_OF_STUDY)
+	skills := client.Database(DATABASE).Collection(COLLECTION_SKILLS)
+	industries := client.Database(DATABASE).Collection(COLLECTION_INDUSTRIES)
+	degrees := client.Database(DATABASE).Collection(COLLECTION_DEGREES)
 	return &AdditionalUserMongoDBStore{
-		users: users,
+		users:        users,
+		fieldOfStudy: fieldOfStudy,
+		skills:       skills,
+		industries:   industries,
+		degrees:      degrees,
 	}
+}
+
+func (store *AdditionalUserMongoDBStore) InsertDegrees(degrees []*domain.Degree) ([]*domain.Degree, error) {
+	fmt.Println("InsertDegree")
+	fmt.Println(degrees)
+	for _, i := range degrees {
+		_, err := store.degrees.InsertOne(context.TODO(), i)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return degrees, nil
+}
+
+func (store *AdditionalUserMongoDBStore) GetDegrees() (degrees []*domain.Degree, err error) {
+	cursor, err := store.degrees.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+	var allDegrees []*domain.Degree
+	for cursor.Next(context.TODO()) {
+		var degree domain.Degree
+		if err = cursor.Decode(&degree); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(degree)
+		allDegrees = append(allDegrees, &degree)
+	}
+	fmt.Println(allDegrees)
+	return allDegrees, nil
+}
+
+func (store *AdditionalUserMongoDBStore) InsertIndustries(industries []*domain.Industry) ([]*domain.Industry, error) {
+	fmt.Println("InsertIndustries")
+	fmt.Println(industries)
+	for _, i := range industries {
+		_, err := store.industries.InsertOne(context.TODO(), i)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return industries, nil
+}
+
+func (store *AdditionalUserMongoDBStore) GetIndustries() (industries []*domain.Industry, err error) {
+	cursor, err := store.industries.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+	var allIndustries []*domain.Industry
+	for cursor.Next(context.TODO()) {
+		var industry domain.Industry
+		if err = cursor.Decode(&industry); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(industry)
+		allIndustries = append(allIndustries, &industry)
+	}
+	fmt.Println(allIndustries)
+	return allIndustries, nil
+}
+
+func (store *AdditionalUserMongoDBStore) InsertSkills(skills []*domain.Skill) ([]*domain.Skill, error) {
+	fmt.Println("InsertSkills")
+	fmt.Println(skills)
+	for _, s := range skills {
+		_, err := store.skills.InsertOne(context.TODO(), s)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return skills, nil
+}
+
+func (store *AdditionalUserMongoDBStore) InsertFieldOfStudy(filedOfStudies []*domain.FieldOfStudy) ([]*domain.
+	FieldOfStudy, error) {
+	fmt.Println("InsertFieldOfStudy")
+	fmt.Println(filedOfStudies)
+	for _, f := range filedOfStudies {
+		_, err := store.fieldOfStudy.InsertOne(context.TODO(), f)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return filedOfStudies, nil
+}
+func (store *AdditionalUserMongoDBStore) GetSkills() ([]*domain.Skill, error) {
+	cursor, err := store.skills.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+	var skills []*domain.Skill
+	for cursor.Next(context.TODO()) {
+		var skill domain.Skill
+		if err = cursor.Decode(&skill); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(skill)
+		skills = append(skills, &skill)
+	}
+	fmt.Println(skills)
+	return skills, nil
+}
+
+func (store *AdditionalUserMongoDBStore) GetAllFieldOfStudy() ([]*domain.FieldOfStudy, error) {
+	cursor, err := store.fieldOfStudy.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+	var fields []*domain.FieldOfStudy
+	for cursor.Next(context.TODO()) {
+		var field domain.FieldOfStudy
+		if err = cursor.Decode(&field); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(field)
+		fields = append(fields, &field)
+	}
+	fmt.Println(fields)
+	return fields, nil
 }
 
 func (store *AdditionalUserMongoDBStore) FindUserDocument(userUUID string) (user *domain.AdditionalUser, err error) {

@@ -3,11 +3,17 @@ package startup
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+
 	"github.com/dislinkt/api_gateway/infrastructure/api"
 	"github.com/gorilla/handlers"
+
 	//"github.com/dislinkt/api_gateway/infrastructure/api"
+
 	cfg "github.com/dislinkt/api_gateway/startup/config"
-	additionaluserGw "github.com/dislinkt/common/proto/additional_user_service"
+	additionalUserGw "github.com/dislinkt/common/proto/additional_user_service"
 	authGw "github.com/dislinkt/common/proto/auth_service"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
@@ -16,9 +22,6 @@ import (
 	otgo "github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"io"
-	"log"
-	"net/http"
 )
 
 type Server struct {
@@ -54,7 +57,7 @@ func (server *Server) initHandlers() {
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
 	additionalUserEndpoint := fmt.Sprintf("%s:%s", server.config.AdditionalUserHost, server.config.AdditionalUserPort)
-	err = additionaluserGw.RegisterAdditionalUserServiceHandlerFromEndpoint(context.TODO(), server.mux, additionalUserEndpoint, opts)
+	err = additionalUserGw.RegisterAdditionalUserServiceHandlerFromEndpoint(context.TODO(), server.mux, additionalUserEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -73,8 +76,8 @@ func (server *Server) initHandlers() {
 }
 
 func (server *Server) initCustomHandlers() {
-	//postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
-	//connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
+	// postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
+	// connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
 	userFeedHandler := api.NewUserFeedHandler(server.config)
 	userFeedHandler.Init(server.mux)
 }
