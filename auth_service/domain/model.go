@@ -11,6 +11,7 @@ type User struct {
 	Password string
 	UserRole int
 	Active   bool
+	ApiToken string `gorm:"unique"`
 }
 
 type LoginRequest struct {

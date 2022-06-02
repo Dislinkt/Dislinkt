@@ -63,6 +63,19 @@ service AuthService{
     };
   }
 
+  rpc CreateNewAPIToken(APITokenRequest) returns (NewAPITokenResponse) {
+    option (google.api.http) = {
+      get: "/api/auth/newApiToken/{username}"
+    };
+  }
+
+  rpc CheckApiToken(JobPostingDtoRequest) returns (JobPostingDtoResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/checkApiToken"
+      body: "*"
+    };
+  }
+
 }
 
 message LoginRequest {
@@ -144,3 +157,37 @@ message AccountRecoveryMailRequest{
 message AccountRecoveryMailResponse{
   string success = 1;
 }
+
+
+message APITokenRequest {
+  string username = 1;
+}
+
+message NewAPITokenResponse {
+  string token = 1;
+}
+
+message JobPostingDtoRequest{
+  EmployeePositionDto position = 1;
+  string description = 2;
+  string preconditions = 3;
+  int64 datePosted = 4;
+  int32 duration = 5;
+  string apiToken = 6;
+}
+
+message JobPostingDtoResponse{
+  EmployeePositionDto position = 1;
+  string description = 2;
+  string preconditions = 3;
+  int64 datePosted = 4;
+  int32 duration = 5;
+  string username = 6;
+  string message = 7;
+}
+
+message EmployeePositionDto{
+  string name = 1;
+  string seniority = 2;
+}
+

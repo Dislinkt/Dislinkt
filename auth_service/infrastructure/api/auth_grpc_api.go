@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"fmt"
+
 	//"github.com/dislinkt/auth_service/domain"
 	"net/http"
 
@@ -80,4 +82,14 @@ func (handler *AuthHandler) RecoverAccount(ctx context.Context, req *pb.RecoverA
 
 func (handler *AuthHandler) SendAccountRecoveryMail(ctx context.Context, req *pb.AccountRecoveryMailRequest) (*pb.AccountRecoveryMailResponse, error) {
 	return handler.service.SendAccountRecoveryMail(ctx, req)
+}
+
+func (handler *AuthHandler) CreateNewAPIToken(ctx context.Context, request *pb.APITokenRequest) (*pb.NewAPITokenResponse, error) {
+	fmt.Println("AuthHandler CreateNewAPIToken")
+	fmt.Println(request.Username)
+	return handler.service.GenerateAPIToken(ctx, request)
+}
+
+func (handler *AuthHandler) CheckApiToken(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
+	return handler.service.ValidateApiTokenFunc(ctx, request)
 }

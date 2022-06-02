@@ -89,6 +89,17 @@ func (server *Server) initPermissionStore(client *gorm.DB) domain.PermissionStor
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = store.DeleteAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, permission := range permissions {
+		err := store.Insert(permission)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return store
 }
 

@@ -1,0 +1,1 @@
+protoc -I ./common/proto/auth_service --go_out ./common/proto/auth_service --go_opt paths=source_relative --go-grpc_out ./common/proto/auth_service --go-grpc_opt paths=source_relative --grpc-gateway_out ./common/proto/auth_service --grpc-gateway_opt paths=source_relative ./common/proto/auth_service/auth_service.proto

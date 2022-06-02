@@ -78,3 +78,13 @@ func (store *UserPostgresStore) GetByEmail(email string) (user *domain.User, err
 	}
 	return &foundUser, nil
 }
+
+func (store *UserPostgresStore) UpdateAPIToken(id, apiToken string) error {
+	var auth domain.User
+	err := store.db.First(&auth, "id = ?", id)
+	store.db.Model(&domain.User{}).Where("Id = ?", id).Update("ApiToken", apiToken)
+	if err != nil {
+		return err.Error
+	}
+	return nil
+}
