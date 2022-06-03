@@ -37,6 +37,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 
 		err := handler.postService.InsertUser(mapPostCommandUser(command))
 		if err != nil {
+			fmt.Println(err)
 			reply.Type = events.PostNotUpdated
 			return
 		}

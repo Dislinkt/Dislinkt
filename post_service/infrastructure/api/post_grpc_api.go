@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"post_service/domain"
 
 	pb "github.com/dislinkt/common/proto/post_service"
@@ -16,6 +17,21 @@ type PostHandler struct {
 
 func NewPostHandler(service *application.PostService) *PostHandler {
 	return &PostHandler{service: service}
+}
+
+func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	post, err := handler.service.Get(objectId)
+	if err != nil {
+		return nil, err
+	}
+	postPb := mapPost(post)
+	response := &pb.GetResponse{Post: postPb}
+	return response, nil
 }
 
 func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {

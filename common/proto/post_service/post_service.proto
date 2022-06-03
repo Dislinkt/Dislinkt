@@ -16,6 +16,11 @@ service PostService{
   }
     rpc getAllByUserId(GetRequest) returns(GetMultipleResponse) {
       option (google.api.http) = {
+        get: "/post/user/{Id}"
+      };
+    }
+    rpc get(GetRequest) returns(GetResponse) {
+      option (google.api.http) = {
         get: "/post/{Id}"
       };
     }

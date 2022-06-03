@@ -1,6 +1,7 @@
 package domain
 
 type Post struct {
+	Id             string
 	UserId         string
 	PostText       string
 	ImagePaths     []string

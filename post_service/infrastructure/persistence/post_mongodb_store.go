@@ -239,11 +239,11 @@ func decodeJobOffers(cursor *mongo.Cursor) (offers []*domain.JobOffer, err error
 /* USERS */
 
 func (store *PostMongoDBStore) InsertUser(user *domain.User) error {
-	result, err := store.users.InsertOne(context.TODO(), user)
+	user.Id = primitive.NewObjectID()
+	_, err := store.users.InsertOne(context.TODO(), user)
 	if err != nil {
 		return err
 	}
-	user.Id = result.InsertedID.(primitive.ObjectID)
 
 	return nil
 }

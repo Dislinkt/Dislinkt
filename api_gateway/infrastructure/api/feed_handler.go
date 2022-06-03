@@ -84,6 +84,7 @@ func loadUserPosts(postsPb []*postGw.Post) []domain.Post {
 
 	for _, postPb := range postsPb {
 		var post domain.Post
+		post.Id = postPb.Id
 		post.UserId = postPb.UserId
 		post.PostText = postPb.PostText
 		post.ImagePaths = postPb.ImagePaths

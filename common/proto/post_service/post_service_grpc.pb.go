@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type PostServiceClient interface {
 	GetRecent(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error)
 	GetAllByUserId(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetMultipleResponse, error)
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Empty, error)
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error)
@@ -56,6 +57,15 @@ func (c *postServiceClient) GetRecent(ctx context.Context, in *GetRequest, opts 
 func (c *postServiceClient) GetAllByUserId(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetMultipleResponse, error) {
 	out := new(GetMultipleResponse)
 	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/getAllByUserId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+	out := new(GetResponse)
+	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +168,7 @@ func (c *postServiceClient) GetAllCommentsForPost(ctx context.Context, in *GetRe
 type PostServiceServer interface {
 	GetRecent(context.Context, *GetRequest) (*GetMultipleResponse, error)
 	GetAllByUserId(context.Context, *GetRequest) (*GetMultipleResponse, error)
+	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetAll(context.Context, *Empty) (*GetMultipleResponse, error)
 	CreatePost(context.Context, *CreatePostRequest) (*Empty, error)
 	CreateComment(context.Context, *CreateCommentRequest) (*CreateCommentResponse, error)
@@ -180,6 +191,9 @@ func (UnimplementedPostServiceServer) GetRecent(context.Context, *GetRequest) (*
 }
 func (UnimplementedPostServiceServer) GetAllByUserId(context.Context, *GetRequest) (*GetMultipleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllByUserId not implemented")
+}
+func (UnimplementedPostServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedPostServiceServer) GetAll(context.Context, *Empty) (*GetMultipleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
@@ -256,6 +270,24 @@ func _PostService_GetAllByUserId_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).GetAllByUserId(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/post_service_proto.PostService/get",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).Get(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -454,6 +486,10 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "getAllByUserId",
 			Handler:    _PostService_GetAllByUserId_Handler,
+		},
+		{
+			MethodName: "get",
+			Handler:    _PostService_Get_Handler,
 		},
 		{
 			MethodName: "getAll",
