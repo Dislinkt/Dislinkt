@@ -140,12 +140,11 @@ func (handler *UserHandler) PatchUser(ctx context.Context, request *pb.PatchUser
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
-	parsedUUID, err := uuid.FromString(request.Id)
-	if err != nil {
-		fmt.Println(err.Error())
-		return nil, err
-	}
-	user, err := handler.service.PatchUser(request.UpdateMask.Paths, mapNewUser(request.User), parsedUUID)
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	fmt.Println("Patch : " + username)
+	user := mapNewUser(request.User)
+	user.Username = &username
+	err := handler.service.PatchUserStart(user)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err

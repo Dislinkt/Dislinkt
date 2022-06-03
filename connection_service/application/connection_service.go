@@ -40,3 +40,9 @@ func (service *ConnectionService) GetAllConnectionForUser(userUid string) ([]*do
 func (service *ConnectionService) GetAllConnectionRequestsForUser(userUid string) ([]*domain.UserNode, error) {
 	return service.store.GetAllConnectionRequestsForUser(userUid)
 }
+
+func (service *ConnectionService) UpdateUser(userUUID string,
+	private bool) error {
+	fmt.Println("[ConnectionService UpdateUser")
+	return service.store.UpdateUser(userUUID, private)
+}

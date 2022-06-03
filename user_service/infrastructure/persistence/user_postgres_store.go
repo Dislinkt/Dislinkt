@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"encoding/json"
+
 	"github.com/dislinkt/user_service/domain"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
@@ -33,7 +35,13 @@ func (store *UserPostgresStore) Insert(user *domain.User) error {
 func (store *UserPostgresStore) Update(user *domain.User) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-DB")
 	// defer span.Finish()
-	result := store.db.Updates(&user)
+	var inInterface map[string]interface{}
+	parsedUser, _ := json.Marshal(user)
+	err1 := json.Unmarshal(parsedUser, &inInterface)
+	if err1 != nil {
+		return nil, err1
+	}
+	result := store.db.Model(&user).Updates(inInterface)
 	if result.Error != nil {
 		return nil, result.Error
 	}

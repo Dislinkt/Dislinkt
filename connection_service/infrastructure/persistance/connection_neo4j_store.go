@@ -317,3 +317,44 @@ func checkIfUserExist(uid string, transaction neo4j.Transaction) bool {
 	}
 	return false
 }
+
+func (store *ConnectionDBStore) UpdateUser(userUUID string, private bool) error {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		if checkIfUserExist(userUUID, tx) {
+
+			var status string
+			if private {
+				status = "PRIVATE"
+			} else {
+				status = "PUBLIC"
+			}
+
+			_, err := tx.Run("MATCH (n:UserNode { uid: $uid}) set n.status = $status",
+				map[string]interface{}{
+					"uid":    userUUID,
+					"status": status,
+				})
+
+			if err != nil {
+				return nil, err
+			}
+			return nil, nil
+		} else {
+			return nil, nil
+		}
+
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
