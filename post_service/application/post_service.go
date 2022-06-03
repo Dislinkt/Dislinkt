@@ -56,3 +56,15 @@ func (service *PostService) GetAllJobOffers() ([]*domain.JobOffer, error) {
 func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
 	return service.store.InsertJobOffer(offer)
 }
+
+func (service *PostService) InsertUser(user *domain.User) error {
+	return service.store.InsertUser(user)
+}
+
+func (service *PostService) DeleteUser(user *domain.User) error {
+	return service.store.DeleteUser(user)
+}
+
+func (service *PostService) UpdateUser(user *domain.User) error {
+	return service.store.UpdateUser(user)
+}

@@ -35,14 +35,12 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 	case events.UpdateInPost:
 		fmt.Println("post handler-update")
 
-		// Napravila sam ti saga_mapper samo prilagodi kako tebi odgovara
-
-		// err := handler.postService.UpdateUser(mapCommandUser(command))
-		// if err != nil {
-		//	vratiti starog usera kako bih ja u user servisu mogla da vratim na stare vrednosti
-		// 	reply.Type = events.UserNotUpdatedInPost
-		// 	return
-		// }
+		err := handler.postService.UpdateUser(mapPostCommandUpdateUser(command))
+		if err != nil {
+			//reply.User =
+			reply.Type = events.UserNotUpdatedInPost
+			return
+		}
 		reply.Type = events.UserUpdatedInPost
 	default:
 		reply.Type = events.UnknownUpdateReply

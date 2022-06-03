@@ -35,20 +35,18 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 	case events.UpdatePost:
 		fmt.Println("posthandler-update")
 
-		// Napravila sam ti saga_mapper samo prilagodi kako tebi odgovara
-
-		// err := handler.postService.InsertUser(mapCommandUser(command))
-		// if err != nil {
-		// 	reply.Type = events.PostNotUpdated
-		// 	return
-		// }
+		err := handler.postService.InsertUser(mapPostCommandUser(command))
+		if err != nil {
+			reply.Type = events.PostNotUpdated
+			return
+		}
 		reply.Type = events.PostUpdated
 	case events.RollbackPost:
 		fmt.Println("posthandler-rollback")
-		// err := handler.postService.DeleteUser(mapCommandUser(command))
-		// if err != nil {
-		// 	return
-		// }
+		err := handler.postService.DeleteUser(mapPostCommandUser(command))
+		if err != nil {
+			return
+		}
 		reply.Type = events.PostRolledBack
 	default:
 		reply.Type = events.UnknownReply

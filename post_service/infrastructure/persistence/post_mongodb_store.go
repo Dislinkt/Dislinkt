@@ -14,19 +14,23 @@ const (
 	DATABASE             = "post"
 	COLLECTION_POST      = "post"
 	COLLECTION_JOB_OFFER = "job_offer"
+	COLLECTION_USER      = "user"
 )
 
 type PostMongoDBStore struct {
 	posts     *mongo.Collection
 	jobOffers *mongo.Collection
+	users     *mongo.Collection
 }
 
 func NewPostMongoDBStore(client *mongo.Client) domain.PostStore {
 	posts := client.Database(DATABASE).Collection(COLLECTION_POST)
 	jobOffers := client.Database(DATABASE).Collection(COLLECTION_JOB_OFFER)
+	users := client.Database(DATABASE).Collection(COLLECTION_USER)
 	return &PostMongoDBStore{
 		posts:     posts,
 		jobOffers: jobOffers,
+		users:     users,
 	}
 }
 
@@ -230,4 +234,36 @@ func decodeJobOffers(cursor *mongo.Cursor) (offers []*domain.JobOffer, err error
 	}
 	err = cursor.Err()
 	return
+}
+
+/* USERS */
+
+func (store *PostMongoDBStore) InsertUser(user *domain.User) error {
+	result, err := store.users.InsertOne(context.TODO(), user)
+	if err != nil {
+		return err
+	}
+	user.Id = result.InsertedID.(primitive.ObjectID)
+
+	return nil
+}
+
+func (store *PostMongoDBStore) DeleteUser(user *domain.User) error {
+	_, err := store.users.DeleteOne(context.TODO(), bson.M{"userUUID": user.UserUUID})
+	return err
+}
+
+func (store *PostMongoDBStore) UpdateUser(user *domain.User) error {
+
+	_, err := store.users.UpdateOne(context.TODO(), bson.M{"userUUID": user.UserUUID}, bson.D{
+		{"$set", bson.D{{"username", user.Username}}},
+		{"$set", bson.D{{"name", user.Name}}},
+		{"$set", bson.D{{"surname", user.Surname}}},
+	},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
