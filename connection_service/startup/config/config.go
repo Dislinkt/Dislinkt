@@ -14,6 +14,8 @@ type Config struct {
 	NatsPass                   string
 	RegisterUserCommandSubject string
 	RegisterUserReplySubject   string
+	PatchUserCommandSubject    string
+	PatchUserReplySubject      string
 	PublicKey                  string
 }
 
@@ -36,6 +38,8 @@ func NewConfig() *Config {
 		NatsPass:                   os.Getenv("NATS_PASS"),
 		RegisterUserCommandSubject: os.Getenv("REGISTER_USER_COMMAND_SUBJECT"),
 		RegisterUserReplySubject:   os.Getenv("REGISTER_USER_REPLY_SUBJECT"),
+		PatchUserCommandSubject:    os.Getenv("PATCH_USER_COMMAND_SUBJECT"),
+		PatchUserReplySubject:      os.Getenv("PATCH_USER_REPLY_SUBJECT"),
 		PublicKey:                  "Dislinkt",
 	}
 }

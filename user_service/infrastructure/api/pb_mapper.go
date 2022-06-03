@@ -45,7 +45,8 @@ func mapUser(userD *domain.User) *pb.User {
 }
 
 func mapNewUser(userPb *pb.NewUser) *domain.User {
-	fmt.Println("PROTO" + userPb.Password)
+	fmt.Println("PROTO")
+	fmt.Println(userPb.Private)
 	userD := &domain.User{
 		Id:        uuid.NewV4(),
 		Name:      userPb.Name,
@@ -59,7 +60,8 @@ func mapNewUser(userPb *pb.NewUser) *domain.User {
 		Private:   userPb.Private,
 		Password:  userPb.Password,
 	}
-	fmt.Println("DOMAIN: " + userD.Password)
+	fmt.Println("DOMAIN")
+	fmt.Println(userD.Private)
 	return userD
 }
 

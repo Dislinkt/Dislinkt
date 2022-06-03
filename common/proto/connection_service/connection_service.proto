@@ -40,6 +40,14 @@ service ConnectionService{
     };
   }
 
+
+  rpc GetAllConnectionRequestsForUser(GetConnectionRequest) returns (GetAllResponse) {
+    option (google.api.http) = {
+      get: "/connection/user/{uuid}/requests"
+      body: ""
+    };
+  }
+
 }
 
 message RegisterRequest{

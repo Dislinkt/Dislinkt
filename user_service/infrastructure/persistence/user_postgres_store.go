@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"encoding/json"
+
 	"github.com/dislinkt/user_service/domain"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
@@ -33,7 +35,13 @@ func (store *UserPostgresStore) Insert(user *domain.User) error {
 func (store *UserPostgresStore) Update(user *domain.User) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-DB")
 	// defer span.Finish()
-	result := store.db.Updates(&user)
+	var inInterface map[string]interface{}
+	parsedUser, _ := json.Marshal(user)
+	err1 := json.Unmarshal(parsedUser, &inInterface)
+	if err1 != nil {
+		return nil, err1
+	}
+	result := store.db.Model(&user).Updates(inInterface)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -74,7 +82,7 @@ func (store *UserPostgresStore) FindByUsername(username string) (user *domain.Us
 func (store *UserPostgresStore) Search(searchText string) (*[]domain.User, error) {
 	var users []domain.User
 	arg := "%" + searchText + "%"
-	result := store.db.Where("name LIKE ? OR surname LIKE ? OR username LIKE ?", arg, arg, arg).Find(&users)
+	result := store.db.Where("name LIKE ? OR surname LIKE ? OR username LIKE ? LIMIT 5", arg, arg, arg).Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}

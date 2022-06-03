@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dislinkt/user_service/domain"
@@ -10,14 +11,17 @@ import (
 )
 
 type UserService struct {
-	store        domain.UserStore
-	orchestrator *RegisterUserOrchestrator
+	store             domain.UserStore
+	orchestrator      *RegisterUserOrchestrator
+	patchOrchestrator *PatchUserOrchestrator
 }
 
-func NewUserService(store domain.UserStore, orchestrator *RegisterUserOrchestrator) *UserService {
+func NewUserService(store domain.UserStore, orchestrator *RegisterUserOrchestrator,
+	patchOrchestrator *PatchUserOrchestrator) *UserService {
 	return &UserService{
-		store:        store,
-		orchestrator: orchestrator,
+		store:             store,
+		orchestrator:      orchestrator,
+		patchOrchestrator: patchOrchestrator,
 	}
 }
 
@@ -61,30 +65,46 @@ func (service *UserService) Update(uuid uuid.UUID, user *domain.User) (*domain.U
 	return updatedUser, err
 }
 
+func (service *UserService) PatchUserStart(requestUser *domain.User) error {
+	err := service.patchOrchestrator.Start(requestUser)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
 func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.User,
-	uuid uuid.UUID) (*domain.User, error) {
+	username string) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	foundUser, err := service.store.FindByID(uuid)
+	foundUser, err := service.store.FindByUsername(username)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
+	fmt.Println(foundUser)
+
 	updatedUser, err := updateField(updatePaths, foundUser, requestUser)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	dbUser, err := service.store.Update(updatedUser)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
+	fmt.Println(dbUser)
 	return dbUser, nil
 }
 
 func updateField(paths []string, user *domain.User, requestUser *domain.User) (*domain.User, error) {
 	for _, path := range paths {
+		fmt.Println(path)
 		switch path {
 		case "private":
 			user.Private = requestUser.Private

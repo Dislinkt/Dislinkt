@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/application"
 )
@@ -52,6 +53,25 @@ func (handler *ConnectionHandler) AcceptConnection(ctx context.Context, request 
 func (handler *ConnectionHandler) GetAllConnectionForUser(ctx context.Context, request *pb.GetConnectionRequest) (*pb.GetAllResponse, error) {
 
 	users, err := handler.service.GetAllConnectionForUser(request.GetUuid())
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllResponse{
+		Users: []*pb.User{},
+	}
+
+	for _, user := range users {
+		current := pb.User{UserID: user.UserUID, Status: string(user.Status)}
+		response.Users = append(response.Users, &current)
+	}
+
+	return response, nil
+}
+
+func (handler *ConnectionHandler) GetAllConnectionRequestsForUser(ctx context.Context,
+	request *pb.GetConnectionRequest) (*pb.GetAllResponse, error) {
+
+	users, err := handler.service.GetAllConnectionRequestsForUser(request.GetUuid())
 	if err != nil {
 		return nil, err
 	}

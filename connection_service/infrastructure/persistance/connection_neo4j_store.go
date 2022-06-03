@@ -2,10 +2,11 @@ package persistance
 
 import (
 	"fmt"
+	"time"
+
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/domain"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
-	"time"
 )
 
 type ConnectionDBStore struct {
@@ -44,6 +45,7 @@ func (store *ConnectionDBStore) CreateConnection(baseUserUuid string, connectUse
 
 			status := record.Values[0].(string)
 			dateNow := time.Now().Local().Unix()
+			fmt.Println(status)
 			if status == "PRIVATE" {
 				connectionStatus = "REQUEST_SENT"
 				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $connect_user_uuid  MATCH (u2:UserNode) WHERE u2.uid = $base_user_uuid CREATE (u1)-[r1:CONNECTION {status: $status, date: $date}]->(u2)", map[string]interface{}{
@@ -211,6 +213,53 @@ func (store *ConnectionDBStore) GetAllConnectionForUser(userUid string) (userNod
 	return userNodes, nil
 }
 
+func (store *ConnectionDBStore) GetAllConnectionRequestsForUser(userUid string) (userNodes []*domain.UserNode,
+	error1 error) {
+
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		fmt.Println("UUID ")
+		fmt.Println(userUid)
+		if !checkIfUserExist(userUid, tx) {
+			fmt.Println("NE POSTOJI")
+			return &domain.UserNode{
+				UserUID: "",
+				Status:  "",
+			}, nil
+		}
+
+		records, err := tx.Run("MATCH (u1:UserNode)   MATCH (u2:UserNode) WHERE u2.uid = $userUid match ("+
+			"u1)-[r1:CONNECTION {status:$status}]->(u2) return u1.uid, u1.status", map[string]interface{}{
+			"userUid": userUid,
+			"status":  "REQUEST_SENT",
+		})
+
+		for records.Next() {
+			fmt.Println(records.Record())
+			node := domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Private}
+			userNodes = append(userNodes, &node)
+			fmt.Println("USAO")
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		return userNodes, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return userNodes, nil
+}
+
 func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.UserNode, error) {
 	fmt.Println("[ConnectionDBStore Register]")
 	fmt.Println(userNode)
@@ -222,7 +271,7 @@ func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.Use
 
 		}
 	}(session)
-	
+
 	fmt.Println(session)
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 		fmt.Println("linija5")
@@ -271,4 +320,48 @@ func checkIfUserExist(uid string, transaction neo4j.Transaction) bool {
 		return true
 	}
 	return false
+}
+
+func (store *ConnectionDBStore) UpdateUser(userUUID string, private bool) error {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		fmt.Println("UUID " + userUUID)
+		if checkIfUserExist(userUUID, tx) {
+
+			var status string
+			if private {
+				status = "PRIVATE"
+			} else {
+				status = "PUBLIC"
+			}
+			fmt.Println("MENJAM U " + status)
+
+			_, err := tx.Run("MATCH (n:UserNode { uid: $uid}) set n.status = $status",
+				map[string]interface{}{
+					"uid":    userUUID,
+					"status": status,
+				})
+
+			if err != nil {
+				return nil, err
+			}
+			return nil, nil
+		} else {
+			fmt.Println("NEPOSTOJI")
+			return nil, nil
+		}
+
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

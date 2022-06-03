@@ -10,7 +10,7 @@ import (
 	"github.com/dislinkt/api_gateway/infrastructure/api"
 	"github.com/gorilla/handlers"
 
-	//"github.com/dislinkt/api_gateway/infrastructure/api"
+	// "github.com/dislinkt/api_gateway/infrastructure/api"
 
 	cfg "github.com/dislinkt/api_gateway/startup/config"
 	additionalUserGw "github.com/dislinkt/common/proto/additional_user_service"
@@ -80,20 +80,22 @@ func (server *Server) initCustomHandlers() {
 	// connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
 	userFeedHandler := api.NewUserFeedHandler(server.config)
 	userFeedHandler.Init(server.mux)
+	connectionRequestHandler := api.NewConnectionRequestHandler(server.config)
+	connectionRequestHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {
-	//crtPath, _ := filepath.Abs("./server.crt")
-	//keyPath, _ := filepath.Abs("./server.key")
+	// crtPath, _ := filepath.Abs("./server.crt")
+	// keyPath, _ := filepath.Abs("./server.key")
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**", "http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**"}),
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}),
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
 		handlers.AllowCredentials(),
 	)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
-	//log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
-	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
+	// log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
+	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
 }
 
 func muxMiddleware(server *Server) http.Handler {

@@ -22,6 +22,7 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 		Email:    command.User.Email,
 		UserRole: int(command.User.UserRole),
 		Active:   true,
+		ApiToken: nil,
 	}
 	return userD
 }

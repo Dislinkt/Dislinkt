@@ -25,3 +25,11 @@ type Links struct {
 	Like    string
 	Dislike string
 }
+
+type ConnectionRequest struct {
+	UserId    string
+	Name      string
+	Surname   string
+	Biography string
+	Username  string
+}

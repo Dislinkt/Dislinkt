@@ -47,11 +47,19 @@ func (server *Server) Start() {
 	replySubscriber := server.initSubscriber(server.config.RegisterUserReplySubject, QueueGroup)
 	registerUserOrchestrator := server.initRegisterUserOrchestrator(commandPublisher, replySubscriber)
 
-	userService := server.initUserService(userStore, registerUserOrchestrator)
+	patchCommandPublisher := server.initPublisher(server.config.PatchUserCommandSubject)
+	patchReplySubscriber := server.initSubscriber(server.config.PatchUserReplySubject, QueueGroup)
+	patchUserOrchestrator := server.initPatchUserOrchestrator(patchCommandPublisher, patchReplySubscriber)
+
+	userService := server.initUserService(userStore, registerUserOrchestrator, patchUserOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
 	server.initRegisterUserHandler(userService, replyPublisher, commandSubscriber)
+
+	patchCommandSubscriber := server.initSubscriber(server.config.PatchUserCommandSubject, QueueGroup)
+	patchReplyPublisher := server.initPublisher(server.config.PatchUserReplySubject)
+	server.initPatchUserHandler(userService, patchCommandSubscriber, patchReplyPublisher)
 
 	userHandler := server.initUserHandler(userService)
 
@@ -114,14 +122,28 @@ func (server *Server) initRegisterUserOrchestrator(publisher saga.Publisher,
 	return orchestrator
 }
 
+func (server *Server) initPatchUserOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *application.PatchUserOrchestrator {
+	orchestrator, err := application.NewPatchUserOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
 func (server *Server) initUserService(store domain.UserStore,
-	orchestrator *application.RegisterUserOrchestrator) *application.UserService {
-	return application.NewUserService(store, orchestrator)
+	orchestrator *application.RegisterUserOrchestrator, patchOrchestrator *application.PatchUserOrchestrator) *application.UserService {
+	return application.NewUserService(store, orchestrator, patchOrchestrator)
 }
 
 func (server *Server) initRegisterUserHandler(service *application.UserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initPatchUserHandler(service *application.UserService, subscriber saga.Subscriber, publisher saga.Publisher) {
+	_, err := api.NewPatchUserCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

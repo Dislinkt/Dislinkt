@@ -19,7 +19,7 @@ func NewConnectionService(store domain.ConnectionStore) *ConnectionService {
 
 func (service *ConnectionService) Register(userID string, status string) (*domain.UserNode, error) {
 	fmt.Println("[ConnectionService Register]")
-	node := domain.UserNode{userID, domain.ProfileStatus(status)}
+	node := domain.UserNode{UserUID: userID, Status: domain.ProfileStatus(status)}
 	return service.store.Register(&node)
 }
 
@@ -35,4 +35,14 @@ func (service *ConnectionService) AcceptConnection(requestSenderUser string, req
 
 func (service *ConnectionService) GetAllConnectionForUser(userUid string) ([]*domain.UserNode, error) {
 	return service.store.GetAllConnectionForUser(userUid)
+}
+
+func (service *ConnectionService) GetAllConnectionRequestsForUser(userUid string) ([]*domain.UserNode, error) {
+	return service.store.GetAllConnectionRequestsForUser(userUid)
+}
+
+func (service *ConnectionService) UpdateUser(userUUID string,
+	private bool) error {
+	fmt.Println("[ConnectionService UpdateUser")
+	return service.store.UpdateUser(userUUID, private)
 }

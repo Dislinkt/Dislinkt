@@ -46,6 +46,10 @@ func (server *Server) Start() {
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
 	server.initRegisterUserHandler(connectionService, replyPublisher, commandSubscriber)
 
+	patchCommandSubscriber := server.initSubscriber(server.config.PatchUserCommandSubject, QueueGroup)
+	patchReplyPublisher := server.initPublisher(server.config.PatchUserReplySubject)
+	server.iniPatchUserHandler(connectionService, patchReplyPublisher, patchCommandSubscriber)
+
 	connectionHandler := server.initConnectionHandler(connectionService)
 
 	server.startGrpcServer(connectionHandler)
@@ -94,6 +98,12 @@ func (server *Server) initRegisterUserHandler(service *application.ConnectionSer
 	}
 }
 
+func (server *Server) iniPatchUserHandler(service *application.ConnectionService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewPatchUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 func (server *Server) initConnectionHandler(service *application.ConnectionService) *api.ConnectionHandler {
 	return api.NewConnectionHandler(service)
 }
