@@ -34,3 +34,15 @@ const (
 	LIKED
 	DISLIKED
 )
+
+type JobOffer struct {
+	Id            primitive.ObjectID `bson:"_id"`
+	Position      string             `bson:"position"`
+	Description   string             `bson:"description"`
+	Preconditions string             `bson:"preconditions"`
+	DatePosted    time.Time          `bson:"date_posted"`
+	Duration      time.Duration      `bson:"duration"`
+	Location      string             `bson:"location"`
+	Title         string             `bson:"title"`
+	Field         string             `bson:"field"`
+}

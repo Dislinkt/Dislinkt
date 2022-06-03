@@ -48,3 +48,11 @@ func (service *PostService) DislikePost(post *domain.Post, username string) erro
 func (service *PostService) GetRecent(uuid string) ([]*domain.Post, error) {
 	return service.store.GetRecent(uuid)
 }
+
+func (service *PostService) GetAllJobOffers() ([]*domain.JobOffer, error) {
+	return service.store.GetAllJobOffers()
+}
+
+func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
+	return service.store.InsertJobOffer(offer)
+}

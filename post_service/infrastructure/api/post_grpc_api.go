@@ -136,3 +136,27 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 
 	return &pb.Empty{}, nil
 }
+
+/* JOB OFFERS */
+
+func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Empty) (*pb.GetAllJobOffers, error) {
+	offers, err := handler.service.GetAllJobOffers()
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllJobOffers{JobOffers: []*pb.JobOffer{}}
+	for _, offer := range offers {
+		current := mapJobOffer(offer)
+		response.JobOffers = append(response.JobOffers, current)
+	}
+	return response, nil
+}
+
+func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.CreateJobOfferRequest) (*pb.Empty, error) {
+	offer := mapNewJobOffer(request.JobOffer)
+	err := handler.service.InsertJobOffer(offer)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Empty{}, nil
+}

@@ -12,4 +12,7 @@ type PostStore interface {
 	LikePost(post *Post, username string) error
 	DislikePost(post *Post, username string) error
 	GetRecent(uuid string) ([]*Post, error)
+
+	GetAllJobOffers() ([]*JobOffer, error)
+	InsertJobOffer(offer *JobOffer) error
 }

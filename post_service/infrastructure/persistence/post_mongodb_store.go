@@ -11,17 +11,23 @@ import (
 )
 
 const (
-	DATABASE   = "post"
-	COLLECTION = "post"
+	DATABASE             = "post"
+	COLLECTION_POST      = "post"
+	COLLECTION_JOB_OFFER = "job_offer"
 )
 
 type PostMongoDBStore struct {
-	posts *mongo.Collection
+	posts     *mongo.Collection
+	jobOffers *mongo.Collection
 }
 
 func NewPostMongoDBStore(client *mongo.Client) domain.PostStore {
-	posts := client.Database(DATABASE).Collection(COLLECTION)
-	return &PostMongoDBStore{posts: posts}
+	posts := client.Database(DATABASE).Collection(COLLECTION_POST)
+	jobOffers := client.Database(DATABASE).Collection(COLLECTION_JOB_OFFER)
+	return &PostMongoDBStore{
+		posts:     posts,
+		jobOffers: jobOffers,
+	}
 }
 
 func (store *PostMongoDBStore) GetRecent(uuid string) ([]*domain.Post, error) {
@@ -180,6 +186,47 @@ func decode(cursor *mongo.Cursor) (posts []*domain.Post, err error) {
 			return
 		}
 		posts = append(posts, &post)
+	}
+	err = cursor.Err()
+	return
+}
+
+/* JOB OFFERS */
+
+func (store *PostMongoDBStore) InsertJobOffer(offer *domain.JobOffer) error {
+	result, err := store.jobOffers.InsertOne(context.TODO(), offer)
+	if err != nil {
+		return err
+	}
+	offer.Id = result.InsertedID.(primitive.ObjectID)
+
+	return nil
+}
+
+func (store *PostMongoDBStore) GetAllJobOffers() ([]*domain.JobOffer, error) {
+	filter := bson.D{}
+	return store.filterJobOffers(filter)
+}
+
+func (store *PostMongoDBStore) filterJobOffers(filter interface{}) ([]*domain.JobOffer, error) {
+	cursor, err := store.jobOffers.Find(context.TODO(), filter)
+	defer cursor.Close(context.TODO())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return decodeJobOffers(cursor)
+}
+
+func decodeJobOffers(cursor *mongo.Cursor) (offers []*domain.JobOffer, err error) {
+	for cursor.Next(context.TODO()) {
+		var offer domain.JobOffer
+		err = cursor.Decode(&offer)
+		if err != nil {
+			return
+		}
+		offers = append(offers, &offer)
 	}
 	err = cursor.Err()
 	return

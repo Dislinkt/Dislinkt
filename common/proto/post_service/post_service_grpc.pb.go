@@ -29,6 +29,8 @@ type PostServiceClient interface {
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*CreateCommentResponse, error)
 	LikePost(ctx context.Context, in *ReactionRequest, opts ...grpc.CallOption) (*Empty, error)
 	DislikePost(ctx context.Context, in *ReactionRequest, opts ...grpc.CallOption) (*Empty, error)
+	CreateJobOffer(ctx context.Context, in *CreateJobOfferRequest, opts ...grpc.CallOption) (*Empty, error)
+	GetAllJobOffers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllJobOffers, error)
 }
 
 type postServiceClient struct {
@@ -102,6 +104,24 @@ func (c *postServiceClient) DislikePost(ctx context.Context, in *ReactionRequest
 	return out, nil
 }
 
+func (c *postServiceClient) CreateJobOffer(ctx context.Context, in *CreateJobOfferRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/createJobOffer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postServiceClient) GetAllJobOffers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllJobOffers, error) {
+	out := new(GetAllJobOffers)
+	err := c.cc.Invoke(ctx, "/post_service_proto.PostService/getAllJobOffers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostServiceServer is the server API for PostService service.
 // All implementations must embed UnimplementedPostServiceServer
 // for forward compatibility
@@ -113,6 +133,8 @@ type PostServiceServer interface {
 	CreateComment(context.Context, *CreateCommentRequest) (*CreateCommentResponse, error)
 	LikePost(context.Context, *ReactionRequest) (*Empty, error)
 	DislikePost(context.Context, *ReactionRequest) (*Empty, error)
+	CreateJobOffer(context.Context, *CreateJobOfferRequest) (*Empty, error)
+	GetAllJobOffers(context.Context, *Empty) (*GetAllJobOffers, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
 
@@ -140,6 +162,12 @@ func (UnimplementedPostServiceServer) LikePost(context.Context, *ReactionRequest
 }
 func (UnimplementedPostServiceServer) DislikePost(context.Context, *ReactionRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DislikePost not implemented")
+}
+func (UnimplementedPostServiceServer) CreateJobOffer(context.Context, *CreateJobOfferRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateJobOffer not implemented")
+}
+func (UnimplementedPostServiceServer) GetAllJobOffers(context.Context, *Empty) (*GetAllJobOffers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllJobOffers not implemented")
 }
 func (UnimplementedPostServiceServer) mustEmbedUnimplementedPostServiceServer() {}
 
@@ -280,6 +308,42 @@ func _PostService_DislikePost_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PostService_CreateJobOffer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateJobOfferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).CreateJobOffer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/post_service_proto.PostService/createJobOffer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).CreateJobOffer(ctx, req.(*CreateJobOfferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostService_GetAllJobOffers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).GetAllJobOffers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/post_service_proto.PostService/getAllJobOffers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).GetAllJobOffers(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostService_ServiceDesc is the grpc.ServiceDesc for PostService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -314,6 +378,14 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "dislikePost",
 			Handler:    _PostService_DislikePost_Handler,
+		},
+		{
+			MethodName: "createJobOffer",
+			Handler:    _PostService_CreateJobOffer_Handler,
+		},
+		{
+			MethodName: "getAllJobOffers",
+			Handler:    _PostService_GetAllJobOffers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

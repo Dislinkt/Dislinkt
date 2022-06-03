@@ -3,6 +3,7 @@ package api
 import (
 	b64 "encoding/base64"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	pb "github.com/dislinkt/common/proto/post_service"
@@ -17,6 +18,7 @@ func mapPost(post *domain.Post) *pb.Post {
 		Comment: "/post/" + id + "/comment",
 		Like:    "/post/" + id + "/like",
 		Dislike: "/post/" + id + "/dislike",
+		User:    "/user/" + post.UserId,
 	}
 
 	postPb := &pb.Post{
@@ -94,4 +96,42 @@ func convertByteToBase64(images [][]byte) []string {
 		encodedImages = append(encodedImages, imageEnc)
 	}
 	return encodedImages
+}
+
+/* JOB OFFERS */
+
+func mapJobOffer(offer *domain.JobOffer) *pb.JobOffer {
+	id := offer.Id.Hex()
+
+	offerPb := &pb.JobOffer{
+		Id:            id,
+		Position:      offer.Position,
+		Description:   offer.Description,
+		Preconditions: offer.Preconditions,
+		DatePosted:    timestamppb.New(offer.DatePosted),
+		Duration:      offer.Duration.String(),
+		Location:      offer.Location,
+		Title:         offer.Title,
+		Field:         offer.Field,
+	}
+
+	return offerPb
+}
+
+func mapNewJobOffer(offerPb *pb.JobOffer) *domain.JobOffer {
+	duration, _ := time.ParseDuration(offerPb.Duration)
+
+	offer := &domain.JobOffer{
+		Id:            primitive.NewObjectID(),
+		Position:      offerPb.Position,
+		Description:   offerPb.Description,
+		Preconditions: offerPb.Preconditions,
+		DatePosted:    offerPb.DatePosted.AsTime(),
+		Duration:      duration,
+		Location:      offerPb.Location,
+		Title:         offerPb.Title,
+		Field:         offerPb.Field,
+	}
+
+	return offer
 }

@@ -5,6 +5,8 @@ option go_package = "github.com/Dislinkt/common/proto/post_service";
 package post_service_proto;
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
 
 service PostService{
   rpc getRecent(GetRequest) returns(GetMultipleResponse) {
@@ -44,6 +46,17 @@ service PostService{
       option (google.api.http) = {
         post: "/post/{PostId}/dislike"
         body: "*"
+      };
+    }
+    rpc createJobOffer(CreateJobOfferRequest) returns (Empty) {
+      option (google.api.http) = {
+        post: "/job_offer"
+        body: "JobOffer"
+      };
+    }
+    rpc getAllJobOffers(Empty) returns(GetAllJobOffers) {
+      option (google.api.http) = {
+        get: "/job_offer"
       };
     }
 }
@@ -111,4 +124,27 @@ message Links{
   string Comment = 1;
   string Like = 2;
   string Dislike = 3;
+  string User = 4;
 }
+
+message JobOffer {
+  string Id = 1;
+  string Position = 2;
+  string Description = 3;
+  string Preconditions = 4;
+  google.protobuf.Timestamp DatePosted = 5;
+  string Duration = 6;
+  string Location = 7;
+  string Title = 8;
+  string Field= 9;
+}
+
+message CreateJobOfferRequest {
+  JobOffer JobOffer = 1;
+}
+
+message GetAllJobOffers {
+  repeated JobOffer JobOffers = 1;
+}
+
+
