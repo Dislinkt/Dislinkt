@@ -76,8 +76,6 @@ func mapUpdateUser(userPb *pb.UpdateUser) *domain.User {
 		DateOfBirth: userPb.DateOfBirth,
 		UserRole:    domain.Regular,
 		Biography:   userPb.Biography,
-		Blocked:     false,
-		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
 	return userD

@@ -37,14 +37,38 @@ func (service *PostService) CreateComment(post *domain.Post, comment *domain.Com
 	return service.store.CreateComment(post, comment)
 }
 
-func (service *PostService) LikePost(post *domain.Post, username string) error {
-	return service.store.LikePost(post, username)
+func (service *PostService) LikePost(post *domain.Post, userId string) error {
+	return service.store.LikePost(post, userId)
 }
 
-func (service *PostService) DislikePost(post *domain.Post, username string) error {
-	return service.store.DislikePost(post, username)
+func (service *PostService) DislikePost(post *domain.Post, userId string) error {
+	return service.store.DislikePost(post, userId)
 }
 
 func (service *PostService) GetRecent(uuid string) ([]*domain.Post, error) {
 	return service.store.GetRecent(uuid)
+}
+
+func (service *PostService) GetAllJobOffers() ([]*domain.JobOffer, error) {
+	return service.store.GetAllJobOffers()
+}
+
+func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
+	return service.store.InsertJobOffer(offer)
+}
+
+func (service *PostService) InsertUser(user *domain.User) error {
+	return service.store.InsertUser(user)
+}
+
+func (service *PostService) DeleteUser(user *domain.User) error {
+	return service.store.DeleteUser(user)
+}
+
+func (service *PostService) UpdateUser(user *domain.User) error {
+	return service.store.UpdateUser(user)
+}
+
+func (service *PostService) GetUser(id string) (*domain.User, error) {
+	return service.store.GetUser(id)
 }

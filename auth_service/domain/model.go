@@ -15,7 +15,7 @@ type User struct {
 }
 
 type LoginRequest struct {
-	Username string `bson:"password"`
+	Username string `bson:"username"`
 	Password string `bson:"password"`
 }
 

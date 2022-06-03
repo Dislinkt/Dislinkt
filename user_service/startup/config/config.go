@@ -22,6 +22,8 @@ type Config struct {
 	RegisterUserReplySubject   string
 	PatchUserCommandSubject    string
 	PatchUserReplySubject      string
+	UpdateUserCommandSubject   string
+	UpdateUserReplySubject     string
 	JaegerServiceName          string
 	PublicKey                  string
 }
@@ -49,6 +51,8 @@ func NewConfig() *Config {
 		RegisterUserReplySubject:   os.Getenv("REGISTER_USER_REPLY_SUBJECT"),
 		PatchUserCommandSubject:    os.Getenv("PATCH_USER_COMMAND_SUBJECT"),
 		PatchUserReplySubject:      os.Getenv("PATCH_USER_REPLY_SUBJECT"),
+		UpdateUserCommandSubject:   os.Getenv("UPDATE_USER_COMMAND_SUBJECT"),
+		UpdateUserReplySubject:     os.Getenv("UPDATE_USER_REPLY_SUBJECT"),
 		JaegerServiceName:          os.Getenv("JAEGER_SERVICE_NAME"),
 		PublicKey:                  "Dislinkt",
 	}

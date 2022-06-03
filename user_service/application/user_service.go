@@ -11,17 +11,20 @@ import (
 )
 
 type UserService struct {
-	store             domain.UserStore
-	orchestrator      *RegisterUserOrchestrator
-	patchOrchestrator *PatchUserOrchestrator
+	store                    domain.UserStore
+	registerUserOrchestrator *RegisterUserOrchestrator
+	updateUserOrchestrator   *UpdateUserOrchestrator
+	patchOrchestrator        *PatchUserOrchestrator
 }
 
-func NewUserService(store domain.UserStore, orchestrator *RegisterUserOrchestrator,
+func NewUserService(store domain.UserStore, registerUserOrchestrator *RegisterUserOrchestrator,
+	updateUserOrchestrator *UpdateUserOrchestrator,
 	patchOrchestrator *PatchUserOrchestrator) *UserService {
 	return &UserService{
-		store:             store,
-		orchestrator:      orchestrator,
-		patchOrchestrator: patchOrchestrator,
+		store:                    store,
+		registerUserOrchestrator: registerUserOrchestrator,
+		updateUserOrchestrator:   updateUserOrchestrator,
+		patchOrchestrator:        patchOrchestrator,
 	}
 }
 
@@ -30,12 +33,29 @@ func (service *UserService) Register(user *domain.User) error {
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	err := service.orchestrator.Start(user)
+	err := service.registerUserOrchestrator.Start(user)
 	if err != nil {
 		return err
 	}
 
 	return err
+}
+func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error) {
+	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
+	// defer span.Finish()
+	//
+	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	dbUser, err := service.store.FindByID(user.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = service.updateUserOrchestrator.Start(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return dbUser, err
 }
 
 func (service *UserService) Insert(user *domain.User) error {

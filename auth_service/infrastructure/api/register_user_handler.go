@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/dislinkt/auth_service/application"
+	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	events "github.com/dislinkt/common/saga/register_user"
 )
 
 type CreateUserCommandHandler struct {

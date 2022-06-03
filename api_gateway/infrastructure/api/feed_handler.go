@@ -84,41 +84,17 @@ func loadUserPosts(postsPb []*postGw.Post) []domain.Post {
 
 	for _, postPb := range postsPb {
 		var post domain.Post
+		post.Id = postPb.Id
 		post.UserId = postPb.UserId
 		post.PostText = postPb.PostText
 		post.ImagePaths = postPb.ImagePaths
 		post.DatePosted = postPb.DatePosted
-		post.Reactions = loadPostReactions(postPb.Reactions)
-		post.Comments = loadPostComments(postPb.Comments)
+		post.LikesNumber = int(postPb.LikesNumber)
+		post.DislikesNumber = int(postPb.DislikesNumber)
+		post.CommentsNumber = int(postPb.CommentsNumber)
 		post.Links = domain.Links{Comment: postPb.Links.Comment, Dislike: postPb.Links.Dislike, Like: postPb.Links.Like}
 
 		posts = append(posts, post)
 	}
 	return posts
-}
-
-func loadPostReactions(reactionsPb []*postGw.Reaction) []domain.Reaction {
-	var reactions []domain.Reaction
-
-	for _, reactionPb := range reactionsPb {
-		var reaction domain.Reaction
-		reaction.Username = reactionPb.Username
-		reaction.Reaction = int(reactionPb.Reaction)
-
-		reactions = append(reactions, reaction)
-	}
-	return reactions
-}
-
-func loadPostComments(commentsPb []*postGw.Comment) []domain.Comment {
-	var comments []domain.Comment
-
-	for _, commentPb := range commentsPb {
-		var comment domain.Comment
-		comment.Username = commentPb.Username
-		comment.CommentText = commentPb.CommentText
-
-		comments = append(comments, comment)
-	}
-	return comments
 }

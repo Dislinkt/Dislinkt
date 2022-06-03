@@ -36,7 +36,9 @@ func NewServer(config *config.Config) *Server {
 }
 
 const (
-	QueueGroup = "user_service"
+	QueueGroupRegister = "user_service_register"
+	QueueGroupUpdate   = "user_service_update"
+	QueueGroupPatch    = "user_service_patch"
 )
 
 func (server *Server) Start() {
@@ -44,22 +46,30 @@ func (server *Server) Start() {
 	userStore := server.initUserStore(postgresClient)
 
 	commandPublisher := server.initPublisher(server.config.RegisterUserCommandSubject)
-	replySubscriber := server.initSubscriber(server.config.RegisterUserReplySubject, QueueGroup)
+	replySubscriber := server.initSubscriber(server.config.RegisterUserReplySubject, QueueGroupRegister)
 	registerUserOrchestrator := server.initRegisterUserOrchestrator(commandPublisher, replySubscriber)
 
 	patchCommandPublisher := server.initPublisher(server.config.PatchUserCommandSubject)
-	patchReplySubscriber := server.initSubscriber(server.config.PatchUserReplySubject, QueueGroup)
+	patchReplySubscriber := server.initSubscriber(server.config.PatchUserReplySubject, QueueGroupPatch)
 	patchUserOrchestrator := server.initPatchUserOrchestrator(patchCommandPublisher, patchReplySubscriber)
 
-	userService := server.initUserService(userStore, registerUserOrchestrator, patchUserOrchestrator)
+	updateCommandPublisher := server.initPublisher(server.config.UpdateUserCommandSubject)
+	updateReplySubscriber := server.initSubscriber(server.config.UpdateUserReplySubject, QueueGroupUpdate)
+	updateUserOrchestrator := server.initUpdateUserOrchestrator(updateCommandPublisher, updateReplySubscriber)
 
-	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
+	userService := server.initUserService(userStore, registerUserOrchestrator, updateUserOrchestrator, patchUserOrchestrator)
+
+	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroupRegister)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
 	server.initRegisterUserHandler(userService, replyPublisher, commandSubscriber)
 
-	patchCommandSubscriber := server.initSubscriber(server.config.PatchUserCommandSubject, QueueGroup)
+	patchCommandSubscriber := server.initSubscriber(server.config.PatchUserCommandSubject, QueueGroupPatch)
 	patchReplyPublisher := server.initPublisher(server.config.PatchUserReplySubject)
 	server.initPatchUserHandler(userService, patchCommandSubscriber, patchReplyPublisher)
+
+	updateCommandSubscriber := server.initSubscriber(server.config.UpdateUserCommandSubject, QueueGroupUpdate)
+	updateReplyPublisher := server.initPublisher(server.config.UpdateUserReplySubject)
+	server.initUpdateUserHandler(userService, updateReplyPublisher, updateCommandSubscriber)
 
 	userHandler := server.initUserHandler(userService)
 
@@ -129,9 +139,19 @@ func (server *Server) initPatchUserOrchestrator(publisher saga.Publisher, subscr
 	}
 	return orchestrator
 }
+func (server *Server) initUpdateUserOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.UpdateUserOrchestrator {
+	orchestrator, err := application.NewUpdateUserOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
 func (server *Server) initUserService(store domain.UserStore,
-	orchestrator *application.RegisterUserOrchestrator, patchOrchestrator *application.PatchUserOrchestrator) *application.UserService {
-	return application.NewUserService(store, orchestrator, patchOrchestrator)
+	registerUserOrchestrator *application.RegisterUserOrchestrator,
+	updateUserOrchestrator *application.UpdateUserOrchestrator, patchOrchestrator *application.PatchUserOrchestrator) *application.UserService {
+	return application.NewUserService(store, registerUserOrchestrator, updateUserOrchestrator, patchOrchestrator)
 }
 
 func (server *Server) initRegisterUserHandler(service *application.UserService, publisher saga.Publisher,
@@ -144,6 +164,12 @@ func (server *Server) initRegisterUserHandler(service *application.UserService, 
 
 func (server *Server) initPatchUserHandler(service *application.UserService, subscriber saga.Subscriber, publisher saga.Publisher) {
 	_, err := api.NewPatchUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func (server *Server) initUpdateUserHandler(service *application.UserService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewUpdateUserCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

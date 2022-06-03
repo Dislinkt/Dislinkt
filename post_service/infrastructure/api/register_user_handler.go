@@ -5,19 +5,19 @@ import (
 
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	"github.com/dislinkt/connection_service/application"
+	"post_service/application"
 )
 
 type CreateUserCommandHandler struct {
-	connectionService *application.ConnectionService
+	postService       *application.PostService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
 }
 
-func NewRegisterUserCommandHandler(userService *application.ConnectionService, publisher saga.Publisher,
+func NewRegisterUserCommandHandler(postService *application.PostService, publisher saga.Publisher,
 	subscriber saga.Subscriber) (*CreateUserCommandHandler, error) {
 	o := &CreateUserCommandHandler{
-		connectionService: userService,
+		postService:       postService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
 	}
@@ -31,29 +31,24 @@ func NewRegisterUserCommandHandler(userService *application.ConnectionService, p
 func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserCommand) {
 	reply := events.RegisterUserReply{User: command.User}
 
-	var status string
-	if command.User.Private {
-		status = "PRIVATE"
-	} else {
-		status = "PUBLIC"
-	}
-
 	switch command.Type {
-	case events.UpdateConnectionNode:
-		fmt.Println("connection handler-update")
-		_, err := handler.connectionService.Register(command.User.Id, status)
+	case events.UpdatePost:
+		fmt.Println("posthandler-update")
+
+		err := handler.postService.InsertUser(mapPostCommandUser(command))
 		if err != nil {
-			reply.Type = events.ConnectionsNotUpdated
+			fmt.Println(err)
+			reply.Type = events.PostNotUpdated
 			return
 		}
-		reply.Type = events.ConnectionsUpdated
-	case events.RollbackConnectionNode:
-		fmt.Println("connection handler-rollback")
-		// err := handler.connectionService.Delete(mapCommandUser(command))
-		// if err != nil {
-		// 	return
-		// }
-		reply.Type = events.UserServiceRolledBack
+		reply.Type = events.PostUpdated
+	case events.RollbackPost:
+		fmt.Println("posthandler-rollback")
+		err := handler.postService.DeleteUser(mapPostCommandUser(command))
+		if err != nil {
+			return
+		}
+		reply.Type = events.PostRolledBack
 	default:
 		reply.Type = events.UnknownReply
 	}
