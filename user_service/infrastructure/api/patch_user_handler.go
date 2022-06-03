@@ -37,12 +37,13 @@ func (handler *PatchUserCommandHandler) handle(command *events.PatchUserCommand)
 		fmt.Println(command.User)
 		var paths []string
 		paths = append(paths, "private")
-		_, err := handler.userService.PatchUser(paths, mapPatchUser(command.User), command.User.Username)
+		dbUser, err := handler.userService.PatchUser(paths, mapPatchUser(command.User), command.User.Username)
 		if err != nil {
 			fmt.Println(err)
 			reply.Type = events.PatchFailedInUser
 			return
 		}
+		reply.User.Id = dbUser.Id.String()
 		reply.Type = events.PatchedUserInUser
 
 	default:

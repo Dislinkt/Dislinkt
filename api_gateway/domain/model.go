@@ -31,4 +31,5 @@ type ConnectionRequest struct {
 	Name      string
 	Surname   string
 	Biography string
+	Username  string
 }

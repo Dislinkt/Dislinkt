@@ -27,7 +27,7 @@ func (o *PatchUserOrchestrator) Start(user *domain.User) error {
 	event := &events.PatchUserCommand{
 		Type: events.PatchUserInUser,
 		User: events.User{
-			Id:       user.Id.String(),
+			Id:       "",
 			Private:  user.Private,
 			Username: *user.Username,
 		},

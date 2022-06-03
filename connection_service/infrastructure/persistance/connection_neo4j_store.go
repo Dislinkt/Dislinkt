@@ -45,6 +45,7 @@ func (store *ConnectionDBStore) CreateConnection(baseUserUuid string, connectUse
 
 			status := record.Values[0].(string)
 			dateNow := time.Now().Local().Unix()
+			fmt.Println(status)
 			if status == "PRIVATE" {
 				connectionStatus = "REQUEST_SENT"
 				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $connect_user_uuid  MATCH (u2:UserNode) WHERE u2.uid = $base_user_uuid CREATE (u1)-[r1:CONNECTION {status: $status, date: $date}]->(u2)", map[string]interface{}{
@@ -225,26 +226,29 @@ func (store *ConnectionDBStore) GetAllConnectionRequestsForUser(userUid string) 
 
 	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
+		fmt.Println("UUID ")
+		fmt.Println(userUid)
 		if !checkIfUserExist(userUid, tx) {
+			fmt.Println("NE POSTOJI")
 			return &domain.UserNode{
 				UserUID: "",
 				Status:  "",
 			}, nil
 		}
 
-		records, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $userUid MATCH (u2:UserNode) WHERE not u2.uid = $userUid match (u2)-[r1:CONNECTION {status: $status}]->(u1) match (u1)-[r2:CONNECTION {status: $status }]->(u2) return u2.uid, u2.status", map[string]interface{}{
+		records, err := tx.Run("MATCH (u1:UserNode)   MATCH (u2:UserNode) WHERE u2.uid = $userUid match ("+
+			"u1)-[r1:CONNECTION {status:$status}]->(u2) return u1.uid, u1.status", map[string]interface{}{
 			"userUid": userUid,
 			"status":  "REQUEST_SENT",
 		})
 
 		for records.Next() {
+			fmt.Println(records.Record())
 			node := domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Private}
 			userNodes = append(userNodes, &node)
+			fmt.Println("USAO")
 		}
 
-		if err != nil {
-			return nil, err
-		}
 		if err != nil {
 			return nil, err
 		}
@@ -329,6 +333,7 @@ func (store *ConnectionDBStore) UpdateUser(userUUID string, private bool) error 
 
 	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
+		fmt.Println("UUID " + userUUID)
 		if checkIfUserExist(userUUID, tx) {
 
 			var status string
@@ -337,6 +342,7 @@ func (store *ConnectionDBStore) UpdateUser(userUUID string, private bool) error 
 			} else {
 				status = "PUBLIC"
 			}
+			fmt.Println("MENJAM U " + status)
 
 			_, err := tx.Run("MATCH (n:UserNode { uid: $uid}) set n.status = $status",
 				map[string]interface{}{
@@ -349,6 +355,7 @@ func (store *ConnectionDBStore) UpdateUser(userUUID string, private bool) error 
 			}
 			return nil, nil
 		} else {
+			fmt.Println("NEPOSTOJI")
 			return nil, nil
 		}
 

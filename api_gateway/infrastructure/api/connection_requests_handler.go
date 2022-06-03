@@ -85,6 +85,7 @@ func loadUserInfo(userPb *userGw.User) domain.ConnectionRequest {
 	request.Name = userPb.Name
 	request.Surname = userPb.Surname
 	request.Biography = userPb.Biography
+	request.Username = userPb.Username
 
 	return request
 }

@@ -4,6 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"net/smtp"
+	//	"github.com/nats-io/jwt/v2"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/auth_service/startup/config"
@@ -12,11 +17,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
-	"net/smtp"
-
-	//	"github.com/nats-io/jwt/v2"
-	"time"
 )
 
 type AuthService struct {
@@ -129,7 +129,7 @@ func getRoleString(role int) string {
 
 func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims, err error) {
 	token, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
+		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -219,7 +219,7 @@ func passwordlessLoginMailMessage(token string, username string) []byte {
 func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.ConfirmEmailLoginRequest) (*pb.ConfirmEmailLoginResponse, error) {
 
 	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
+		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -288,11 +288,11 @@ func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangeP
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
-	//isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
+	// isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
 	//
-	//if isWeak {
+	// if isWeak {
 	//	return "", errors.New("Password must contain minimum eight characters, at least one capital letter, one number and one special character")
-	//}
+	// }
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
@@ -346,7 +346,7 @@ func verificationMailMessage(token string, username string) []byte {
 
 func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.ActivationRequest) (*pb.ActivationResponse, error) {
 	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
+		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -426,7 +426,7 @@ func recoverAccountMailMessage(token string, username string) []byte {
 
 func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.RecoverAccountRequest) (*pb.RecoverAccountResponse, error) {
 	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
+		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -500,7 +500,8 @@ func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITo
 	fmt.Println(config.NewConfig().PublicKey)
 	jwtToken, err := token.SignedString([]byte(config.NewConfig().PublicKey))
 
-	user.ApiToken, err = HashAndSaltApiToken(jwtToken)
+	salted, err := HashAndSaltApiToken(jwtToken)
+	user.ApiToken = &salted
 
 	err = auth.userService.Update(user.Id, user)
 
@@ -525,7 +526,7 @@ func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.J
 		return nil, nil
 	}
 
-	if !equalTokens(user.ApiToken, request.ApiToken) {
+	if !equalTokens(*user.ApiToken, request.ApiToken) {
 		fmt.Println("Greska hash")
 		return nil, nil
 	}
@@ -546,7 +547,7 @@ func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.J
 
 func (interceptor *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims, err error) {
 	token, err := jwt.ParseWithClaims(apiToken, &ApiTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
+		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -570,9 +571,9 @@ func (interceptor *AuthService) VerifyApiToken(apiToken string) (claims *ApiToke
 	return claims, nil
 }
 
-//func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
+// func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
 //
-//}
+// }
 
 func HashAndSaltApiToken(apiToken string) (string, error) {
 

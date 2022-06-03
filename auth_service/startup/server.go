@@ -48,13 +48,6 @@ func (server *Server) Start() {
 
 	authHandler := server.initAuthHandler(authService)
 
-	for _, permission := range permissions {
-		err := permissionStore.Insert(permission)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
 	server.startGrpcServer(authHandler)
 }
 
