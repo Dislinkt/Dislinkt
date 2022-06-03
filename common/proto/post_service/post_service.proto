@@ -59,6 +59,21 @@ service PostService{
         get: "/job_offer"
       };
     }
+    rpc getAllLikesForPost(GetRequest) returns(GetReactionsResponse) {
+      option (google.api.http) = {
+        get: "/post/{Id}/likes"
+      };
+    }
+    rpc getAllDislikesForPost(GetRequest) returns(GetReactionsResponse) {
+      option (google.api.http) = {
+        get: "/post/{Id}/dislikes"
+      };
+    }
+    rpc getAllCommentsForPost(GetRequest) returns(GetAllCommentsResponse) {
+      option (google.api.http) = {
+        get: "/post/{Id}/comments"
+      };
+    }
 }
 
 message GetRequest {
@@ -71,6 +86,14 @@ message GetResponse {
 
 message GetMultipleResponse {
   repeated Post Posts = 1;
+}
+
+message GetAllCommentsResponse {
+  repeated Comment Comments = 1;
+}
+
+message GetReactionsResponse {
+  repeated User Users = 1;
 }
 
 message Empty {}
@@ -90,7 +113,7 @@ message CreateCommentResponse {
 
 message ReactionRequest {
   string PostId = 1;
-  string Username = 2;
+  string UserId = 2;
 }
 
 message Post {
@@ -99,25 +122,24 @@ message Post {
   string PostText = 3;
   repeated string ImagePaths = 4;
   string DatePosted = 6;
-  repeated Reaction Reactions = 7;
-  repeated Comment Comments = 8;
+  int32 LikesNumber = 7;
+  int32 DislikesNumber = 8;
   Links Links = 9;
+  int32 CommentsNumber = 10;
 }
 
-message Reaction {
+message User {
   string Username = 1;
-  ReactionType Reaction = 2;
-}
-
-enum ReactionType {
-  Neutral = 0;
-  LIKED = 1;
-  DISLIKED = 2;
+  string Name = 2;
+  string Surname = 3;
 }
 
 message Comment {
-  string Username = 1;
-  string CommentText = 2;
+  string UserId = 1;
+  string Username = 2;
+  string Name = 3;
+  string Surname = 4;
+  string CommentText = 5;
 }
 
 message Links{

@@ -1,13 +1,14 @@
 package domain
 
 type Post struct {
-	UserId     string
-	PostText   string
-	ImagePaths []string
-	DatePosted string
-	Reactions  []Reaction
-	Comments   []Comment
-	Links      Links
+	UserId         string
+	PostText       string
+	ImagePaths     []string
+	DatePosted     string
+	LikesNumber    int
+	DislikesNumber int
+	CommentsNumber int
+	Links          Links
 }
 
 type Comment struct {

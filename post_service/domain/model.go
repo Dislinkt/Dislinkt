@@ -18,12 +18,12 @@ type Post struct {
 }
 
 type Comment struct {
-	Username    string `bson:"username"`
+	UserId      string `bson:"user_id"`
 	CommentText string `bson:"comment_text"`
 }
 
 type Reaction struct {
-	Username string       `bson:"username"`
+	UserId   string       `bson:"user_id"`
 	Reaction ReactionType `bson:"reaction"`
 }
 

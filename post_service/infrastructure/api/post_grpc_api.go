@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"post_service/domain"
 
 	pb "github.com/dislinkt/common/proto/post_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -112,7 +113,7 @@ func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRe
 	if err != nil {
 		return nil, err
 	}
-	err = handler.service.LikePost(post, request.Username)
+	err = handler.service.LikePost(post, request.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +130,7 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 	if err != nil {
 		return nil, err
 	}
-	err = handler.service.DislikePost(post, request.Username)
+	err = handler.service.DislikePost(post, request.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +153,8 @@ func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Emp
 	return response, nil
 }
 
+/* REACTIONS I COMMENTS */
+
 func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.CreateJobOfferRequest) (*pb.Empty, error) {
 	offer := mapNewJobOffer(request.JobOffer)
 	err := handler.service.InsertJobOffer(offer)
@@ -159,4 +162,86 @@ func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.Crea
 		return nil, err
 	}
 	return &pb.Empty{}, nil
+}
+
+func (handler *PostHandler) GetAllLikesForPost(ctx context.Context, request *pb.GetRequest) (*pb.GetReactionsResponse, error) {
+	objectId, err := primitive.ObjectIDFromHex(request.Id)
+	if err != nil {
+		return nil, err
+	}
+	post, err := handler.service.Get(objectId)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.GetReactionsResponse{Users: []*pb.User{}}
+	for _, reaction := range post.Reactions {
+		if reaction.Reaction == domain.LIKED {
+			user, err := handler.service.GetUser(reaction.UserId)
+			if err != nil {
+				return nil, err
+			}
+			current := mapUserReaction(user)
+			response.Users = append(response.Users, current)
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (handler *PostHandler) GetAllDislikesForPost(ctx context.Context, request *pb.GetRequest) (*pb.GetReactionsResponse, error) {
+	objectId, err := primitive.ObjectIDFromHex(request.Id)
+	if err != nil {
+		return nil, err
+	}
+	post, err := handler.service.Get(objectId)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.GetReactionsResponse{Users: []*pb.User{}}
+	for _, reaction := range post.Reactions {
+		if reaction.Reaction == domain.DISLIKED {
+			user, err := handler.service.GetUser(reaction.UserId)
+			if err != nil {
+				return nil, err
+			}
+			current := mapUserReaction(user)
+			response.Users = append(response.Users, current)
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (handler *PostHandler) GetAllCommentsForPost(ctx context.Context, request *pb.GetRequest) (*pb.GetAllCommentsResponse, error) {
+	objectId, err := primitive.ObjectIDFromHex(request.Id)
+	if err != nil {
+		return nil, err
+	}
+	post, err := handler.service.Get(objectId)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.GetAllCommentsResponse{Comments: []*pb.Comment{}}
+	for _, comment := range post.Comments {
+		user, err := handler.service.GetUser(comment.UserId)
+		if err != nil {
+			return nil, err
+		}
+		current := mapUserCommentsForPost(user, comment.CommentText)
+		response.Comments = append(response.Comments, current)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }

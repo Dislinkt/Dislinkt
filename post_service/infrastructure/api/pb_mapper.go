@@ -21,27 +21,35 @@ func mapPost(post *domain.Post) *pb.Post {
 		User:    "/user/" + post.UserId,
 	}
 
+	likesNum, dislikesNum := findNumberOfReactions(post)
+
 	postPb := &pb.Post{
-		Id:         id,
-		UserId:     post.UserId,
-		PostText:   post.PostText,
-		DatePosted: post.DatePosted.String(),
-		Links:      links,
+		Id:             id,
+		UserId:         post.UserId,
+		PostText:       post.PostText,
+		DatePosted:     post.DatePosted.String(),
+		Links:          links,
+		LikesNumber:    int32(likesNum),
+		DislikesNumber: int32(dislikesNum),
+		CommentsNumber: int32(len(post.Comments)),
 	}
 	postPb.ImagePaths = convertByteToBase64(post.ImagePaths)
-	for _, reaction := range post.Reactions {
-		postPb.Reactions = append(postPb.Reactions, &pb.Reaction{
-			Username: reaction.Username,
-			Reaction: mapReactionTypeToPb(reaction.Reaction),
-		})
-	}
-	for _, comment := range post.Comments {
-		postPb.Comments = append(postPb.Comments, &pb.Comment{
-			Username:    comment.Username,
-			CommentText: comment.CommentText,
-		})
-	}
+
 	return postPb
+}
+
+func findNumberOfReactions(post *domain.Post) (int, int) {
+	likesNum := 0
+	dislikesNum := 0
+
+	for _, reaction := range post.Reactions {
+		if reaction.Reaction == domain.LIKED {
+			likesNum++
+		} else if reaction.Reaction == domain.DISLIKED {
+			dislikesNum++
+		}
+	}
+	return likesNum, dislikesNum
 }
 
 func mapNewPost(postPb *pb.Post) *domain.Post {
@@ -58,23 +66,11 @@ func mapNewPost(postPb *pb.Post) *domain.Post {
 
 func mapNewComment(commentPb *pb.Comment) *domain.Comment {
 	comment := &domain.Comment{
-		Username:    commentPb.Username,
+		UserId:      commentPb.UserId,
 		CommentText: commentPb.CommentText,
 	}
 
 	return comment
-}
-
-func mapReactionTypeToPb(reactionType domain.ReactionType) pb.ReactionType {
-	switch reactionType {
-	case domain.Neutral:
-		return pb.ReactionType_Neutral
-	case domain.LIKED:
-		return pb.ReactionType_LIKED
-	case domain.DISLIKED:
-		return pb.ReactionType_DISLIKED
-	}
-	return pb.ReactionType_Neutral
 }
 
 func convertBase64ToByte(images []string) [][]byte {
@@ -96,6 +92,30 @@ func convertByteToBase64(images [][]byte) []string {
 		encodedImages = append(encodedImages, imageEnc)
 	}
 	return encodedImages
+}
+
+func mapUserReaction(user *domain.User) *pb.User {
+
+	userPb := &pb.User{
+		Username: user.Username,
+		Name:     user.Name,
+		Surname:  user.Surname,
+	}
+
+	return userPb
+}
+
+func mapUserCommentsForPost(user *domain.User, commentText string) *pb.Comment {
+
+	commentPb := &pb.Comment{
+		UserId:      user.UserUUID,
+		Username:    user.Username,
+		Name:        user.Name,
+		Surname:     user.Surname,
+		CommentText: commentText,
+	}
+
+	return commentPb
 }
 
 /* JOB OFFERS */

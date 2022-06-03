@@ -94,13 +94,13 @@ func (store *PostMongoDBStore) CreateComment(post *domain.Post, comment *domain.
 	return nil
 }
 
-func (store *PostMongoDBStore) LikePost(post *domain.Post, username string) error {
+func (store *PostMongoDBStore) LikePost(post *domain.Post, userId string) error {
 
 	var reactions []domain.Reaction
 
 	reactionExists := false
 	for _, reaction := range post.Reactions {
-		if reaction.Username != username {
+		if reaction.UserId != userId {
 			reactions = append(reactions, reaction)
 		} else {
 			if reaction.Reaction != domain.LIKED {
@@ -113,7 +113,7 @@ func (store *PostMongoDBStore) LikePost(post *domain.Post, username string) erro
 	}
 	if !reactionExists {
 		reaction := domain.Reaction{
-			Username: username,
+			UserId:   userId,
 			Reaction: domain.LIKED,
 		}
 		reactions = append(reactions, reaction)
@@ -130,12 +130,12 @@ func (store *PostMongoDBStore) LikePost(post *domain.Post, username string) erro
 	return nil
 }
 
-func (store *PostMongoDBStore) DislikePost(post *domain.Post, username string) error {
+func (store *PostMongoDBStore) DislikePost(post *domain.Post, userId string) error {
 	var reactions []domain.Reaction
 
 	reactionExists := false
 	for _, reaction := range post.Reactions {
-		if reaction.Username != username {
+		if reaction.UserId != userId {
 			reactions = append(reactions, reaction)
 		} else {
 			if reaction.Reaction != domain.DISLIKED {
@@ -148,7 +148,7 @@ func (store *PostMongoDBStore) DislikePost(post *domain.Post, username string) e
 	}
 	if !reactionExists {
 		reaction := domain.Reaction{
-			Username: username,
+			UserId:   userId,
 			Reaction: domain.DISLIKED,
 		}
 		reactions = append(reactions, reaction)
@@ -266,4 +266,15 @@ func (store *PostMongoDBStore) UpdateUser(user *domain.User) error {
 	}
 
 	return nil
+}
+
+func (store *PostMongoDBStore) GetUser(id string) (*domain.User, error) {
+	filter := bson.M{"userUUID": id}
+	return store.filterOneUser(filter)
+}
+
+func (store *PostMongoDBStore) filterOneUser(filter interface{}) (user *domain.User, err error) {
+	result := store.users.FindOne(context.TODO(), filter)
+	err = result.Decode(&user)
+	return
 }
