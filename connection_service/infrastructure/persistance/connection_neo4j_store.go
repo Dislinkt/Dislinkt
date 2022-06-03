@@ -2,10 +2,11 @@ package persistance
 
 import (
 	"fmt"
+	"time"
+
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/domain"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
-	"time"
 )
 
 type ConnectionDBStore struct {
@@ -211,6 +212,50 @@ func (store *ConnectionDBStore) GetAllConnectionForUser(userUid string) (userNod
 	return userNodes, nil
 }
 
+func (store *ConnectionDBStore) GetAllConnectionRequestsForUser(userUid string) (userNodes []*domain.UserNode,
+	error1 error) {
+
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		if !checkIfUserExist(userUid, tx) {
+			return &domain.UserNode{
+				UserUID: "",
+				Status:  "",
+			}, nil
+		}
+
+		records, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $userUid MATCH (u2:UserNode) WHERE not u2.uid = $userUid match (u2)-[r1:CONNECTION {status: $status}]->(u1) match (u1)-[r2:CONNECTION {status: $status }]->(u2) return u2.uid, u2.status", map[string]interface{}{
+			"userUid": userUid,
+			"status":  "REQUEST_SENT",
+		})
+
+		for records.Next() {
+			node := domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Private}
+			userNodes = append(userNodes, &node)
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		if err != nil {
+			return nil, err
+		}
+		return userNodes, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return userNodes, nil
+}
+
 func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.UserNode, error) {
 	fmt.Println("[ConnectionDBStore Register]")
 	fmt.Println(userNode)
@@ -222,7 +267,7 @@ func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.Use
 
 		}
 	}(session)
-	
+
 	fmt.Println(session)
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 		fmt.Println("linija5")

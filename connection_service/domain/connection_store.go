@@ -9,4 +9,5 @@ type ConnectionStore interface {
 	CreateConnection(baseUserUuid string, connectUserUuid string) (*pb.NewConnectionResponse, error)
 	AcceptConnection(requestSenderUser string, requestApprovalUser string) (*pb.NewConnectionResponse, error)
 	GetAllConnectionForUser(userUid string) ([]*UserNode, error)
+	GetAllConnectionRequestsForUser(userUid string) ([]*UserNode, error)
 }

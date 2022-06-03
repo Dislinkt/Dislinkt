@@ -36,3 +36,7 @@ func (service *ConnectionService) AcceptConnection(requestSenderUser string, req
 func (service *ConnectionService) GetAllConnectionForUser(userUid string) ([]*domain.UserNode, error) {
 	return service.store.GetAllConnectionForUser(userUid)
 }
+
+func (service *ConnectionService) GetAllConnectionRequestsForUser(userUid string) ([]*domain.UserNode, error) {
+	return service.store.GetAllConnectionRequestsForUser(userUid)
+}
