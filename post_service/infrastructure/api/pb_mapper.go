@@ -3,9 +3,10 @@ package api
 import (
 	b64 "encoding/base64"
 	"fmt"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	pb "github.com/dislinkt/common/proto/post_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -123,6 +124,7 @@ func mapUserCommentsForPost(user *domain.User, commentText string) *pb.Comment {
 
 func mapJobOffer(offer *domain.JobOffer) *pb.JobOffer {
 	id := offer.Id.Hex()
+	duration := strconv.Itoa(offer.Duration)
 
 	offerPb := &pb.JobOffer{
 		Id:            id,
@@ -130,7 +132,7 @@ func mapJobOffer(offer *domain.JobOffer) *pb.JobOffer {
 		Description:   offer.Description,
 		Preconditions: offer.Preconditions,
 		DatePosted:    timestamppb.New(offer.DatePosted),
-		Duration:      string(offer.Duration),
+		Duration:      duration,
 		Location:      offer.Location,
 		Title:         offer.Title,
 		Field:         offer.Field,
