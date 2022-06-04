@@ -41,7 +41,7 @@ type JobOffer struct {
 	Description   string             `bson:"description"`
 	Preconditions string             `bson:"preconditions"`
 	DatePosted    time.Time          `bson:"date_posted"`
-	Duration      time.Duration      `bson:"duration"`
+	Duration      int                `bson:"duration"`
 	Location      string             `bson:"location"`
 	Title         string             `bson:"title"`
 	Field         string             `bson:"field"`
