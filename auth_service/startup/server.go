@@ -30,7 +30,8 @@ func NewServer(config *config.Config) *Server {
 }
 
 const (
-	QueueGroup = "auth_service"
+	QueueGroup       = "auth_service"
+	QueueGroupUpdate = "auth_service_update"
 )
 
 func (server *Server) Start() {
@@ -45,6 +46,10 @@ func (server *Server) Start() {
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
 	server.initRegisterUserHandler(userService, authService, replyPublisher, commandSubscriber)
+
+	updateCommandSubscriber := server.initSubscriber(server.config.UpdateUserCommandSubject, QueueGroupUpdate)
+	updateReplyPublisher := server.initPublisher(server.config.UpdateUserReplySubject)
+	server.initUpdateUserHandler(userService, updateReplyPublisher, updateCommandSubscriber)
 
 	authHandler := server.initAuthHandler(authService)
 
@@ -152,5 +157,12 @@ func (server *Server) startGrpcServer(authHandler *api.AuthHandler) {
 	authProto.RegisterAuthServiceServer(grpcServer, authHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
+	}
+}
+
+func (server *Server) initUpdateUserHandler(service *application.UserService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewUpdateUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
 	}
 }

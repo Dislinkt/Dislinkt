@@ -3,6 +3,7 @@ package application
 import (
 	"errors"
 	"fmt"
+
 	"github.com/dislinkt/auth_service/domain"
 	uuid "github.com/satori/go.uuid"
 )
@@ -44,10 +45,11 @@ func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 
-	newUUID := uuid.NewV4()
-	user.Id = newUUID
+	// TODO: obrisala jer mi treba da imaju isti id da mogu da menjam username
+	// newUUID := uuid.NewV4()
+	// user.Id = newUUID
 	err := service.store.Insert(user)
-	return newUUID, err
+	return user.Id, err
 }
 
 func (service *UserService) Delete(user *domain.User) error {
@@ -66,4 +68,27 @@ func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
 
 	user.Id = uuid
 	return service.store.Update(user)
+}
+
+func (service *UserService) GetById(uuid uuid.UUID) (*domain.User, error) {
+	user, err := service.store.FindByID(uuid)
+	if err != nil {
+		return nil, err
+	}
+	return user, err
+}
+
+func (service *UserService) ChangeUsername(stringId string, username string) error {
+
+	id, err := uuid.FromString(stringId)
+	user, err := service.GetById(id)
+	if err != nil {
+		return err
+	}
+	user.Username = username
+	err = service.Update(id, user)
+	if err != nil {
+		return err
+	}
+	return err
 }

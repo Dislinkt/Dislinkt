@@ -10,6 +10,7 @@ const (
 	UnknownUpdateCommand
 	UserUpdateSucceeded
 	UserUpdateCancelled
+	UpdateInAuth
 )
 
 type UpdateUserCommand struct {
@@ -26,6 +27,8 @@ const (
 	UserUpdatedInPost
 	UserNotUpdatedInPost
 	UserRolledBackInPost
+	UserUpdatedInAuth
+	UserNotUpdatedInAuth
 	UnknownUpdateReply
 )
 

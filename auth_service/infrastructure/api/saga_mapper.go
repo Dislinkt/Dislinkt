@@ -10,13 +10,14 @@ import (
 )
 
 func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
+	id, _ := uuid.FromString(command.User.Id)
 	hashAndSalt, err := HashAndSaltPasswordIfStrongAndMatching(command.User.Password)
 	if err != nil {
 		return nil
 	}
 	// TODO: ACTIVE NA FALSE!!
 	userD := &domain.User{
-		Id:       uuid.UUID{},
+		Id:       id,
 		Username: command.User.Username,
 		Password: hashAndSalt,
 		Email:    command.User.Email,

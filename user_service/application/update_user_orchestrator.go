@@ -58,11 +58,15 @@ func (o *UpdateUserOrchestrator) nextCommandType(reply events.UpdateUserReplyTyp
 	case events.UserRolledBackInPost:
 		return events.UserUpdateCancelled
 	case events.UserUpdatedInUser:
-		return events.UserUpdateSucceeded
+		return events.UpdateInAuth
 	case events.UserNotUpdatedInUser:
 		return events.RollbackUpdateInPost
 	case events.UserRolledBackInUser:
 		return events.RollbackUpdateInPost
+	case events.UserUpdatedInAuth:
+		return events.UserUpdateSucceeded
+	case events.UserNotUpdatedInAuth:
+		return events.RollbackUpdateInUser
 
 	default:
 		return events.UnknownUpdateCommand
