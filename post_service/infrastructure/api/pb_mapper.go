@@ -4,6 +4,7 @@ import (
 	b64 "encoding/base64"
 	"fmt"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"strconv"
 	"time"
 
 	pb "github.com/dislinkt/common/proto/post_service"
@@ -139,7 +140,7 @@ func mapJobOffer(offer *domain.JobOffer) *pb.JobOffer {
 }
 
 func mapNewJobOffer(offerPb *pb.JobOffer) *domain.JobOffer {
-	duration, _ := time.ParseDuration(offerPb.Duration)
+	dur, _ := strconv.Atoi(offerPb.Duration)
 
 	offer := &domain.JobOffer{
 		Id:            primitive.NewObjectID(),
@@ -147,7 +148,7 @@ func mapNewJobOffer(offerPb *pb.JobOffer) *domain.JobOffer {
 		Description:   offerPb.Description,
 		Preconditions: offerPb.Preconditions,
 		DatePosted:    offerPb.DatePosted.AsTime(),
-		Duration:      int(duration),
+		Duration:      dur,
 		Location:      offerPb.Location,
 		Title:         offerPb.Title,
 		Field:         offerPb.Field,
