@@ -15,6 +15,7 @@ type PostStore interface {
 
 	GetAllJobOffers() ([]*JobOffer, error)
 	InsertJobOffer(offer *JobOffer) error
+	SearchJobOffers(searchText string) ([]*JobOffer, error)
 
 	InsertUser(user *User) error
 	DeleteUser(user *User) error

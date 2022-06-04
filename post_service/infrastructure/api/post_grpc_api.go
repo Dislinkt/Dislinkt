@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"time"
 
 	"post_service/domain"
 
@@ -156,16 +157,30 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 
 /* JOB OFFERS */
 
-func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Empty) (*pb.GetAllJobOffers, error) {
-	offers, err := handler.service.GetAllJobOffers()
+func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.SearchMessage) (*pb.GetAllJobOffers, error) {
+	var offers []*domain.JobOffer
+	var err error
+
+	if len(request.SearchText) == 0 {
+		offers, err = handler.service.GetAllJobOffers()
+	} else {
+		offers, err = handler.service.SearchJobOffers(request.SearchText)
+	}
+
 	if err != nil {
 		return nil, err
 	}
 	response := &pb.GetAllJobOffers{JobOffers: []*pb.JobOffer{}}
 	for _, offer := range offers {
-		current := mapJobOffer(offer)
-		response.JobOffers = append(response.JobOffers, current)
+		y, m, d := offer.DatePosted.Date()
+		endDate := time.Date(y, m, d+offer.Duration, 0, 0, 0, 0, time.Local)
+
+		if time.Now().Before(endDate) {
+			current := mapJobOffer(offer)
+			response.JobOffers = append(response.JobOffers, current)
+		}
 	}
+
 	return response, nil
 }
 

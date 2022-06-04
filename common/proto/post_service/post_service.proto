@@ -59,7 +59,7 @@ service PostService{
         body: "JobOffer"
       };
     }
-    rpc getAllJobOffers(Empty) returns(GetAllJobOffers) {
+    rpc getAllJobOffers(SearchMessage) returns(GetAllJobOffers) {
       option (google.api.http) = {
         get: "/job_offer"
       };
@@ -102,6 +102,10 @@ message GetReactionsResponse {
 }
 
 message Empty {}
+
+message SearchMessage{
+  string searchText = 1;
+}
 
 message CreatePostRequest {
   Post Post = 1;

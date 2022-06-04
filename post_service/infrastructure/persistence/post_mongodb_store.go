@@ -212,6 +212,46 @@ func (store *PostMongoDBStore) GetAllJobOffers() ([]*domain.JobOffer, error) {
 	return store.filterJobOffers(filter)
 }
 
+func (store *PostMongoDBStore) SearchJobOffers(searchText string) ([]*domain.JobOffer, error) {
+	filter := bson.M{
+		"$or": []bson.M{
+			{
+				"title": bson.M{
+					"$regex": primitive.Regex{
+						Pattern: searchText,
+						Options: "i",
+					},
+				},
+			},
+			{
+				"position": bson.M{
+					"$regex": primitive.Regex{
+						Pattern: searchText,
+						Options: "i",
+					},
+				},
+			},
+			{
+				"location": bson.M{
+					"$regex": primitive.Regex{
+						Pattern: searchText,
+						Options: "i",
+					},
+				},
+			},
+			{
+				"field": bson.M{
+					"$regex": primitive.Regex{
+						Pattern: searchText,
+						Options: "i",
+					},
+				},
+			},
+		},
+	}
+	return store.filterJobOffers(filter)
+}
+
 func (store *PostMongoDBStore) filterJobOffers(filter interface{}) ([]*domain.JobOffer, error) {
 	cursor, err := store.jobOffers.Find(context.TODO(), filter)
 	defer cursor.Close(context.TODO())

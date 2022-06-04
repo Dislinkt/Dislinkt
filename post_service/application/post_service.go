@@ -72,3 +72,7 @@ func (service *PostService) UpdateUser(user *domain.User) error {
 func (service *PostService) GetUser(id string) (*domain.User, error) {
 	return service.store.GetUser(id)
 }
+
+func (service *PostService) SearchJobOffers(searchText string) ([]*domain.JobOffer, error) {
+	return service.store.SearchJobOffers(searchText)
+}
