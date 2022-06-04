@@ -34,6 +34,7 @@ type Claims struct {
 type ApiTokenClaims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
+	Permissions []string `json:"permissions"`
 }
 
 func NewAuthService(userService *UserService, permissionStore domain.PermissionStore) *AuthService {
@@ -481,6 +482,8 @@ func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.Recover
 
 func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITokenRequest) (*pb.NewAPITokenResponse, error) {
 	fmt.Println("Auth Service GenerateAPIToken")
+	var permissions []string
+	permissions = append(permissions, "createJobOffer")
 	user, err := auth.userService.GetByUsername(request.Username)
 	fmt.Println(user)
 	expireTime := time.Now().Add(time.Hour * 4).Unix()
@@ -489,7 +492,8 @@ func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITo
 			Subject:   user.Id.String(),
 			ExpiresAt: expireTime,
 		},
-		Username: user.Username,
+		Username:    user.Username,
+		Permissions: permissions,
 	}
 
 	token := jwt.NewWithClaims(
@@ -542,6 +546,7 @@ func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.J
 		DatePosted:    request.DatePosted,
 		Preconditions: request.Preconditions,
 		Description:   request.Description,
+		Token:         request.ApiToken,
 	}, nil
 }
 

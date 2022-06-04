@@ -88,7 +88,9 @@ func (server *Server) Start() {
 	// crtPath, _ := filepath.Abs("./server.crt")
 	// keyPath, _ := filepath.Abs("./server.key")
 	cors := handlers.CORS(
-		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**", "http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**"}),
+		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**",
+			"http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**",
+			"http://localhost:3000/**", "http://localhost:3000"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}),
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
 		handlers.AllowCredentials(),

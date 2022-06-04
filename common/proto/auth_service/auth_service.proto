@@ -184,6 +184,7 @@ message JobPostingDtoResponse{
   int32 duration = 5;
   string username = 6;
   string message = 7;
+  string token = 8;
 }
 
 message EmployeePositionDto{
