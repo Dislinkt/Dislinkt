@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/smtp"
+	"regexp"
+
 	//	"github.com/nats-io/jwt/v2"
 	"time"
 
@@ -45,7 +47,6 @@ func NewAuthService(userService *UserService, permissionStore domain.PermissionS
 }
 
 func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (string, error) {
-
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 	if err != nil || user == nil {
 		return "", errors.New("invalid username")
@@ -289,11 +290,11 @@ func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangeP
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
-	// isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
-	//
-	// if isWeak {
-	//	return "", errors.New("Password must contain minimum eight characters, at least one capital letter, one number and one special character")
-	// }
+	isStrong, _ := regexp.MatchString("[0-9A-Za-z!?#$@.*+_\\-]+", password)
+
+	if !isStrong {
+		return "", errors.New("Password not strong enough!")
+	}
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
@@ -550,7 +551,7 @@ func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.J
 	}, nil
 }
 
-func (interceptor *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims, err error) {
+func (auth *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims, err error) {
 	token, err := jwt.ParseWithClaims(apiToken, &ApiTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

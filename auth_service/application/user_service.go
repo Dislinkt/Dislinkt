@@ -3,6 +3,7 @@ package application
 import (
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/dislinkt/auth_service/domain"
 	uuid "github.com/satori/go.uuid"
@@ -19,6 +20,9 @@ func NewUserService(store domain.UserStore) *UserService {
 }
 
 func (service *UserService) GetByUsername(username string) (*domain.User, error) {
+	if (!isUsernameValid(username)) {
+		return nil, errors.New("unallowed characters in username")
+	}
 	fmt.Println(username)
 	user, err := service.store.GetByUsername(username)
 
@@ -30,6 +34,9 @@ func (service *UserService) GetByUsername(username string) (*domain.User, error)
 }
 
 func (service *UserService) GetByEmail(email string) (*domain.User, error) {
+	if (!isEmailValid(email)) {
+		return nil, errors.New("unallowed characters in email")
+	}
 	user, err := service.store.GetByEmail(email)
 
 	if err != nil {
@@ -79,6 +86,9 @@ func (service *UserService) GetById(uuid uuid.UUID) (*domain.User, error) {
 }
 
 func (service *UserService) ChangeUsername(stringId string, username string) error {
+	if (!isUsernameValid(username)) {
+		return errors.New("unallowed characters in username")
+	}
 
 	id, err := uuid.FromString(stringId)
 	user, err := service.GetById(id)
@@ -91,4 +101,16 @@ func (service *UserService) ChangeUsername(stringId string, username string) err
 		return err
 	}
 	return err
+}
+
+func isUsernameValid(username string) bool {
+	isValid, _ := regexp.MatchString("[0-9A-Za-z]+", username)
+
+	return isValid
+}
+
+func isEmailValid(email string) bool {
+	isValid, _ := regexp.MatchString("[a-z0-9.\\-_]{3,64}@([a-z0-9]+\\.){1,2}[a-z]+", email)
+
+	return isValid
 }
