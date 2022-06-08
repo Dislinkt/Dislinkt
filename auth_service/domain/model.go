@@ -6,8 +6,8 @@ import (
 
 type User struct {
 	Id        uuid.UUID `gorm:"index:idx_name,unique"`
-	Username  string    `gorm:"unique"`
-	Email     string    `gorm:"unique"`
+	Username  string    `gorm:"unique" validate:"alphanum"`
+	Email     string    `gorm:"unique" validate:"email"`
 	Password  string
 	UserRole  int
 	Active    bool

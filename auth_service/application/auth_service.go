@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/pquerna/otp/totp"
 	"log"
 	"net/smtp"
@@ -85,6 +86,10 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 
 func (auth *AuthService) generateToken(user *domain.User, expireTime int64) (string, error) {
 	//	rolesString, _ := json.Marshal(user.Roles)
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return "", errors.New("Invalid user data")
+	}
 
 	var permissionNames []string
 	permissions, err := auth.permissionStore.GetAllByRole(user.UserRole)

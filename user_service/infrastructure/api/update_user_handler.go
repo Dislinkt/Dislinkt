@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
@@ -36,6 +37,11 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 		fmt.Println("update user handler-update")
 		fmt.Println(command.User)
 		user := mapCommandUpdateUser(command)
+		if err := validator.New().Struct(user); err != nil {
+			//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+			reply.Type = events.UserNotUpdatedInUser
+			return
+		}
 		_, err := handler.userService.Update(user.Id, user)
 		if err != nil {
 			reply.Type = events.UserNotUpdatedInUser
