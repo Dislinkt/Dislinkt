@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/dislinkt/auth_service/application"
+	"github.com/dislinkt/auth_service/startup/config"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/pquerna/otp/totp"
@@ -42,7 +43,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		}
 
 		key, err := totp.Generate(totp.GenerateOpts{
-			Issuer:      "NenadBecanovic1234567",
+			Issuer:      config.NewConfig().PublicKey,
 			AccountName: user.Username,
 		})
 

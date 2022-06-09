@@ -143,8 +143,9 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 	if !equalPasswords(user.Password, loginRequest.Password) {
 		return "", errors.New("invalid password")
 	}
-
-	valid := totp.Validate(loginRequest.Token, user.TotpToken)
+	n := time.Now().UTC()
+	code, err := totp.GenerateCode(user.TotpToken, n)
+	valid := totp.Validate(code, user.TotpToken)
 
 	if !valid {
 		return "", errors.New("Token not valid!")
