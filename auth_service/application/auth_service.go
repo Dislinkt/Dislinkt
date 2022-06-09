@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/pquerna/otp/totp"
 	"log"
 	"net/smtp"
 	"regexp"
@@ -127,6 +128,35 @@ func getRoleString(role int) string {
 	default:
 		return "Regular"
 	}
+}
+
+func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFactoryRequest) (string, error) {
+	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	//defer span.Finish()
+
+	user, err := auth.userService.GetByUsername(loginRequest.Username)
+
+	if !user.Active {
+		return "", errors.New("user account not activated!")
+	}
+
+	if !equalPasswords(user.Password, loginRequest.Password) {
+		return "", errors.New("invalid password")
+	}
+
+	valid := totp.Validate(loginRequest.Token, user.TotpToken)
+
+	if !valid {
+		return "", errors.New("Token not valid!")
+	}
+
+	expireTime := time.Now().Add(time.Hour).Unix()
+	token, err := auth.generateToken(user, expireTime)
+	if err != nil {
+		return "", errors.New("invalid password")
+	}
+
+	return token, err
 }
 
 func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims, err error) {

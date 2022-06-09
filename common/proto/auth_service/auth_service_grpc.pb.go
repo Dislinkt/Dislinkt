@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	AuthenticateUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error)
+	AuthenticateTwoFactoryUser(ctx context.Context, in *LoginTwoFactoryRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error)
 	ValidateToken(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
 	PasswordlessLogin(ctx context.Context, in *PasswordlessLoginRequest, opts ...grpc.CallOption) (*PasswordlessLoginResponse, error)
 	ConfirmEmailLogin(ctx context.Context, in *ConfirmEmailLoginRequest, opts ...grpc.CallOption) (*ConfirmEmailLoginResponse, error)
@@ -45,6 +46,15 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 func (c *authServiceClient) AuthenticateUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error) {
 	out := new(JwtTokenResponse)
 	err := c.cc.Invoke(ctx, "/proto.AuthService/AuthenticateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) AuthenticateTwoFactoryUser(ctx context.Context, in *LoginTwoFactoryRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error) {
+	out := new(JwtTokenResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/AuthenticateTwoFactoryUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +147,7 @@ func (c *authServiceClient) CheckApiToken(ctx context.Context, in *JobPostingDto
 // for forward compatibility
 type AuthServiceServer interface {
 	AuthenticateUser(context.Context, *LoginRequest) (*JwtTokenResponse, error)
+	AuthenticateTwoFactoryUser(context.Context, *LoginTwoFactoryRequest) (*JwtTokenResponse, error)
 	ValidateToken(context.Context, *ValidateRequest) (*ValidateResponse, error)
 	PasswordlessLogin(context.Context, *PasswordlessLoginRequest) (*PasswordlessLoginResponse, error)
 	ConfirmEmailLogin(context.Context, *ConfirmEmailLoginRequest) (*ConfirmEmailLoginResponse, error)
@@ -155,6 +166,9 @@ type UnimplementedAuthServiceServer struct {
 
 func (UnimplementedAuthServiceServer) AuthenticateUser(context.Context, *LoginRequest) (*JwtTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateUser not implemented")
+}
+func (UnimplementedAuthServiceServer) AuthenticateTwoFactoryUser(context.Context, *LoginTwoFactoryRequest) (*JwtTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateTwoFactoryUser not implemented")
 }
 func (UnimplementedAuthServiceServer) ValidateToken(context.Context, *ValidateRequest) (*ValidateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
@@ -210,6 +224,24 @@ func _AuthService_AuthenticateUser_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).AuthenticateUser(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_AuthenticateTwoFactoryUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginTwoFactoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).AuthenticateTwoFactoryUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/AuthenticateTwoFactoryUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).AuthenticateTwoFactoryUser(ctx, req.(*LoginTwoFactoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -386,6 +418,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AuthenticateUser",
 			Handler:    _AuthService_AuthenticateUser_Handler,
+		},
+		{
+			MethodName: "AuthenticateTwoFactoryUser",
+			Handler:    _AuthService_AuthenticateTwoFactoryUser_Handler,
 		},
 		{
 			MethodName: "ValidateToken",
