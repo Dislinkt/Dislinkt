@@ -1,7 +1,9 @@
 package application
 
 import (
+	"errors"
 	"github.com/dislinkt/additional_user_service/domain"
+	uuid "github.com/satori/go.uuid"
 )
 
 type AdditionalUserService struct {
@@ -9,6 +11,9 @@ type AdditionalUserService struct {
 }
 
 func (service *AdditionalUserService) CreateDocument(uuid string) error {
+	if (!IsValidUUID(uuid)) {
+		return errors.New("Invalid uuid")
+	}
 	_, err := service.store.CreateUserDocument(uuid)
 	if err != nil {
 		return err
@@ -18,6 +23,10 @@ func (service *AdditionalUserService) CreateDocument(uuid string) error {
 }
 
 func (service *AdditionalUserService) DeleteDocument(uuid string) error {
+	if (!IsValidUUID(uuid)) {
+		return errors.New("Invalid uuid")
+	}
+
 	err := service.store.DeleteUserDocument(uuid)
 	if err != nil {
 		return err
@@ -36,6 +45,9 @@ func NewAdditionalUserService(store domain.AdditionalUserStore) *AdditionalUserS
 
 func (service *AdditionalUserService) CreateEducation(uuid string, education *domain.Education) (*domain.Education,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
@@ -52,6 +64,10 @@ func (service *AdditionalUserService) CreateEducation(uuid string, education *do
 
 func (service *AdditionalUserService) FindUserEducations(uuid string) (*map[string]domain.Education,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
+
 	document, err := service.store.FindUserDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -61,6 +77,9 @@ func (service *AdditionalUserService) FindUserEducations(uuid string) (*map[stri
 
 func (service *AdditionalUserService) UpdateUserEducation(uuid string, educationId string,
 	education *domain.Education) (*map[string]domain.Education, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	err := service.store.UpdateUserEducation(educationId, education)
 	if err != nil {
@@ -74,6 +93,9 @@ func (service *AdditionalUserService) UpdateUserEducation(uuid string, education
 }
 
 func (service *AdditionalUserService) DeleteUserEducation(uuid string, additionID string) (*map[string]domain.Education, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	err := service.store.DeleteUserEducation(additionID)
 	userEducation, err := service.store.FindUserDocument(uuid)
@@ -87,6 +109,9 @@ func (service *AdditionalUserService) DeleteUserEducation(uuid string, additionI
 
 func (service *AdditionalUserService) CreatePosition(uuid string, position *domain.Position) (*domain.Position,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
@@ -102,6 +127,10 @@ func (service *AdditionalUserService) CreatePosition(uuid string, position *doma
 }
 
 func (service *AdditionalUserService) FindUserPositions(uuid string) (*map[string]domain.Position, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
+
 	document, err := service.store.FindUserDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -111,6 +140,10 @@ func (service *AdditionalUserService) FindUserPositions(uuid string) (*map[strin
 
 func (service *AdditionalUserService) UpdateUserPosition(uuid string, positionId string,
 	position *domain.Position) (*map[string]domain.Position, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
+
 	err := service.store.UpdateUserPosition(positionId, position)
 	if err != nil {
 		return nil, err
@@ -124,6 +157,9 @@ func (service *AdditionalUserService) UpdateUserPosition(uuid string, positionId
 
 func (service *AdditionalUserService) DeleteUserPosition(uuid string, additionID string) (*map[string]domain.Position,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	err := service.store.DeleteUserPosition(additionID)
 	userPosition, err := service.store.FindUserDocument(uuid)
@@ -137,6 +173,9 @@ func (service *AdditionalUserService) DeleteUserPosition(uuid string, additionID
 
 func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Skill) (*domain.Skill,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
@@ -152,6 +191,10 @@ func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Ski
 }
 
 func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]domain.Skill, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
+
 	document, err := service.store.FindUserDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -161,6 +204,10 @@ func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]d
 
 func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId string,
 	skill *domain.Skill) (*map[string]domain.Skill, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
+
 	err := service.store.UpdateUserSkill(skillId, skill)
 	if err != nil {
 		return nil, err
@@ -174,6 +221,9 @@ func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId strin
 
 func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID string) (*map[string]domain.Skill,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	err := service.store.DeleteUserSkill(additionID)
 	userSkill, err := service.store.FindUserDocument(uuid)
@@ -187,6 +237,9 @@ func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID st
 
 func (service *AdditionalUserService) CreateInterest(uuid string, interest *domain.Interest) (*domain.Interest,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
@@ -202,6 +255,10 @@ func (service *AdditionalUserService) CreateInterest(uuid string, interest *doma
 }
 
 func (service *AdditionalUserService) FindUserInterests(uuid string) (*map[string]domain.Interest, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
+
 	document, err := service.store.FindUserDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -211,6 +268,10 @@ func (service *AdditionalUserService) FindUserInterests(uuid string) (*map[strin
 
 func (service *AdditionalUserService) UpdateUserInterest(uuid string, interestId string,
 	interest *domain.Interest) (*map[string]domain.Interest, error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
+
 	err := service.store.UpdateUserInterest(interestId, interest)
 	if err != nil {
 		return nil, err
@@ -224,6 +285,9 @@ func (service *AdditionalUserService) UpdateUserInterest(uuid string, interestId
 
 func (service *AdditionalUserService) DeleteUserInterest(uuid string, additionID string) (*map[string]domain.Interest,
 	error) {
+	if (!IsValidUUID(uuid)) {
+		return nil, errors.New("Invalid uuid")
+	}
 
 	err := service.store.DeleteUserInterest(additionID)
 	userInterest, err := service.store.FindUserDocument(uuid)
@@ -263,4 +327,9 @@ func (service *AdditionalUserService) GetDegrees() ([]*domain.Degree, error) {
 		return nil, nil
 	}
 	return degrees, nil
+}
+
+func IsValidUUID(u string) bool {
+	_, err := uuid.FromString(u)
+	return err == nil
 }

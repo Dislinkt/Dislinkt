@@ -5,13 +5,14 @@ import (
 )
 
 type User struct {
-	Id       uuid.UUID `gorm:"index:idx_name,unique"`
-	Username string    `gorm:"unique"`
-	Email    string    `gorm:"unique"`
-	Password string
-	UserRole int
-	Active   bool
-	ApiToken *string `gorm:"unique"`
+	Id        uuid.UUID `gorm:"index:idx_name,unique"`
+	Username  string    `gorm:"unique"`
+	Email     string    `gorm:"unique" validate:"email"`
+	Password  string
+	UserRole  int
+	Active    bool
+	ApiToken  *string `gorm:"unique"`
+	TotpToken string  `gorm:"totp_token"`
 }
 
 type LoginRequest struct {

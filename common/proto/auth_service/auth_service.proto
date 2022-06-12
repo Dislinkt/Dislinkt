@@ -14,6 +14,20 @@ service AuthService{
     };
   }
 
+  rpc AuthenticateTwoFactoryUser(LoginTwoFactoryRequest) returns(JwtTokenResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/two-factory-login",
+      body: "*"
+    };
+  }
+
+  rpc GenerateTwoFactoryCode(TwoFactoryLoginForCodea) returns(TwoFactoryCode) {
+    option (google.api.http) = {
+      post: "/api/auth/generate-two-factory-code",
+      body: "*"
+    };
+  }
+
   rpc ValidateToken(ValidateRequest) returns(ValidateResponse) {
     option (google.api.http) = {
       post: "/api/auth/validate",
@@ -80,6 +94,20 @@ service AuthService{
 
 message LoginRequest {
   UserData userData = 1;
+}
+
+message TwoFactoryLoginForCode {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginTwoFactoryRequest {
+  string username = 1;
+  string code = 2;
+}
+
+message TwoFactoryCode {
+  string code = 1;
 }
 
 message JwtTokenResponse {

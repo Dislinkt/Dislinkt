@@ -1,6 +1,8 @@
 package application
 
 import (
+	"errors"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"post_service/domain"
 )
@@ -58,14 +60,26 @@ func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
 }
 
 func (service *PostService) InsertUser(user *domain.User) error {
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return errors.New("Invalid user data")
+	}
 	return service.store.InsertUser(user)
 }
 
 func (service *PostService) DeleteUser(user *domain.User) error {
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return errors.New("Invalid user data")
+	}
 	return service.store.DeleteUser(user)
 }
 
 func (service *PostService) UpdateUser(user *domain.User) error {
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return errors.New("Invalid user data")
+	}
 	return service.store.UpdateUser(user)
 }
 

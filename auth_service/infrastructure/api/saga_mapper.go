@@ -1,7 +1,9 @@
 package api
 
 import (
+	"errors"
 	"log"
+	"regexp"
 
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/common/saga/events"
@@ -29,11 +31,11 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
-	// isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
-	//
-	// if isWeak {
-	//	return "", errors.New("Password must contain minimum eight characters, at least one capital letter, one number and one special character")
-	// }
+	isStrong, _ := regexp.MatchString("[0-9A-Za-z!?#$@.*+_\\-]+", password)
+
+	if !isStrong {
+		return "", errors.New("Password not strong enough!")
+	}
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
