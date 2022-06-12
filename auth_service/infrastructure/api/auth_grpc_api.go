@@ -43,6 +43,16 @@ func (handler *AuthHandler) AuthenticateTwoFactoryUser(ctx context.Context, requ
 	}, nil
 }
 
+func (handler *AuthHandler) GenerateTwoFactoryCode(ctx context.Context, request *pb.TwoFactoryLoginForCode) (*pb.TwoFactoryCode, error) {
+	code, err := handler.service.GenerateTwoFactoryCode(request)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.TwoFactoryCode{
+		Code: code,
+	}, nil
+}
+
 func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateRequest) (*pb.ValidateResponse, error) {
 	token := mapValidationRequest(req)
 	claims, err := handler.service.ValidateToken(token)

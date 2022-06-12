@@ -145,12 +145,7 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 		return "", errors.New("user account not activated!")
 	}
 
-	if !equalPasswords(user.Password, loginRequest.Password) {
-		return "", errors.New("invalid password")
-	}
-	n := time.Now().UTC()
-	code, err := totp.GenerateCode(user.TotpToken, n)
-	valid := totp.Validate(code, user.TotpToken)
+	valid := totp.Validate(loginRequest.Code, user.TotpToken)
 
 	if !valid {
 		return "", errors.New("Token not valid!")
@@ -163,6 +158,29 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 	}
 
 	return token, err
+}
+
+func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLoginForCode) (string, error) {
+	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	//defer span.Finish()
+
+	user, err := auth.userService.GetByUsername(loginRequest.Username)
+
+	if !user.Active {
+		return "", errors.New("user account not activated!")
+	}
+
+	if !equalPasswords(user.Password, loginRequest.Password) {
+		return "", errors.New("invalid password")
+	}
+	n := time.Now().UTC()
+	code, err := totp.GenerateCode(user.TotpToken, n)
+
+	if err != nil {
+		return "", errors.New("Error generating token!")
+	}
+
+	return code, err
 }
 
 func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims, err error) {
