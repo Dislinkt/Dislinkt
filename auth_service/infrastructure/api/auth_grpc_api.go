@@ -33,6 +33,26 @@ func (handler *AuthHandler) AuthenticateUser(ctx context.Context, request *pb.Lo
 	}, nil
 }
 
+func (handler *AuthHandler) AuthenticateTwoFactoryUser(ctx context.Context, request *pb.LoginTwoFactoryRequest) (*pb.JwtTokenResponse, error) {
+	token, err := handler.service.AuthenticateTwoFactoryUser(request)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.JwtTokenResponse{
+		Jwt: mapJwtToken(token),
+	}, nil
+}
+
+func (handler *AuthHandler) GenerateTwoFactoryCode(ctx context.Context, request *pb.TwoFactoryLoginForCode) (*pb.TwoFactoryCode, error) {
+	code, err := handler.service.GenerateTwoFactoryCode(request)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.TwoFactoryCode{
+		Code: code,
+	}, nil
+}
+
 func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateRequest) (*pb.ValidateResponse, error) {
 	token := mapValidationRequest(req)
 	claims, err := handler.service.ValidateToken(token)

@@ -26,6 +26,10 @@ FROM alpine:latest
 
 WORKDIR /root/
 
+COPY ./api_gateway/cert.crt .
+
+COPY ./api_gateway/cert.key .
+
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main .
 

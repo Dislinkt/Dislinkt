@@ -1,7 +1,9 @@
 package application
 
 import (
+	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"time"
 
 	"github.com/dislinkt/user_service/domain"
@@ -33,6 +35,10 @@ func (service *UserService) Register(user *domain.User) error {
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return errors.New("Invalid user data")
+	}
 	err := service.registerUserOrchestrator.Start(user)
 	if err != nil {
 		return err
@@ -45,6 +51,10 @@ func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error)
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid user data")
+	}
 	dbUser, err := service.store.FindByID(user.Id)
 	if err != nil {
 		return nil, err
@@ -63,6 +73,10 @@ func (service *UserService) Insert(user *domain.User) error {
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return errors.New("Invalid user data")
+	}
 	err := service.store.Insert(user)
 	return err
 }
@@ -123,6 +137,16 @@ func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.
 }
 
 func updateField(paths []string, user *domain.User, requestUser *domain.User) (*domain.User, error) {
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid user data")
+	}
+
+	if err := validator.New().Struct(requestUser); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid request user data")
+	}
+
 	for _, path := range paths {
 		fmt.Println(path)
 		switch path {
@@ -173,5 +197,9 @@ func (service *UserService) FindByUsername(username string) (*domain.User, error
 }
 
 func (service *UserService) Delete(user *domain.User) interface{} {
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return err
+	}
 	return service.store.Delete(user)
 }

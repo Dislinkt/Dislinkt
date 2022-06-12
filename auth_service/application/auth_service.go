@@ -4,8 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
+	"github.com/pquerna/otp/totp"
 	"log"
 	"net/smtp"
+	"regexp"
+
 	//	"github.com/nats-io/jwt/v2"
 	"time"
 
@@ -45,7 +49,6 @@ func NewAuthService(userService *UserService, permissionStore domain.PermissionS
 }
 
 func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (string, error) {
-
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 	if err != nil || user == nil {
 		return "", errors.New("invalid username")
@@ -83,6 +86,10 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 
 func (auth *AuthService) generateToken(user *domain.User, expireTime int64) (string, error) {
 	//	rolesString, _ := json.Marshal(user.Roles)
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return "", errors.New("Invalid user data")
+	}
 
 	var permissionNames []string
 	permissions, err := auth.permissionStore.GetAllByRole(user.UserRole)
@@ -126,6 +133,54 @@ func getRoleString(role int) string {
 	default:
 		return "Regular"
 	}
+}
+
+func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFactoryRequest) (string, error) {
+	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	//defer span.Finish()
+
+	user, err := auth.userService.GetByUsername(loginRequest.Username)
+
+	if !user.Active {
+		return "", errors.New("user account not activated!")
+	}
+
+	valid := totp.Validate(loginRequest.Code, user.TotpToken)
+
+	if !valid {
+		return "", errors.New("Token not valid!")
+	}
+
+	expireTime := time.Now().Add(time.Hour).Unix()
+	token, err := auth.generateToken(user, expireTime)
+	if err != nil {
+		return "", errors.New("invalid password")
+	}
+
+	return token, err
+}
+
+func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLoginForCode) (string, error) {
+	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	//defer span.Finish()
+
+	user, err := auth.userService.GetByUsername(loginRequest.Username)
+
+	if !user.Active {
+		return "", errors.New("user account not activated!")
+	}
+
+	if !equalPasswords(user.Password, loginRequest.Password) {
+		return "", errors.New("invalid password")
+	}
+	n := time.Now().UTC()
+	code, err := totp.GenerateCode(user.TotpToken, n)
+
+	if err != nil {
+		return "", errors.New("Error generating token!")
+	}
+
+	return code, err
 }
 
 func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims, err error) {
@@ -289,11 +344,11 @@ func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangeP
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
-	// isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
-	//
-	// if isWeak {
-	//	return "", errors.New("Password must contain minimum eight characters, at least one capital letter, one number and one special character")
-	// }
+	isStrong, _ := regexp.MatchString("[0-9A-Za-z!?#$@.*+_\\-]+", password)
+
+	if !isStrong {
+		return "", errors.New("Password not strong enough!")
+	}
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
@@ -550,7 +605,7 @@ func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.J
 	}, nil
 }
 
-func (interceptor *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims, err error) {
+func (auth *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims, err error) {
 	token, err := jwt.ParseWithClaims(apiToken, &ApiTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
