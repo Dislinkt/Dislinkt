@@ -29,7 +29,7 @@ type User struct {
 	Surname     string    `validate:"alpha"`
 	Username    *string   `gorm:"unique" validate:"alphanum"`
 	Email       *string   `gorm:"unique" validate:"email"`
-	Number      string    `validate:"numeric"`
+	Number      string    `validate:"numeric,omitempty"`
 	Gender      Gender
 	DateOfBirth string
 	Password    string `gorm:"-"`

@@ -13,11 +13,11 @@ import (
 	//	"github.com/nats-io/jwt/v2"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/auth_service/startup/config"
 	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/auth_service"
+	"github.com/form3tech-oss/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
