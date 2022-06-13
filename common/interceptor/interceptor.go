@@ -3,7 +3,7 @@ package interceptor
 import (
 	"context"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/form3tech-oss/jwt-go"
 	"strings"
 	"time"
 
