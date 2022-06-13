@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 

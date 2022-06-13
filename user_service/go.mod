@@ -7,7 +7,7 @@ replace github.com/dislinkt/common => ../common
 require (
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.11.0
-	github.com/satori/go.uuid v1.2.0
+	github.com/gofrs/uuid v4.0.0+incompatible
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 	gorm.io/driver/postgres v1.3.5
@@ -26,7 +26,6 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
-	github.com/jackc/pgtype v1.11.0 // indirect
 	github.com/jackc/pgx/v4 v4.16.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect

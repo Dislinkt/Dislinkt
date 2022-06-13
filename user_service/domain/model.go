@@ -1,9 +1,9 @@
 package domain
 
 import (
+	uuid "github.com/gofrs/uuid"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 

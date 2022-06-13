@@ -3,7 +3,7 @@ package application
 import (
 	"errors"
 	"fmt"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/domain"

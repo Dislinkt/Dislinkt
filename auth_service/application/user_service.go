@@ -7,7 +7,7 @@ import (
 	"regexp"
 
 	"github.com/dislinkt/auth_service/domain"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 )
 
 type UserService struct {

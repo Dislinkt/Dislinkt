@@ -3,7 +3,7 @@ package application
 import (
 	"errors"
 	"github.com/dislinkt/additional_user_service/domain"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 )
 
 type AdditionalUserService struct {
@@ -11,7 +11,7 @@ type AdditionalUserService struct {
 }
 
 func (service *AdditionalUserService) CreateDocument(uuid string) error {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return errors.New("Invalid uuid")
 	}
 	_, err := service.store.CreateUserDocument(uuid)
@@ -23,7 +23,7 @@ func (service *AdditionalUserService) CreateDocument(uuid string) error {
 }
 
 func (service *AdditionalUserService) DeleteDocument(uuid string) error {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return errors.New("Invalid uuid")
 	}
 
@@ -45,7 +45,7 @@ func NewAdditionalUserService(store domain.AdditionalUserStore) *AdditionalUserS
 
 func (service *AdditionalUserService) CreateEducation(uuid string, education *domain.Education) (*domain.Education,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -64,7 +64,7 @@ func (service *AdditionalUserService) CreateEducation(uuid string, education *do
 
 func (service *AdditionalUserService) FindUserEducations(uuid string) (*map[string]domain.Education,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -77,7 +77,7 @@ func (service *AdditionalUserService) FindUserEducations(uuid string) (*map[stri
 
 func (service *AdditionalUserService) UpdateUserEducation(uuid string, educationId string,
 	education *domain.Education) (*map[string]domain.Education, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -93,7 +93,7 @@ func (service *AdditionalUserService) UpdateUserEducation(uuid string, education
 }
 
 func (service *AdditionalUserService) DeleteUserEducation(uuid string, additionID string) (*map[string]domain.Education, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -109,7 +109,7 @@ func (service *AdditionalUserService) DeleteUserEducation(uuid string, additionI
 
 func (service *AdditionalUserService) CreatePosition(uuid string, position *domain.Position) (*domain.Position,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -127,7 +127,7 @@ func (service *AdditionalUserService) CreatePosition(uuid string, position *doma
 }
 
 func (service *AdditionalUserService) FindUserPositions(uuid string) (*map[string]domain.Position, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -140,7 +140,7 @@ func (service *AdditionalUserService) FindUserPositions(uuid string) (*map[strin
 
 func (service *AdditionalUserService) UpdateUserPosition(uuid string, positionId string,
 	position *domain.Position) (*map[string]domain.Position, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -157,7 +157,7 @@ func (service *AdditionalUserService) UpdateUserPosition(uuid string, positionId
 
 func (service *AdditionalUserService) DeleteUserPosition(uuid string, additionID string) (*map[string]domain.Position,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -173,7 +173,7 @@ func (service *AdditionalUserService) DeleteUserPosition(uuid string, additionID
 
 func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Skill) (*domain.Skill,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -191,7 +191,7 @@ func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Ski
 }
 
 func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]domain.Skill, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -204,7 +204,7 @@ func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]d
 
 func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId string,
 	skill *domain.Skill) (*map[string]domain.Skill, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -221,7 +221,7 @@ func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId strin
 
 func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID string) (*map[string]domain.Skill,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -237,7 +237,7 @@ func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID st
 
 func (service *AdditionalUserService) CreateInterest(uuid string, interest *domain.Interest) (*domain.Interest,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -255,7 +255,7 @@ func (service *AdditionalUserService) CreateInterest(uuid string, interest *doma
 }
 
 func (service *AdditionalUserService) FindUserInterests(uuid string) (*map[string]domain.Interest, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -268,7 +268,7 @@ func (service *AdditionalUserService) FindUserInterests(uuid string) (*map[strin
 
 func (service *AdditionalUserService) UpdateUserInterest(uuid string, interestId string,
 	interest *domain.Interest) (*map[string]domain.Interest, error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -285,7 +285,7 @@ func (service *AdditionalUserService) UpdateUserInterest(uuid string, interestId
 
 func (service *AdditionalUserService) DeleteUserInterest(uuid string, additionID string) (*map[string]domain.Interest,
 	error) {
-	if (!IsValidUUID(uuid)) {
+	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
 

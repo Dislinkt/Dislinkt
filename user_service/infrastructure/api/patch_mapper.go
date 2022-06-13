@@ -5,7 +5,7 @@ import (
 
 	events "github.com/dislinkt/common/saga/patch_user"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 )
 
 func mapPatchUser(user events.User) *domain.User {

@@ -1,6 +1,6 @@
 package domain
 
-import uuid "github.com/satori/go.uuid"
+import uuid "github.com/gofrs/uuid"
 
 type UserStore interface {
 	Insert(user *User) error

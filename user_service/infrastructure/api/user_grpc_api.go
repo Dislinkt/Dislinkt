@@ -9,7 +9,7 @@ import (
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/application"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 )
 
 type UserHandler struct {

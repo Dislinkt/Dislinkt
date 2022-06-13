@@ -6,7 +6,7 @@ replace github.com/dislinkt/common => ../common
 
 require (
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
-	github.com/satori/go.uuid v1.2.0
+	github.com/gofrs/uuid v4.2.0+incompatible
 	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
