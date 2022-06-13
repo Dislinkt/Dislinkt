@@ -7,7 +7,7 @@ replace github.com/dislinkt/common => ../common
 require (
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.11.0
-	github.com/satori/go.uuid v1.2.0
+	github.com/gofrs/uuid v4.0.0+incompatible
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 	gorm.io/driver/postgres v1.3.5
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

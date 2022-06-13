@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	uuid "github.com/gofrs/uuid"
 	"time"
 
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

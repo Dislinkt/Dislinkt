@@ -3,7 +3,7 @@ module github.com/dislinkt/common
 go 1.18
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
 	github.com/joho/godotenv v1.4.0

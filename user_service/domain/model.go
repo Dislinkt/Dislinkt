@@ -3,7 +3,8 @@ package domain
 import (
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
+
 	"gorm.io/gorm"
 )
 
@@ -29,7 +30,7 @@ type User struct {
 	Surname     string    `validate:"alpha"`
 	Username    *string   `gorm:"unique" validate:"alphanum"`
 	Email       *string   `gorm:"unique" validate:"email"`
-	Number      string    `validate:"numeric"`
+	Number      string    `validate:"omitempty,numeric"`
 	Gender      Gender
 	DateOfBirth string
 	Password    string `gorm:"-"`

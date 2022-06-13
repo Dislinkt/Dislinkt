@@ -6,14 +6,14 @@ replace github.com/dislinkt/common => ../common
 
 require (
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
-	github.com/satori/go.uuid v1.2.0
+	github.com/gofrs/uuid v4.2.0+incompatible
 	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 )
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.1 // indirect

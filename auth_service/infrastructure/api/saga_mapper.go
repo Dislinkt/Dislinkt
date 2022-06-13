@@ -7,7 +7,7 @@ import (
 
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/common/saga/events"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
