@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+option go_package = "github.com/Dislinkt/common/proto/message_service";
+
+package message_service_proto;
+
+import "google/api/annotations.proto";
+
+
+service MessageService{
+    rpc getMessageHistoriesByUser(Empty) returns(GetMultipleResponse) {
+      option (google.api.http) = {
+        get: "/message"
+      };
+    }
+    rpc getMessageHistory(GetRequest) returns(GetResponse) {
+      option (google.api.http) = {
+        get: "/message/user/{ReceiverId}"
+      };
+    }
+    rpc sendMessage(SendMessageRequest) returns(GetResponse) {
+      option (google.api.http) = {
+        post: "/message/{MessageHistoryId}"
+        body: "Message"
+      };
+    }
+}
+
+message Empty {}
+
+message GetMultipleResponse {
+  repeated MessageHistory MessageHistories = 1;
+}
+
+message GetRequest {
+  string ReceiverId = 1;
+}
+
+message GetResponse {
+  MessageHistory MessageHistory = 1;
+}
+
+message SendMessageRequest {
+  Message Message = 1;
+  string MessageHistoryId = 2;
+}
+
+message MessageHistory {
+  string Id = 1;
+  string User1Id = 2;
+  string User2Id = 3;
+  repeated Message Messages = 4;
+}
+
+message Message {
+  string SenderId = 1;
+  string ReceiverId = 2;
+  string MessageText = 3;
+  string DateSent = 4;
+}
+
+
