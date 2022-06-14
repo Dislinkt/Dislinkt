@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"github.com/dislinkt/common/interceptor"
-
 	userProto "github.com/dislinkt/common/proto/user_service"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
@@ -57,7 +56,8 @@ func (server *Server) Start() {
 	updateReplySubscriber := server.initSubscriber(server.config.UpdateUserReplySubject, QueueGroupUpdate)
 	updateUserOrchestrator := server.initUpdateUserOrchestrator(updateCommandPublisher, updateReplySubscriber)
 
-	userService := server.initUserService(userStore, registerUserOrchestrator, updateUserOrchestrator, patchUserOrchestrator)
+	userService := server.initUserService(userStore, registerUserOrchestrator, updateUserOrchestrator,
+		patchUserOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroupRegister)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)

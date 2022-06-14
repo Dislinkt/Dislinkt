@@ -1,10 +1,11 @@
 package persistence
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,9 +23,7 @@ func NewUserPostgresStore(db *gorm.DB) (domain.UserStore, error) {
 	}, nil
 }
 
-func (store *UserPostgresStore) Insert(user *domain.User) error {
-	// span := tracer.StartSpanFromContext(ctx, "Register-DB")
-	// defer span.Finish()
+func (store *UserPostgresStore) Insert(ctx context.Context, user *domain.User) error {
 	result := store.db.Create(user)
 	if result.Error != nil {
 		return result.Error

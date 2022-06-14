@@ -1,26 +1,30 @@
 package api
 
 import (
-	"fmt"
-	"github.com/go-playground/validator/v10"
+	"context"
 
+	logger "github.com/dislinkt/common/logging"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/user_service/application"
+	"github.com/go-playground/validator/v10"
 )
 
 type UpdateUserCommandHandler struct {
 	userService       *application.UserService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
+	logger            *logger.Logger
 }
 
 func NewUpdateUserCommandHandler(userService *application.UserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) (*UpdateUserCommandHandler, error) {
+	logger := logger.InitLogger(context.TODO())
 	o := &UpdateUserCommandHandler{
 		userService:       userService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
+		logger:            logger,
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
@@ -34,27 +38,29 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 
 	switch command.Type {
 	case events.UpdateInUser:
-		fmt.Println("update user handler-update")
-		fmt.Println(command.User)
 		user := mapCommandUpdateUser(command)
 		if err := validator.New().Struct(user); err != nil {
 			//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+			handler.logger.WarnLogger.Warn(err.Error())
 			reply.Type = events.UserNotUpdatedInUser
 			return
 		}
-		_, err := handler.userService.Update(user.Id, user)
+		user, err := handler.userService.Update(user.Id, user)
 		if err != nil {
+			handler.logger.WarnLogger.Warn(err.Error())
 			reply.Type = events.UserNotUpdatedInUser
 			return
 		}
+		handler.logger.InfoLogger.Infof("User updated: {%s}", user.Id.String())
 		reply.Type = events.UserUpdatedInUser
 	case events.RollbackUpdateInUser:
-		fmt.Println("update user handler-rollback")
 		user := mapCommandUpdateUser(command)
-		_, err := handler.userService.Update(user.Id, user)
+		user, err := handler.userService.Update(user.Id, user)
 		if err != nil {
+			handler.logger.WarnLogger.Warn(err.Error())
 			return
 		}
+		handler.logger.InfoLogger.Infof("User rolled back: {%s}", user.Id.String())
 		reply.Type = events.UserRolledBackInUser
 	default:
 		reply.Type = events.UnknownUpdateReply

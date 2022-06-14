@@ -5,11 +5,10 @@ import (
 	"fmt"
 
 	"github.com/dislinkt/common/interceptor"
-
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/application"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type UserHandler struct {
@@ -90,14 +89,10 @@ func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.Regist
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
-	fmt.Println("Register user")
 	user := mapNewUser(request.User)
-	fmt.Println("mapper zavrsio")
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Register( ctx, user)
-	err := handler.service.Register(user)
-	fmt.Println("Register zavrsio")
+	err := handler.service.Register(ctx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +117,6 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	fmt.Println(parsedUUID)
 	user.Id = parsedUUID
 	dbUser, err := handler.service.StartUpdate(user)
 	if err != nil {

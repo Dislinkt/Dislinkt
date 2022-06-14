@@ -3,14 +3,12 @@ package startup
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"path/filepath"
 
 	"github.com/dislinkt/api_gateway/infrastructure/api"
 	"github.com/gorilla/handlers"
-
 	// "github.com/dislinkt/api_gateway/infrastructure/api"
 
 	cfg "github.com/dislinkt/api_gateway/startup/config"
@@ -20,7 +18,6 @@ import (
 	postGw "github.com/dislinkt/common/proto/post_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	otgo "github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -28,8 +25,8 @@ import (
 type Server struct {
 	config *cfg.Config
 	mux    *runtime.ServeMux
-	tracer otgo.Tracer
-	closer io.Closer
+	// tracer otgo.Tracer
+	// closer io.Closer
 }
 
 func NewServer(config *cfg.Config) *Server {
@@ -96,7 +93,7 @@ func (server *Server) Start() {
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
 		handlers.AllowCredentials(),
 	)
-	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
+	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
 	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
 	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
 }
