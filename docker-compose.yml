@@ -1,5 +1,10 @@
 version: "3.8"
 
+x-logging: &fluent-bit
+  driver: fluentd
+  options:
+    fluentd-address: ${FLUENT_BIT_ADDRESS}:24224
+
 services:
   user_service:
     image: user_service
@@ -35,6 +40,7 @@ services:
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
       EMAIL_HOST: ${EMAIL_HOST}
       EMAIL_PORT: ${EMAIL_PORT}
+    logging: *fluent-bit
     depends_on:
       - user_db
     #      - tracing
@@ -60,6 +66,7 @@ services:
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
       UPDATE_USER_COMMAND_SUBJECT: ${UPDATE_USER_COMMAND_SUBJECT}
       UPDATE_USER_REPLY_SUBJECT: ${UPDATE_USER_REPLY_SUBJECT}
+    logging: *fluent-bit
     depends_on:
       - post_db
     networks:
@@ -82,6 +89,7 @@ services:
       NATS_PASS: ${NATS_PASS}
       REGISTER_USER_COMMAND_SUBJECT: ${REGISTER_USER_COMMAND_SUBJECT}
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
+    logging: *fluent-bit
     depends_on:
       - additional_user_db
     networks:
@@ -108,6 +116,7 @@ services:
       - REGISTER_USER_REPLY_SUBJECT=${REGISTER_USER_REPLY_SUBJECT}
       - PATCH_USER_COMMAND_SUBJECT=${PATCH_USER_COMMAND_SUBJECT}
       - PATCH_USER_REPLY_SUBJECT=${PATCH_USER_REPLY_SUBJECT}
+    logging: *fluent-bit
     depends_on:
       - neo4j
     networks:
@@ -135,6 +144,7 @@ services:
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
       UPDATE_USER_COMMAND_SUBJECT: ${UPDATE_USER_COMMAND_SUBJECT}
       UPDATE_USER_REPLY_SUBJECT: ${UPDATE_USER_REPLY_SUBJECT}
+    logging: *fluent-bit
     depends_on:
       - auth_db
     networks:
@@ -161,6 +171,7 @@ services:
       ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
       CONNECTION_SERVICE_HOST: ${CONNECTION_SERVICE_HOST}
       CONNECTION_SERVICE_PORT: ${CONNECTION_SERVICE_PORT}
+    logging: *fluent-bit
     networks:
       - network
   #      - jaeger-demo
@@ -175,6 +186,7 @@ services:
       POSTGRES_USER: ${USER_DB_USER}
       POSTGRES_PASSWORD: ${USER_DB_PASS}
       POSTGRES_DB: ${USER_DB_NAME}
+    logging: *fluent-bit
     networks:
       - network
 
@@ -186,6 +198,7 @@ services:
       POSTGRES_USER: ${AUTH_DB_USER}
       POSTGRES_PASSWORD: ${AUTH_DB_PASS}
       POSTGRES_DB: ${AUTH_DB_NAME}
+    logging: *fluent-bit
     networks:
       - network
 
@@ -193,6 +206,7 @@ services:
     image: mongo
     container_name: post_db
     restart: on-failure
+    logging: *fluent-bit
     networks:
       - network
   neo4j:
@@ -203,6 +217,7 @@ services:
       - "7687:7687"
     networks:
       - network
+    logging: *fluent-bit
     environment:
       - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_memory_pagecache_size=512M
@@ -211,6 +226,7 @@ services:
     image: mongo
     container_name: additional_user_db
     restart: on-failure
+    logging: *fluent-bit
     networks:
       - network
 
@@ -230,6 +246,7 @@ services:
     image: nats
     container_name: nats
     restart: on-failure
+    logging: *fluent-bit
     networks:
       - network
     ports:
