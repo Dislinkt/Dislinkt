@@ -2,14 +2,18 @@ package startup
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"path/filepath"
 
 	"github.com/dislinkt/api_gateway/infrastructure/api"
 	"github.com/gorilla/handlers"
+	"google.golang.org/grpc/credentials"
 
 	// "github.com/dislinkt/api_gateway/infrastructure/api"
 
@@ -22,7 +26,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	otgo "github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Server struct {
@@ -54,9 +57,13 @@ func customMatcher(key string) (string, bool) {
 }
 
 func (server *Server) initHandlers() {
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	tlsCredentials, err := loadTLSCredentials()
+	if err != nil {
+		log.Fatal("cannot load TLS credentials: ", err)
+	}
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(tlsCredentials)}
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
-	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
+	err = userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
 	additionalUserEndpoint := fmt.Sprintf("%s:%s", server.config.AdditionalUserHost, server.config.AdditionalUserPort)
 	err = additionalUserGw.RegisterAdditionalUserServiceHandlerFromEndpoint(context.TODO(), server.mux, additionalUserEndpoint, opts)
 	if err != nil {
@@ -96,9 +103,38 @@ func (server *Server) Start() {
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
 		handlers.AllowCredentials(),
 	)
-	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
+	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
 	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
 	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
+}
+func loadTLSCredentials() (credentials.TransportCredentials, error) {
+	// Load certificate of the CA who signed server's certificate
+	caCert, _ := filepath.Abs("./ca-cert.pem")
+	pemServerCA, err := ioutil.ReadFile(caCert)
+	if err != nil {
+		return nil, err
+	}
+
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(pemServerCA) {
+		return nil, fmt.Errorf("failed to add server CA's certificate")
+	}
+	// Load client's certificate and private key
+	// cCert, _ := filepath.Abs("./client-cert.pem")
+	// clientKey, _ := filepath.Abs("./client-key.pem")
+	// clientCert, err := tls.LoadX509KeyPair(cCert, clientKey)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// Create the credentials and return it
+	config := &tls.Config{
+		// Certificates: []tls.Certificate{clientCert},
+		InsecureSkipVerify: true,
+		RootCAs:            certPool,
+	}
+
+	return credentials.NewTLS(config), nil
 }
 
 func muxMiddleware(server *Server) http.Handler {

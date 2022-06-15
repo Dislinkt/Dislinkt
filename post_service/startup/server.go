@@ -1,9 +1,11 @@
 package startup
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
+	"path/filepath"
 
 	"github.com/dislinkt/common/interceptor"
 	postProto "github.com/dislinkt/common/proto/post_service"
@@ -11,6 +13,7 @@ import (
 	"github.com/dislinkt/common/saga/messaging/nats"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"post_service/application"
 	"post_service/domain"
 	"post_service/infrastructure/api"
@@ -112,9 +115,42 @@ func (server *Server) startGrpcServer(postHandler *api.PostHandler) {
 	}
 
 	interceptor := interceptor.NewAuthInterceptor(config.AccessiblePermissions(), server.config.PublicKey)
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
+	tlsCredentials, err := loadTLSCredentials()
+	if err != nil {
+		log.Fatal("cannot load TLS credentials: ", err)
+	}
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()), grpc.Creds(tlsCredentials))
 	postProto.RegisterPostServiceServer(grpcServer, postHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
+}
+func loadTLSCredentials() (credentials.TransportCredentials, error) {
+	// Load certificate of the CA who signed client's certificate
+	// caCert, _ := filepath.Abs("./ca-cert.pem")
+	// pemClientCA, err := ioutil.ReadFile(caCert)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// certPool := x509.NewCertPool()
+	// if !certPool.AppendCertsFromPEM(pemClientCA) {
+	// 	return nil, fmt.Errorf("failed to add client CA's certificate")
+	// }
+
+	// Load server's certificate and private key
+	crtPath, _ := filepath.Abs("./server-cert.pem")
+	keyPath, _ := filepath.Abs("./server-key.pem")
+	serverCert, err := tls.LoadX509KeyPair(crtPath, keyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the credentials and return it
+	config := &tls.Config{
+		Certificates: []tls.Certificate{serverCert},
+		ClientAuth:   tls.NoClientCert,
+	}
+
+	return credentials.NewTLS(config), nil
 }

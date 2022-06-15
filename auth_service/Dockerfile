@@ -26,6 +26,8 @@ FROM alpine:latest
 
 WORKDIR /root/
 
+COPY ./auth_service/cert .
+
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main .
 

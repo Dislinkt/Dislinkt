@@ -30,6 +30,8 @@ COPY ./api_gateway/cert.crt .
 
 COPY ./api_gateway/cert.key .
 
+COPY ./api_gateway/cert .
+
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main .
 
