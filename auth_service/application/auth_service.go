@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator/v10"
-	"github.com/pquerna/otp/totp"
 	"log"
 	"net/smtp"
 	"regexp"
-
 	//	"github.com/nats-io/jwt/v2"
 	"time"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/pquerna/otp/totp"
 
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/auth_service/startup/config"
@@ -136,8 +136,8 @@ func getRoleString(role int) string {
 }
 
 func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFactoryRequest) (string, error) {
-	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
-	//defer span.Finish()
+	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	// defer span.Finish()
 
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 
@@ -161,8 +161,8 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 }
 
 func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLoginForCode) (string, error) {
-	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
-	//defer span.Finish()
+	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	// defer span.Finish()
 
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 
@@ -469,7 +469,7 @@ func recoverAccountMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
 	urlRedirection := "http://localhost:4200/recover-account/" + token
 
-	subject := "Subject: Account activation\n"
+	subject := "Subject: Account recovery\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body := "<html><body>\n" +
 		"Hello " + username + "! Recover your account with click on link: " + urlRedirection +

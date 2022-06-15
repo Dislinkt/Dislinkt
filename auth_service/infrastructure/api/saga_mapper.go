@@ -7,7 +7,7 @@ import (
 
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/common/saga/events"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,14 +17,13 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 	if err != nil {
 		return nil
 	}
-	// TODO: ACTIVE NA FALSE!!
 	userD := &domain.User{
 		Id:       id,
 		Username: command.User.Username,
 		Password: hashAndSalt,
 		Email:    command.User.Email,
 		UserRole: int(command.User.UserRole),
-		Active:   true,
+		Active:   false,
 		ApiToken: nil,
 	}
 	return userD
