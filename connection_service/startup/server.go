@@ -1,7 +1,9 @@
 package startup
 
 import (
+	"context"
 	"fmt"
+	logger "github.com/dislinkt/common/logging"
 	"log"
 	"net"
 
@@ -22,11 +24,14 @@ import (
 
 type Server struct {
 	config *config.Config
+	logger *logger.Logger
 }
 
 func NewServer(config *config.Config) *Server {
+	logger := logger.InitLogger(context.TODO())
 	return &Server{
 		config: config,
+		logger: logger,
 	}
 }
 
@@ -53,11 +58,13 @@ func (server *Server) Start() {
 	connectionHandler := server.initConnectionHandler(connectionService)
 
 	server.startGrpcServer(connectionHandler)
+	server.logger.InfoLogger.Info("SS")
 }
 
 func (server *Server) initNeo4J() *neo4j.Driver {
 	client, err := persistance.GetClient(server.config.Neo4jUri, server.config.Neo4jUsername, server.config.Neo4jPassword)
 	if err != nil {
+		server.logger.ErrorLogger.Error("IC")
 		log.Fatal(err)
 	}
 	return client
@@ -111,6 +118,7 @@ func (server *Server) initConnectionHandler(service *application.ConnectionServi
 func (server *Server) startGrpcServer(connectionHandler *api.ConnectionHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
+		server.logger.ErrorLogger.Error("FTL")
 		log.Fatalf("failed to listen: %v", err)
 	}
 
@@ -118,6 +126,7 @@ func (server *Server) startGrpcServer(connectionHandler *api.ConnectionHandler) 
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
 	connection.RegisterConnectionServiceServer(grpcServer, connectionHandler)
 	if err := grpcServer.Serve(listener); err != nil {
+		server.logger.ErrorLogger.Error("FTS")
 		log.Fatalf("failed to serve: %s", err)
 	}
 }

@@ -1,7 +1,9 @@
 package persistance
 
 import (
+	"context"
 	"fmt"
+	logger "github.com/dislinkt/common/logging"
 	"time"
 
 	pb "github.com/dislinkt/common/proto/connection_service"
@@ -11,11 +13,14 @@ import (
 
 type ConnectionDBStore struct {
 	connectionDB *neo4j.Driver
+	logger       *logger.Logger
 }
 
 func NewConnectionDBStore(client *neo4j.Driver) domain.ConnectionStore {
+	logger := logger.InitLogger(context.TODO())
 	return &ConnectionDBStore{
 		connectionDB: client,
+		logger:       logger,
 	}
 }
 
@@ -75,6 +80,7 @@ func (store *ConnectionDBStore) CreateConnection(baseUserUuid string, connectUse
 
 			fmt.Println(status)
 
+			store.logger.InfoLogger.Infof("CC {%s}", connectUserUuid)
 			// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
 			return &pb.NewConnectionResponse{
 				BaseUserUUID:       baseUserUuid,
@@ -82,6 +88,7 @@ func (store *ConnectionDBStore) CreateConnection(baseUserUuid string, connectUse
 				ConnectionResponse: connectionStatus,
 			}, nil
 		} else {
+			store.logger.WarnLogger.Warnf("CC {%s}", connectUserUuid)
 			return &pb.NewConnectionResponse{
 				BaseUserUUID:       baseUserUuid,
 				ConnectUserUUID:    connectUserUuid,
@@ -307,6 +314,7 @@ func (store *ConnectionDBStore) Register(userNode *domain.UserNode) (*domain.Use
 	if err != nil {
 		return nil, err
 	}
+	store.logger.InfoLogger.Infof("UC {%s}", userNode.UserUID)
 
 	return result.(*domain.UserNode), nil
 }
@@ -361,7 +369,10 @@ func (store *ConnectionDBStore) UpdateUser(userUUID string, private bool) error 
 
 	})
 	if err != nil {
+		store.logger.WarnLogger.Warnf("UU {%s}", userUUID)
 		return err
 	}
+	store.logger.InfoLogger.Infof("UU {%s}", userUUID)
+
 	return nil
 }

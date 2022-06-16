@@ -133,6 +133,10 @@ services:
       - neo4j
     networks:
       - network
+    volumes:
+      - type: bind
+        source: ./logs/connection_service
+        target: /root/logs
 
   auth_service:
     image: auth_service
