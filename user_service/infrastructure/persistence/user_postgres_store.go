@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"encoding/json"
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/user_service/domain"
 	"github.com/gofrs/uuid"
@@ -10,7 +11,8 @@ import (
 )
 
 type UserPostgresStore struct {
-	db *gorm.DB
+	db     *gorm.DB
+	logger *logger.Logger
 }
 
 func NewUserPostgresStore(db *gorm.DB) (domain.UserStore, error) {
@@ -18,8 +20,11 @@ func NewUserPostgresStore(db *gorm.DB) (domain.UserStore, error) {
 	if err != nil {
 		return nil, err
 	}
+	logger := logger.InitLogger(context.TODO())
+
 	return &UserPostgresStore{
-		db: db,
+		db:     db,
+		logger: logger,
 	}, nil
 }
 
@@ -28,6 +33,7 @@ func (store *UserPostgresStore) Insert(ctx context.Context, user *domain.User) e
 	if result.Error != nil {
 		return result.Error
 	}
+	store.logger.InfoLogger.Infof("UC {%s}", *user.Username)
 	return nil
 }
 
@@ -48,6 +54,7 @@ func (store *UserPostgresStore) Update(user *domain.User) (*domain.User, error) 
 	if err != nil {
 		return nil, result.Error
 	}
+	store.logger.InfoLogger.Infof("UU {%s}", *user.Username)
 	return dbUser, nil
 }
 
@@ -65,6 +72,7 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 func (store *UserPostgresStore) FindByID(uuid uuid.UUID) (user *domain.User, err error) {
 	foundUser := domain.User{}
 	if result := store.db.First(&foundUser, uuid); result.Error != nil {
+		store.logger.WarnLogger.Warnf("UNF {%s}", *user.Username)
 		return nil, result.Error
 	}
 	return &foundUser, nil
@@ -93,5 +101,6 @@ func (store *UserPostgresStore) Delete(user *domain.User) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	store.logger.InfoLogger.Infof("UD {%s}", *user.Username)
 	return nil
 }

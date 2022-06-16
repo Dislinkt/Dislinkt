@@ -1,7 +1,9 @@
 package startup
 
 import (
+	"context"
 	"fmt"
+	logger "github.com/dislinkt/common/logging"
 	"log"
 	"net"
 
@@ -20,15 +22,18 @@ import (
 
 type Server struct {
 	config *config.Config
+	logger *logger.Logger
 	// tracer otgo.Tracer
 	// closer io.Closer
 }
 
 func NewServer(config *config.Config) *Server {
+	logger := logger.InitLogger(context.TODO())
 	// newTracer, closer := tracer.Init(config.JaegerServiceName)
 	// otgo.SetGlobalTracer(newTracer)
 	return &Server{
 		config: config,
+		logger: logger,
 		// tracer: newTracer,
 		// closer: closer,
 	}
@@ -74,7 +79,7 @@ func (server *Server) Start() {
 	userHandler := server.initUserHandler(userService)
 
 	server.startGrpcServer(userHandler)
-
+	server.logger.InfoLogger.Info("SS")
 }
 
 func (server *Server) initUserClient() *gorm.DB {
@@ -83,6 +88,7 @@ func (server *Server) initUserClient() *gorm.DB {
 		server.config.UserDBPass, server.config.UserDBName,
 		server.config.UserDBPort)
 	if err != nil {
+		server.logger.ErrorLogger.Error("IC")
 		log.Fatal(err)
 	}
 	return client
@@ -182,6 +188,7 @@ func (server *Server) initUserHandler(service *application.UserService) *api.Use
 func (server *Server) startGrpcServer(userHandler *api.UserHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
+		server.logger.ErrorLogger.Error("FTL")
 		log.Fatalf("failed to listen: %v", err)
 	}
 
@@ -190,6 +197,7 @@ func (server *Server) startGrpcServer(userHandler *api.UserHandler) {
 	// grpcServer := grpc.NewServer()
 	userProto.RegisterUserServiceServer(grpcServer, userHandler)
 	if err := grpcServer.Serve(listener); err != nil {
+		server.logger.ErrorLogger.Error("FTS")
 		log.Fatalf("failed to serve: %s", err)
 	}
 }
