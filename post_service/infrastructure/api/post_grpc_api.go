@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"github.com/dislinkt/common/interceptor"
+	logger "github.com/dislinkt/common/logging"
 	"time"
 
 	"post_service/domain"
@@ -14,10 +16,15 @@ import (
 type PostHandler struct {
 	pb.UnimplementedPostServiceServer
 	service *application.PostService
+	logger  *logger.Logger
 }
 
 func NewPostHandler(service *application.PostService) *PostHandler {
-	return &PostHandler{service: service}
+	logger := logger.InitLogger(context.TODO())
+	return &PostHandler{
+		service: service,
+		logger:  logger,
+	}
 }
 
 func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
@@ -28,6 +35,7 @@ func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb
 	}
 	post, err := handler.service.Get(objectId)
 	if err != nil {
+		handler.logger.WarnLogger.Warn("PNF {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 	postPb := mapPost(post)
@@ -93,9 +101,11 @@ func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.
 }
 
 func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePostRequest) (*pb.Empty, error) {
+	handler.logger.InfoLogger.Infof("POST rr: PC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	post := mapNewPost(request.Post)
 	err := handler.service.Insert(post)
 	if err != nil {
+		handler.logger.WarnLogger.Warn("WPC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 	return &pb.Empty{}, nil
@@ -113,6 +123,7 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 	comment := mapNewComment(request.Comment)
 	err = handler.service.CreateComment(post, comment)
 	if err != nil {
+		handler.logger.WarnLogger.Warn("WCC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 
@@ -132,6 +143,7 @@ func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRe
 	}
 	err = handler.service.LikePost(post, request.UserId)
 	if err != nil {
+		handler.logger.WarnLogger.Warn("WR {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 
@@ -149,6 +161,7 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 	}
 	err = handler.service.DislikePost(post, request.UserId)
 	if err != nil {
+		handler.logger.WarnLogger.Warn("WR {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 
@@ -184,16 +197,18 @@ func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Sea
 	return response, nil
 }
 
-/* REACTIONS I COMMENTS */
-
 func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.CreateJobOfferRequest) (*pb.Empty, error) {
+	handler.logger.InfoLogger.Infof("POST rr: JOC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	offer := mapNewJobOffer(request.JobOffer)
 	err := handler.service.InsertJobOffer(offer)
 	if err != nil {
+		handler.logger.WarnLogger.Warn("WJOC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 	return &pb.Empty{}, nil
 }
+
+/* REACTIONS I COMMENTS */
 
 func (handler *PostHandler) GetAllLikesForPost(ctx context.Context, request *pb.GetRequest) (*pb.GetReactionsResponse, error) {
 	objectId, err := primitive.ObjectIDFromHex(request.Id)

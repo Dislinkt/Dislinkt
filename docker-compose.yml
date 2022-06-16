@@ -75,6 +75,10 @@ services:
       - post_db
     networks:
       - network
+    volumes:
+      - type: bind
+        source: ./logs/post_service
+        target: /root/logs
 
   additional_user_service:
     image: additional_user_service
