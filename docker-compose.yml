@@ -102,6 +102,10 @@ services:
       - additional_user_db
     networks:
       - network
+    volumes:
+      - type: bind
+        source: ./logs/additional_user_service
+        target: /root/logs
 
   connection_service:
     image: connection_service

@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/dislinkt/common/interceptor"
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/additional_user_service/application"
 	pb "github.com/dislinkt/common/proto/additional_user_service"
@@ -11,16 +13,19 @@ import (
 type AdditionalUserHandler struct {
 	pb.UnimplementedAdditionalUserServiceServer
 	service *application.AdditionalUserService
+	logger  *logger.Logger
 }
 
 func NewProductHandler(service *application.AdditionalUserService) *AdditionalUserHandler {
+	logger := logger.InitLogger(context.TODO())
 	return &AdditionalUserHandler{
 		service: service,
+		logger:  logger,
 	}
 }
 
 func (handler *AdditionalUserHandler) GetDegrees(ctx context.Context, request *pb.Get) (*pb.
-GetEntitiesResponse, error) {
+	GetEntitiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -38,7 +43,7 @@ GetEntitiesResponse, error) {
 }
 
 func (handler *AdditionalUserHandler) GetIndustries(ctx context.Context, request *pb.Get) (*pb.
-GetEntitiesResponse, error) {
+	GetEntitiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -56,7 +61,7 @@ GetEntitiesResponse, error) {
 }
 
 func (handler *AdditionalUserHandler) GetSkills(ctx context.Context, request *pb.Get) (*pb.
-GetEntitiesResponse, error) {
+	GetEntitiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -74,7 +79,7 @@ GetEntitiesResponse, error) {
 }
 
 func (handler *AdditionalUserHandler) GetFieldOfStudies(ctx context.Context, request *pb.Get) (*pb.
-GetEntitiesResponse, error) {
+	GetEntitiesResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -94,16 +99,18 @@ GetEntitiesResponse, error) {
 // EDUCATION
 
 func (handler *AdditionalUserHandler) NewEducation(ctx context.Context, request *pb.NewEducationRequest) (*pb.
-EducationResponse, error) {
+	EducationResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
-
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("POST rr: EC {%s}", username)
 	education := mapNewEducation(request.Education)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
 	createdEducation, err := handler.service.CreateEducation(request.Id, education)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("EC {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -136,9 +143,13 @@ func (handler *AdditionalUserHandler) UpdateEducation(ctx context.Context, reque
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("PUT rr: EU {%s}", username)
+
 	educations, err := handler.service.UpdateUserEducation(request.UserId, request.EducationId,
 		mapNewEducation(request.Education))
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("EU {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -149,14 +160,18 @@ func (handler *AdditionalUserHandler) UpdateEducation(ctx context.Context, reque
 }
 
 func (handler *AdditionalUserHandler) DeleteEducation(ctx context.Context, request *pb.EmptyRequest) (*pb.
-AllEducationResponse, error) {
+	AllEducationResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("DELETE rr: ED {%s}", username)
+
 	educations, err := handler.service.DeleteUserEducation(request.UserId, request.AdditionId)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("ED {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -169,16 +184,18 @@ AllEducationResponse, error) {
 // POSITION
 
 func (handler *AdditionalUserHandler) NewPosition(ctx context.Context, request *pb.NewPositionRequest) (*pb.
-PositionResponse, error) {
+	PositionResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
-
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("POST rr: PC {%s}", username)
 	position := mapNewPosition(request.Position)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
 	createdPosition, err := handler.service.CreatePosition(request.Id, position)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("PC {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -211,9 +228,13 @@ func (handler *AdditionalUserHandler) UpdatePosition(ctx context.Context, reques
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("PUT rr: PU {%s}", username)
+
 	positions, err := handler.service.UpdateUserPosition(request.UserId, request.PositionId,
 		mapNewPosition(request.Position))
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("PU {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -224,14 +245,18 @@ func (handler *AdditionalUserHandler) UpdatePosition(ctx context.Context, reques
 }
 
 func (handler *AdditionalUserHandler) DeletePosition(ctx context.Context, request *pb.EmptyRequest) (*pb.
-AllPositionResponse, error) {
+	AllPositionResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("DELETE rr: PD {%s}", username)
+
 	positions, err := handler.service.DeleteUserPosition(request.UserId, request.AdditionId)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("PD {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -244,7 +269,7 @@ AllPositionResponse, error) {
 // SKILL
 
 func (handler *AdditionalUserHandler) NewSkill(ctx context.Context, request *pb.NewSkillRequest) (*pb.
-SkillResponse, error) {
+	SkillResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -300,7 +325,7 @@ func (handler *AdditionalUserHandler) UpdateSkill(ctx context.Context, request *
 }
 
 func (handler *AdditionalUserHandler) DeleteSkill(ctx context.Context, request *pb.EmptyRequest) (*pb.
-UserSkillResponse, error) {
+	UserSkillResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
@@ -320,16 +345,18 @@ UserSkillResponse, error) {
 // INTEREST
 
 func (handler *AdditionalUserHandler) NewInterest(ctx context.Context, request *pb.NewInterestRequest) (*pb.
-InterestResponse, error) {
+	InterestResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
-
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("POST rr: INTC {%s}", username)
 	interest := mapNewInterest(request.Interest)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
 	createdInterest, err := handler.service.CreateInterest(request.Id, interest)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("INTC {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -362,9 +389,13 @@ func (handler *AdditionalUserHandler) UpdateInterest(ctx context.Context, reques
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("PUT rr: INTU {%s}", username)
+
 	interests, err := handler.service.UpdateUserInterest(request.UserId, request.InterestId,
 		mapNewInterest(request.Interest))
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("INTU {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -375,14 +406,18 @@ func (handler *AdditionalUserHandler) UpdateInterest(ctx context.Context, reques
 }
 
 func (handler *AdditionalUserHandler) DeleteInterest(ctx context.Context, request *pb.EmptyRequest) (*pb.
-AllInterestResponse, error) {
+	AllInterestResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("DELETE rr: INTD {%s}", username)
+
 	interests, err := handler.service.DeleteUserInterest(request.UserId, request.AdditionId)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("INTD {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}

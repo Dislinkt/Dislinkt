@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"fmt"
+	logger "github.com/dislinkt/common/logging"
 	"log"
 
 	"github.com/dislinkt/additional_user_service/domain"
@@ -28,6 +29,7 @@ type AdditionalUserMongoDBStore struct {
 	skills       *mongo.Collection
 	industries   *mongo.Collection
 	degrees      *mongo.Collection
+	logger       *logger.Logger
 }
 
 func NewAdditionalUserMongoDBStore(client *mongo.Client) domain.AdditionalUserStore {
@@ -36,12 +38,15 @@ func NewAdditionalUserMongoDBStore(client *mongo.Client) domain.AdditionalUserSt
 	skills := client.Database(DATABASE).Collection(COLLECTION_SKILLS)
 	industries := client.Database(DATABASE).Collection(COLLECTION_INDUSTRIES)
 	degrees := client.Database(DATABASE).Collection(COLLECTION_DEGREES)
+
+	logger := logger.InitLogger(context.TODO())
 	return &AdditionalUserMongoDBStore{
 		users:        users,
 		fieldOfStudy: fieldOfStudy,
 		skills:       skills,
 		industries:   industries,
 		degrees:      degrees,
+		logger:       logger,
 	}
 }
 
@@ -176,6 +181,7 @@ func (store *AdditionalUserMongoDBStore) GetAllFieldOfStudy() ([]*domain.FieldOf
 func (store *AdditionalUserMongoDBStore) FindUserDocument(userUUID string) (user *domain.AdditionalUser, err error) {
 	err = store.users.FindOne(context.TODO(), bson.D{{"userUUID", userUUID}}).Decode(&user)
 	if err != nil {
+		store.logger.WarnLogger.Warnf("UDNF {%s}", userUUID)
 		return nil, status.Error(codes.NotFound, "User with provided id does not exist.")
 	}
 	return user, nil
@@ -188,15 +194,22 @@ func (store *AdditionalUserMongoDBStore) CreateUserDocument(uuid string) (*domai
 	}
 	result, err := store.users.InsertOne(context.TODO(), userDocument)
 	if err != nil {
+		store.logger.WarnLogger.Warnf("CUD {%s}", uuid)
 		return nil, err
 	}
 	userDocument.Id = result.InsertedID.(primitive.ObjectID)
+	store.logger.InfoLogger.Infof("CUD {%s}", uuid)
+
 	return &userDocument, nil
 }
 
 func (store *AdditionalUserMongoDBStore) DeleteUserDocument(uuid string) error {
 	_, err := store.users.DeleteOne(context.TODO(), bson.M{"userUUID": uuid})
-	return err
+	if err != nil {
+		store.logger.WarnLogger.Warnf("DUD {%s}", uuid)
+		return err
+	}
+	return nil
 }
 
 func (store *AdditionalUserMongoDBStore) FindDocument(uuid string) (*domain.AdditionalUser, error) {
@@ -220,6 +233,7 @@ func (store *AdditionalUserMongoDBStore) InsertEducation(uuid string,
 	if err != nil {
 		return nil, err
 	}
+	store.logger.InfoLogger.Infof("EC {%s}", education.Id.Hex())
 	return education, nil
 }
 
@@ -244,6 +258,7 @@ func (store *AdditionalUserMongoDBStore) UpdateUserEducation(educationId string,
 		return err
 	}
 
+	store.logger.InfoLogger.Infof("EU {%s}", education.Id.Hex())
 	return nil
 }
 
@@ -288,6 +303,7 @@ func (store *AdditionalUserMongoDBStore) DeleteUserEducation(educationId string)
 		return err
 	}
 
+	store.logger.InfoLogger.Infof("ED {%s}", educationId)
 	return nil
 }
 
@@ -314,7 +330,7 @@ func (store *AdditionalUserMongoDBStore) UpdateUserPosition(positionId string, p
 	if err != nil {
 		return err
 	}
-
+	store.logger.InfoLogger.Infof("PU {%s}", positionId)
 	return nil
 }
 
@@ -326,6 +342,7 @@ func (store *AdditionalUserMongoDBStore) InsertPosition(uuid string, position *d
 	if err != nil {
 		return nil, err
 	}
+	store.logger.InfoLogger.Infof("PC {%s}", position.Id.Hex())
 	return position, nil
 }
 
@@ -344,7 +361,7 @@ func (store *AdditionalUserMongoDBStore) DeleteUserPosition(positionId string) e
 	if err != nil {
 		return err
 	}
-
+	store.logger.InfoLogger.Infof("PD {%s}", positionId)
 	return nil
 }
 
@@ -410,6 +427,7 @@ func (store *AdditionalUserMongoDBStore) InsertInterest(uuid string, interest *d
 	if err != nil {
 		return nil, err
 	}
+	store.logger.InfoLogger.Infof("INTC {%s}", interest.Id.Hex())
 	return interest, nil
 }
 
@@ -430,7 +448,7 @@ func (store *AdditionalUserMongoDBStore) UpdateUserInterest(interestId string, i
 	if err != nil {
 		return err
 	}
-
+	store.logger.InfoLogger.Infof("INTU {%s}", interestId)
 	return nil
 }
 
@@ -449,6 +467,6 @@ func (store *AdditionalUserMongoDBStore) DeleteUserInterest(interestId string) e
 	if err != nil {
 		return err
 	}
-
+	store.logger.InfoLogger.Infof("INTD {%s}", interestId)
 	return nil
 }
