@@ -10,7 +10,8 @@ import (
 	//	"github.com/nats-io/jwt/v2"
 	"time"
 
-	"github.com/go-playground/validator/v10"
+	"github.com/dislinkt/common/validator"
+	goValidator "github.com/go-playground/validator/v10"
 	"github.com/pquerna/otp/totp"
 
 	"github.com/dislinkt/auth_service/domain"
@@ -26,6 +27,7 @@ import (
 type AuthService struct {
 	userService     *UserService
 	permissionStore domain.PermissionStore
+	validator       *goValidator.Validate
 }
 
 type Claims struct {
@@ -45,10 +47,15 @@ func NewAuthService(userService *UserService, permissionStore domain.PermissionS
 	return &AuthService{
 		userService:     userService,
 		permissionStore: permissionStore,
+		validator:       validator.InitValidator(),
 	}
 }
 
 func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (string, error) {
+	if err := auth.validator.Struct(loginRequest); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return "", nil
+	}
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 	if err != nil || user == nil {
 		return "", errors.New("invalid username")
@@ -84,12 +91,9 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 	return true
 }
 
+// private, other functions use it
 func (auth *AuthService) generateToken(user *domain.User, expireTime int64) (string, error) {
 	//	rolesString, _ := json.Marshal(user.Roles)
-	if err := validator.New().Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return "", errors.New("Invalid user data")
-	}
 
 	var permissionNames []string
 	permissions, err := auth.permissionStore.GetAllByRole(user.UserRole)
@@ -139,6 +143,10 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
 	// defer span.Finish()
 
+	if !validator.UsernameValidationString(loginRequest.Username) {
+		return "", errors.New("username not possible, invalid")
+	}
+
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 
 	if !user.Active {
@@ -164,6 +172,10 @@ func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLogin
 	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
 	// defer span.Finish()
 
+	if err := auth.validator.Struct(loginRequest); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return "", nil
+	}
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 
 	if !user.Active {
@@ -212,6 +224,9 @@ func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims
 
 func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.PasswordlessLoginRequest) (*pb.PasswordlessLoginResponse, error) {
 
+	if !validator.EmailValidationString(request.Email) {
+		return &pb.PasswordlessLoginResponse{}, errors.New("email string is not valid")
+	}
 	user, err := auth.userService.GetByEmail(request.Email)
 	if err != nil || user == nil {
 		return nil, errors.New("invalid username")
@@ -335,6 +350,15 @@ func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangeP
 	}
 
 	user.Password = hashedNewPassword
+
+	if err := auth.validator.Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return &pb.ChangePasswordResponse{
+			StatusCode: "400",
+			Message:    "invalid new password",
+		}, nil
+	}
+
 	auth.userService.Update(user.Id, user)
 
 	return &pb.ChangePasswordResponse{
@@ -539,6 +563,9 @@ func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITo
 	fmt.Println("Auth Service GenerateAPIToken")
 	var permissions []string
 	permissions = append(permissions, "createJobOffer")
+	if !validator.UsernameValidationString(request.Username) {
+		return &pb.NewAPITokenResponse{}, errors.New("email string is not valid")
+	}
 	user, err := auth.userService.GetByUsername(request.Username)
 	fmt.Println(user)
 	expireTime := time.Now().Add(time.Hour * 4).Unix()

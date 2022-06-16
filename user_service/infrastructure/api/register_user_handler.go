@@ -2,16 +2,19 @@ package api
 
 import (
 	"fmt"
+
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
+	"github.com/dislinkt/common/validator"
 	"github.com/dislinkt/user_service/application"
-	"github.com/go-playground/validator/v10"
+	goValidator "github.com/go-playground/validator/v10"
 )
 
 type CreateUserCommandHandler struct {
 	userService       *application.UserService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
+	validator         *goValidator.Validate
 }
 
 func NewRegisterUserCommandHandler(userService *application.UserService, publisher saga.Publisher,
@@ -20,6 +23,7 @@ func NewRegisterUserCommandHandler(userService *application.UserService, publish
 		userService:       userService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
+		validator:         validator.InitValidator(),
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
@@ -36,11 +40,6 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		fmt.Println("userhandler-update")
 		fmt.Println(command.User)
 		user := mapCommandUser(command)
-		if err := validator.New().Struct(user); err != nil {
-			//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-			reply.Type = events.UserServiceNotUpdated
-			return
-		}
 		err := handler.userService.Insert(user)
 		if err != nil {
 			reply.Type = events.UserServiceNotUpdated

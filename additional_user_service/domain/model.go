@@ -19,18 +19,18 @@ type AdditionalUserEmpty struct {
 }
 type Education struct {
 	Id           primitive.ObjectID `bson:"_id"`
-	School       string             `bson:"school"`
-	Degree       string             `bson:"degree"`
-	FieldOfStudy string             `bson:"field_of_study"`
+	School       string             `bson:"school" validate:"alphaenum"`
+	Degree       string             `bson:"degree" validate:"alphaenum"`
+	FieldOfStudy string             `bson:"field_of_study" validate:"alphaenum"`
 	StartDate    primitive.DateTime `bson:"start_date"`
 	EndDate      primitive.DateTime `bson:"end_date"`
 }
 
 type Position struct {
 	Id          primitive.ObjectID `bson:"_id"`
-	Title       string             `bson:"title"`
-	CompanyName string             `bson:"company_name"`
-	Industry    string             `bson:"industry"`
+	Title       string             `bson:"title" validate:"alphaenum"`
+	CompanyName string             `bson:"company_name" validate:"alphaenum"`
+	Industry    string             `bson:"industry" validate:"alphaenum"`
 	StartDate   primitive.DateTime `bson:"start_date"`
 	EndDate     primitive.DateTime `bson:"end_date"`
 	Current     bool               `bson:"current"`
@@ -38,12 +38,12 @@ type Position struct {
 
 type Skill struct {
 	Id   primitive.ObjectID `bson:"_id"`
-	Name string             `bson:"name"`
+	Name string             `bson:"name" validate:"alphaenum"`
 }
 
 type Interest struct {
 	Id    primitive.ObjectID `bson:"_id"`
-	Name  string             `bson:"name"`
+	Name  string             `bson:"name" validate:"alphaenum"`
 	Group InterestGroup      `bson:"group"`
 }
 

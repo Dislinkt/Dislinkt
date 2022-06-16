@@ -2,7 +2,9 @@ package api
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
+
+	"github.com/dislinkt/common/validator"
+	goValidator "github.com/go-playground/validator/v10"
 
 	saga "github.com/dislinkt/common/saga/messaging"
 	events "github.com/dislinkt/common/saga/patch_user"
@@ -13,6 +15,7 @@ type PatchUserCommandHandler struct {
 	userService       *application.UserService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
+	validator         *goValidator.Validate
 }
 
 func NewPatchUserCommandHandler(userService *application.UserService, publisher saga.Publisher,
@@ -21,6 +24,7 @@ func NewPatchUserCommandHandler(userService *application.UserService, publisher 
 		userService:       userService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
+		validator:         validator.InitValidator(),
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
@@ -39,11 +43,6 @@ func (handler *PatchUserCommandHandler) handle(command *events.PatchUserCommand)
 		var paths []string
 		paths = append(paths, "private")
 		user := mapPatchUser(command.User)
-		if err := validator.New().Struct(user); err != nil {
-			//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-			reply.Type = events.PatchFailedInUser
-			return
-		}
 		dbUser, err := handler.userService.PatchUser(paths, user, command.User.Username)
 		if err != nil {
 			fmt.Println(err)

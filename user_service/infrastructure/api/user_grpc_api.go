@@ -5,11 +5,10 @@ import (
 	"fmt"
 
 	"github.com/dislinkt/common/interceptor"
-
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/application"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type UserHandler struct {

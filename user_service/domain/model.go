@@ -28,12 +28,12 @@ type User struct {
 	Id          uuid.UUID `gorm:"index:idx_name,unique"`
 	Name        string    `validate:"alpha"`
 	Surname     string    `validate:"alpha"`
-	Username    *string   `gorm:"unique" validate:"alphanum"`
+	Username    *string   `gorm:"unique" validate:"username"`
 	Email       *string   `gorm:"unique" validate:"email"`
 	Number      string    `validate:"omitempty,numeric"`
 	Gender      Gender
 	DateOfBirth string
-	Password    string `gorm:"-"`
+	Password    string `gorm:"-" validate:"password"`
 	UserRole    Role
 	Biography   string
 	Blocked     bool

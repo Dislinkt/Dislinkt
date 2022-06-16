@@ -3,20 +3,24 @@ package application
 import (
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"regexp"
 
+	"github.com/dislinkt/common/validator"
+	goValidator "github.com/go-playground/validator/v10"
+
 	"github.com/dislinkt/auth_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type UserService struct {
-	store domain.UserStore
+	store     domain.UserStore
+	validator *goValidator.Validate
 }
 
 func NewUserService(store domain.UserStore) *UserService {
 	return &UserService{
-		store: store,
+		store:     store,
+		validator: validator.InitValidator(),
 	}
 }
 
@@ -56,7 +60,7 @@ func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 	// TODO: obrisala jer mi treba da imaju isti id da mogu da menjam username
 	// newUUID := uuid.NewV4()
 	// user.Id = newUUID
-	if err := validator.New().Struct(user); err != nil {
+	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return uuid.Nil, errors.New("Invalid user data")
 	}
@@ -65,7 +69,7 @@ func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 }
 
 func (service *UserService) Delete(user *domain.User) error {
-	if err := validator.New().Struct(user); err != nil {
+	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
 	}

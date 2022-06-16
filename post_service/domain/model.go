@@ -37,20 +37,20 @@ const (
 
 type JobOffer struct {
 	Id            primitive.ObjectID `bson:"_id"`
-	Position      string             `bson:"position"`
+	Position      string             `bson:"position" validate:"alphaenum"`
 	Description   string             `bson:"description"`
-	Preconditions string             `bson:"preconditions"`
+	Preconditions string             `bson:"preconditions" validate:"precondition"`
 	DatePosted    time.Time          `bson:"date_posted"`
 	Duration      int                `bson:"duration"`
-	Location      string             `bson:"location"`
-	Title         string             `bson:"title"`
-	Field         string             `bson:"field"`
+	Location      string             `bson:"location" validate:"alphaenum"`
+	Title         string             `bson:"title"  validate:"title"`
+	Field         string             `bson:"field" validate:"alphaenum"`
 }
 
 type User struct {
 	Id       primitive.ObjectID `bson:"_id"`
 	UserUUID string             `bson:"userUUID"`
-	Username string             `bson:"username" validate:"alphanum"`
+	Username string             `bson:"username" validate:"username"`
 	Name     string             `bson:"name" validate:"alpha"`
 	Surname  string             `bson:"surname" validate:"alpha"`
 }

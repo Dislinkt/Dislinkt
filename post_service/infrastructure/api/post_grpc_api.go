@@ -2,8 +2,11 @@ package api
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"github.com/dislinkt/common/validator"
+	goValidator "github.com/go-playground/validator/v10"
 	"post_service/domain"
 
 	pb "github.com/dislinkt/common/proto/post_service"
@@ -13,11 +16,15 @@ import (
 
 type PostHandler struct {
 	pb.UnimplementedPostServiceServer
-	service *application.PostService
+	service   *application.PostService
+	validator *goValidator.Validate
 }
 
 func NewPostHandler(service *application.PostService) *PostHandler {
-	return &PostHandler{service: service}
+	return &PostHandler{
+		service:   service,
+		validator: validator.InitValidator(),
+	}
 }
 
 func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
@@ -37,6 +44,9 @@ func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb
 
 func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
 	id := request.Id
+	if !validator.UUIDValidation(id) {
+		return &pb.GetMultipleResponse{}, errors.New("user uuid is not valid")
+	}
 	posts, err := handler.service.GetRecent(id)
 	if err != nil {
 		return nil, err
@@ -51,6 +61,9 @@ func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetReques
 
 func (handler *PostHandler) GetAllByUserId(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
 	id := request.Id
+	if !validator.UUIDValidation(id) {
+		return &pb.GetMultipleResponse{}, errors.New("user uuid is not valid")
+	}
 	posts, err := handler.service.GetAllByUserId(id)
 	if err != nil {
 		return nil, err
@@ -94,6 +107,10 @@ func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.
 
 func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePostRequest) (*pb.Empty, error) {
 	post := mapNewPost(request.Post)
+
+	if !validator.UUIDValidation(request.Post.UserId) {
+		return &pb.Empty{}, errors.New("user uuid is not valid")
+	}
 	err := handler.service.Insert(post)
 	if err != nil {
 		return nil, err
@@ -164,6 +181,9 @@ func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Sea
 	if len(request.SearchText) == 0 {
 		offers, err = handler.service.GetAllJobOffers()
 	} else {
+		if !validator.JobOfferSearchValidation(request.SearchText) {
+			return &pb.GetAllJobOffers{}, errors.New("invalid characters in search string")
+		}
 		offers, err = handler.service.SearchJobOffers(request.SearchText)
 	}
 
@@ -188,6 +208,10 @@ func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Sea
 
 func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.CreateJobOfferRequest) (*pb.Empty, error) {
 	offer := mapNewJobOffer(request.JobOffer)
+	if err := handler.validator.Struct(offer); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return &pb.Empty{}, errors.New("Invalid user data")
+	}
 	err := handler.service.InsertJobOffer(offer)
 	if err != nil {
 		return nil, err

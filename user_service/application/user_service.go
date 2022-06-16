@@ -3,9 +3,11 @@ package application
 import (
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator/v10"
-	uuid "github.com/gofrs/uuid"
 	"time"
+
+	"github.com/dislinkt/common/validator"
+	goValidator "github.com/go-playground/validator/v10"
+	"github.com/gofrs/uuid"
 
 	"github.com/dislinkt/user_service/domain"
 	"google.golang.org/grpc/codes"
@@ -17,6 +19,7 @@ type UserService struct {
 	registerUserOrchestrator *RegisterUserOrchestrator
 	updateUserOrchestrator   *UpdateUserOrchestrator
 	patchOrchestrator        *PatchUserOrchestrator
+	validator                *goValidator.Validate
 }
 
 func NewUserService(store domain.UserStore, registerUserOrchestrator *RegisterUserOrchestrator,
@@ -27,6 +30,7 @@ func NewUserService(store domain.UserStore, registerUserOrchestrator *RegisterUs
 		registerUserOrchestrator: registerUserOrchestrator,
 		updateUserOrchestrator:   updateUserOrchestrator,
 		patchOrchestrator:        patchOrchestrator,
+		validator:                validator.InitValidator(),
 	}
 }
 
@@ -35,7 +39,7 @@ func (service *UserService) Register(user *domain.User) error {
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	if err := validator.New().Struct(user); err != nil {
+	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
 	}
@@ -46,12 +50,13 @@ func (service *UserService) Register(user *domain.User) error {
 
 	return err
 }
+
 func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	if err := validator.New().Struct(user); err != nil {
+	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return nil, errors.New("Invalid user data")
 	}
@@ -68,18 +73,35 @@ func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error)
 	return dbUser, err
 }
 
+func (service *UserService) PatchUserStart(requestUser *domain.User) error {
+
+	if err := service.validator.Struct(requestUser); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return errors.New("Invalid user data")
+	}
+	err := service.patchOrchestrator.Start(requestUser)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+// From RegisterUser Saga
 func (service *UserService) Insert(user *domain.User) error {
 	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	if err := validator.New().Struct(user); err != nil {
+	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
 	}
 	err := service.store.Insert(user)
 	return err
 }
+
+// From UpdateUser Saga
 func (service *UserService) Update(uuid uuid.UUID, user *domain.User) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
 	// defer span.Finish()
@@ -99,15 +121,7 @@ func (service *UserService) Update(uuid uuid.UUID, user *domain.User) (*domain.U
 	return updatedUser, err
 }
 
-func (service *UserService) PatchUserStart(requestUser *domain.User) error {
-	err := service.patchOrchestrator.Start(requestUser)
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
+// From PatchUser Saga
 func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.User,
 	username string) (*domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
@@ -122,7 +136,7 @@ func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.
 
 	fmt.Println(foundUser)
 
-	updatedUser, err := updateField(updatePaths, foundUser, requestUser)
+	updatedUser, err := service.updateField(updatePaths, foundUser, requestUser)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -136,16 +150,7 @@ func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.
 	return dbUser, nil
 }
 
-func updateField(paths []string, user *domain.User, requestUser *domain.User) (*domain.User, error) {
-	if err := validator.New().Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return nil, errors.New("Invalid user data")
-	}
-
-	if err := validator.New().Struct(requestUser); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return nil, errors.New("Invalid request user data")
-	}
+func (service *UserService) updateField(paths []string, user *domain.User, requestUser *domain.User) (*domain.User, error) {
 
 	for _, path := range paths {
 		fmt.Println(path)
@@ -185,6 +190,9 @@ func (service *UserService) GetAll() (*[]domain.User, error) {
 }
 
 func (service *UserService) Search(searchText string) (*[]domain.User, error) {
+	if !validator.UserSearchValidation(searchText) {
+		return nil, errors.New("invalid characters in search string")
+	}
 	return service.store.Search(searchText)
 }
 
@@ -196,10 +204,7 @@ func (service *UserService) FindByUsername(username string) (*domain.User, error
 	return service.store.FindByUsername(username)
 }
 
+// From RegisterUser Saga
 func (service *UserService) Delete(user *domain.User) interface{} {
-	if err := validator.New().Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return err
-	}
 	return service.store.Delete(user)
 }

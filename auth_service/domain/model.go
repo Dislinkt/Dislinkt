@@ -1,7 +1,7 @@
 package domain
 
 import (
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type User struct {
@@ -16,8 +16,8 @@ type User struct {
 }
 
 type LoginRequest struct {
-	Username string `bson:"username"`
-	Password string `bson:"password"`
+	Username string `bson:"username" validate:"username"`
+	Password string `bson:"password" validate:"password"`
 }
 
 type Permission struct {

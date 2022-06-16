@@ -1,18 +1,20 @@
 package application
 
 import (
-	"errors"
-	"github.com/go-playground/validator/v10"
+	"github.com/dislinkt/common/validator"
+	goValidator "github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"post_service/domain"
 )
 
 type PostService struct {
-	store domain.PostStore
+	store     domain.PostStore
+	validator *goValidator.Validate
 }
 
 func NewPostService(store domain.PostStore) *PostService {
-	return &PostService{store: store}
+	return &PostService{store: store,
+		validator: validator.InitValidator()}
 }
 
 func (service *PostService) Get(id primitive.ObjectID) (*domain.Post, error) {
@@ -59,27 +61,18 @@ func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
 	return service.store.InsertJobOffer(offer)
 }
 
+// InsertUser From RegisterUser Saga
 func (service *PostService) InsertUser(user *domain.User) error {
-	if err := validator.New().Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return errors.New("Invalid user data")
-	}
 	return service.store.InsertUser(user)
 }
 
+// DeleteUser From RegisterUser Saga
 func (service *PostService) DeleteUser(user *domain.User) error {
-	if err := validator.New().Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return errors.New("Invalid user data")
-	}
 	return service.store.DeleteUser(user)
 }
 
+// UpdateUser From RegisterUser Saga
 func (service *PostService) UpdateUser(user *domain.User) error {
-	if err := validator.New().Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return errors.New("Invalid user data")
-	}
 	return service.store.UpdateUser(user)
 }
 

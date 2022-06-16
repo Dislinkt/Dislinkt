@@ -2,12 +2,16 @@ package application
 
 import (
 	"errors"
+
 	"github.com/dislinkt/additional_user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/dislinkt/common/validator"
+	goValidator "github.com/go-playground/validator/v10"
+	"github.com/gofrs/uuid"
 )
 
 type AdditionalUserService struct {
-	store domain.AdditionalUserStore
+	store     domain.AdditionalUserStore
+	validator *goValidator.Validate
 }
 
 func (service *AdditionalUserService) CreateDocument(uuid string) error {
@@ -39,7 +43,8 @@ func (service *AdditionalUserService) DeleteDocument(uuid string) error {
 
 func NewAdditionalUserService(store domain.AdditionalUserStore) *AdditionalUserService {
 	return &AdditionalUserService{
-		store: store,
+		store:     store,
+		validator: validator.InitValidator(),
 	}
 }
 
@@ -49,6 +54,10 @@ func (service *AdditionalUserService) CreateEducation(uuid string, education *do
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(education); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid education data")
+	}
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -81,6 +90,10 @@ func (service *AdditionalUserService) UpdateUserEducation(uuid string, education
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(education); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid education data")
+	}
 	err := service.store.UpdateUserEducation(educationId, education)
 	if err != nil {
 		return nil, err
@@ -113,6 +126,10 @@ func (service *AdditionalUserService) CreatePosition(uuid string, position *doma
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(position); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid position data")
+	}
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -144,6 +161,10 @@ func (service *AdditionalUserService) UpdateUserPosition(uuid string, positionId
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(position); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid position data")
+	}
 	err := service.store.UpdateUserPosition(positionId, position)
 	if err != nil {
 		return nil, err
@@ -177,6 +198,10 @@ func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Ski
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(skill); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid skill data")
+	}
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -208,6 +233,10 @@ func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId strin
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(skill); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid skill data")
+	}
 	err := service.store.UpdateUserSkill(skillId, skill)
 	if err != nil {
 		return nil, err
@@ -241,6 +270,10 @@ func (service *AdditionalUserService) CreateInterest(uuid string, interest *doma
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(interest); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid interest data")
+	}
 	_, err := service.store.FindDocument(uuid)
 	if err != nil {
 		return nil, err
@@ -272,6 +305,10 @@ func (service *AdditionalUserService) UpdateUserInterest(uuid string, interestId
 		return nil, errors.New("Invalid uuid")
 	}
 
+	if err := service.validator.Struct(interest); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return nil, errors.New("Invalid interest data")
+	}
 	err := service.store.UpdateUserInterest(interestId, interest)
 	if err != nil {
 		return nil, err
