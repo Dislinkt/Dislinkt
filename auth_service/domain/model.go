@@ -1,7 +1,7 @@
 package domain
 
 import (
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type User struct {
@@ -12,7 +12,8 @@ type User struct {
 	UserRole  int
 	Active    bool
 	ApiToken  *string `gorm:"unique"`
-	TotpToken string  `gorm:"totp_token"`
+	TotpQR    *[]byte `gorm:"totp_qr"`
+	TotpToken *string `gorm:"totp_token"`
 }
 
 type LoginRequest struct {

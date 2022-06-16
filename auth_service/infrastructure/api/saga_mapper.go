@@ -18,13 +18,15 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 		return nil
 	}
 	userD := &domain.User{
-		Id:       id,
-		Username: command.User.Username,
-		Password: hashAndSalt,
-		Email:    command.User.Email,
-		UserRole: int(command.User.UserRole),
-		Active:   false,
-		ApiToken: nil,
+		Id:        id,
+		Username:  command.User.Username,
+		Password:  hashAndSalt,
+		Email:     command.User.Email,
+		UserRole:  int(command.User.UserRole),
+		Active:    false,
+		ApiToken:  nil,
+		TotpToken: nil,
+		TotpQR:    nil,
 	}
 	return userD
 }

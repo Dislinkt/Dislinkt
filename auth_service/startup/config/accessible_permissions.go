@@ -5,5 +5,7 @@ func AccessiblePermissions() map[string]string {
 
 	return map[string]string{
 		authService + "ChangePassword": "changePasswordPermission",
+		authService + "Get2FA":         "get2faPermission",
+		authService + "Set2FA":         "set2faPermission",
 	}
 }
