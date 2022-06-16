@@ -194,6 +194,10 @@ services:
 #    logging: *fluent-bit
     networks:
       - network
+    volumes:
+      - type: bind
+        source: ./logs/api_gateway
+        target: /root/logs
   #      - jaeger-demo
   #    depends_on:
   #      - tracing
