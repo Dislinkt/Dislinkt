@@ -165,6 +165,10 @@ services:
       - auth_db
     networks:
       - network
+    volumes:
+      - type: bind
+        source: ./logs/auth_service
+        target: /root/logs
 
   api_gateway:
     image: api_gateway

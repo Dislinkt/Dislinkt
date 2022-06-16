@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	logger "github.com/dislinkt/common/logging"
 	"github.com/go-playground/validator/v10"
 	"github.com/pquerna/otp/totp"
 	"log"
@@ -26,6 +27,7 @@ import (
 type AuthService struct {
 	userService     *UserService
 	permissionStore domain.PermissionStore
+	logger          *logger.Logger
 }
 
 type Claims struct {
@@ -42,9 +44,11 @@ type ApiTokenClaims struct {
 }
 
 func NewAuthService(userService *UserService, permissionStore domain.PermissionStore) *AuthService {
+	logger := logger.InitLogger(context.TODO())
 	return &AuthService{
 		userService:     userService,
 		permissionStore: permissionStore,
+		logger:          logger,
 	}
 }
 
@@ -55,6 +59,7 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 	}
 
 	if !user.Active {
+		auth.logger.WarnLogger.Warnf("NA {%s}", loginRequest.Username)
 		return "", errors.New("user account not activated!")
 	}
 
@@ -67,6 +72,7 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 	if err != nil {
 		return "", errors.New("invalid password")
 	}
+	auth.logger.InfoLogger.Infof("AU {%s}", loginRequest.Username)
 
 	return token, err
 }
@@ -157,6 +163,7 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 		return "", errors.New("invalid password")
 	}
 
+	auth.logger.InfoLogger.Infof("AU {%s}", loginRequest.Username)
 	return token, err
 }
 
@@ -425,12 +432,14 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 
 	user, err := auth.userService.GetByUsername(claims.Username)
 	if err != nil || user == nil {
+		auth.logger.WarnLogger.Warnf("UNF {%s}", request.Token)
 		return nil, errors.New("invalid username")
 	}
 
 	user.Active = true
 	auth.userService.Update(user.Id, user)
 
+	auth.logger.InfoLogger.Infof("AA {%s}", request.Token)
 	return &pb.ActivationResponse{
 		Token: request.Token,
 	}, nil
@@ -529,6 +538,7 @@ func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.Recover
 	user.Password = hashedNewPassword
 	auth.userService.Update(user.Id, user)
 
+	auth.logger.InfoLogger.Infof("RA {%s}", request.Token)
 	return &pb.RecoverAccountResponse{
 		StatusCode: "200",
 		Message:    "User account recovered",

@@ -1,30 +1,36 @@
 package persistence
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/auth_service/domain"
+	logger "github.com/dislinkt/common/logging"
 	uuid "github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 
 type UserPostgresStore struct {
-	db *gorm.DB
+	db     *gorm.DB
+	logger *logger.Logger
 }
 
 func (store *UserPostgresStore) Delete(user *domain.User) error {
 	if result := store.db.Delete(user); result.Error != nil {
+		store.logger.WarnLogger.Warnf("UD {%s}", user.Username)
 		return result.Error
 	}
 	return nil
 }
 
 func NewUserPostgresStore(db *gorm.DB) (domain.UserStore, error) {
+	logger := logger.InitLogger(context.TODO())
 	err := db.AutoMigrate(&domain.User{})
 	if err != nil {
 		return nil, err
 	}
 	return &UserPostgresStore{
-		db: db,
+		db:     db,
+		logger: logger,
 	}, nil
 }
 
@@ -32,15 +38,19 @@ func (store *UserPostgresStore) Insert(user *domain.User) error {
 	fmt.Println("TU SAM")
 	result := store.db.Create(user)
 	if result.Error != nil {
+		store.logger.WarnLogger.Warnf("UC {%s}", user.Username)
 		return result.Error
 	}
+	store.logger.InfoLogger.Infof("UC {%s}", user.Username)
 	return nil
 }
 
 func (store *UserPostgresStore) Update(user *domain.User) error {
 	if result := store.db.Save(&user); result.Error != nil {
+		store.logger.WarnLogger.Warnf("UU {%s}", user.Username)
 		return result.Error
 	}
+	store.logger.InfoLogger.Infof("UU {%s}", user.Username)
 	return nil
 }
 

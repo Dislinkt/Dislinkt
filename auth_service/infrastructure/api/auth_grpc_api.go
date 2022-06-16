@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/dislinkt/common/interceptor"
+	logger "github.com/dislinkt/common/logging"
 
 	//"github.com/dislinkt/auth_service/domain"
 	"net/http"
@@ -14,18 +16,23 @@ import (
 type AuthHandler struct {
 	service *application.AuthService
 	pb.UnimplementedAuthServiceServer
+	logger *logger.Logger
 }
 
 func NewAuthHandler(service *application.AuthService) *AuthHandler {
+	logger := logger.InitLogger(context.TODO())
 	return &AuthHandler{
 		service: service,
+		logger:  logger,
 	}
 }
 
 func (handler *AuthHandler) AuthenticateUser(ctx context.Context, request *pb.LoginRequest) (*pb.JwtTokenResponse, error) {
+	handler.logger.InfoLogger.Infof("POST rr: AU {%s}", request.UserData.Username)
 	loginRequest := mapLoginRequest(request.UserData)
 	token, err := handler.service.AuthenticateUser(loginRequest)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("BC {%s}", request.UserData.Username)
 		return nil, err
 	}
 	return &pb.JwtTokenResponse{
@@ -34,8 +41,10 @@ func (handler *AuthHandler) AuthenticateUser(ctx context.Context, request *pb.Lo
 }
 
 func (handler *AuthHandler) AuthenticateTwoFactoryUser(ctx context.Context, request *pb.LoginTwoFactoryRequest) (*pb.JwtTokenResponse, error) {
+	handler.logger.InfoLogger.Infof("POST rr: AU2F {%s}", request.Username)
 	token, err := handler.service.AuthenticateTwoFactoryUser(request)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("BC {%s}", request.Username)
 		return nil, err
 	}
 	return &pb.JwtTokenResponse{
@@ -44,8 +53,10 @@ func (handler *AuthHandler) AuthenticateTwoFactoryUser(ctx context.Context, requ
 }
 
 func (handler *AuthHandler) GenerateTwoFactoryCode(ctx context.Context, request *pb.TwoFactoryLoginForCode) (*pb.TwoFactoryCode, error) {
+	handler.logger.InfoLogger.Infof("POST rr: GC {%s}", request.Username)
 	code, err := handler.service.GenerateTwoFactoryCode(request)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("GC {%s}", request.Username)
 		return nil, err
 	}
 	return &pb.TwoFactoryCode{
@@ -81,6 +92,7 @@ func (handler *AuthHandler) ValidateToken(ctx context.Context, req *pb.ValidateR
 }
 
 func (handler *AuthHandler) PasswordlessLogin(ctx context.Context, req *pb.PasswordlessLoginRequest) (*pb.PasswordlessLoginResponse, error) {
+	handler.logger.InfoLogger.Infof("PUT rr: PLG {%s}", req.Email)
 	return handler.service.PasswordlessLogin(ctx, req)
 }
 
@@ -89,14 +101,18 @@ func (handler *AuthHandler) ConfirmEmailLogin(ctx context.Context, req *pb.Confi
 }
 
 func (handler *AuthHandler) ActivateAccount(ctx context.Context, req *pb.ActivationRequest) (*pb.ActivationResponse, error) {
+	handler.logger.InfoLogger.Infof("PUT rr: AA {%s}", req.Token)
 	return handler.service.ActivateAccount(ctx, req)
 }
 
 func (handler *AuthHandler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("PUT rr: CP {%s}", username)
 	return handler.service.ChangePassword(ctx, req)
 }
 
 func (handler *AuthHandler) RecoverAccount(ctx context.Context, req *pb.RecoverAccountRequest) (*pb.RecoverAccountResponse, error) {
+	handler.logger.InfoLogger.Infof("POST rr: RA {%s}", req.Token)
 	return handler.service.RecoverAccount(ctx, req)
 }
 
@@ -105,6 +121,7 @@ func (handler *AuthHandler) SendAccountRecoveryMail(ctx context.Context, req *pb
 }
 
 func (handler *AuthHandler) CreateNewAPIToken(ctx context.Context, request *pb.APITokenRequest) (*pb.NewAPITokenResponse, error) {
+	handler.logger.InfoLogger.Infof("GET rr: CAT {%s}", request.Username)
 	fmt.Println("AuthHandler CreateNewAPIToken")
 	fmt.Println(request.Username)
 	return handler.service.GenerateAPIToken(ctx, request)
