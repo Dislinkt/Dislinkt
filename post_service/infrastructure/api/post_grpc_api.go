@@ -35,7 +35,7 @@ func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb
 	}
 	post, err := handler.service.Get(objectId)
 	if err != nil {
-		handler.logger.WarnLogger.Warn("PNF {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
+		handler.logger.WarnLogger.Warnf("PNF {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 	postPb := mapPost(post)
@@ -105,7 +105,7 @@ func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePo
 	post := mapNewPost(request.Post)
 	err := handler.service.Insert(post)
 	if err != nil {
-		handler.logger.WarnLogger.Warn("WPC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
+		handler.logger.WarnLogger.Warnf("WPC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 	return &pb.Empty{}, nil
@@ -123,7 +123,7 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 	comment := mapNewComment(request.Comment)
 	err = handler.service.CreateComment(post, comment)
 	if err != nil {
-		handler.logger.WarnLogger.Warn("WCC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
+		handler.logger.WarnLogger.Warnf("WCC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 
@@ -143,7 +143,7 @@ func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRe
 	}
 	err = handler.service.LikePost(post, request.UserId)
 	if err != nil {
-		handler.logger.WarnLogger.Warn("WR {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
+		handler.logger.WarnLogger.Warnf("WR {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 
@@ -161,7 +161,7 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 	}
 	err = handler.service.DislikePost(post, request.UserId)
 	if err != nil {
-		handler.logger.WarnLogger.Warn("WR {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
+		handler.logger.WarnLogger.Warnf("WR {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 
@@ -202,7 +202,7 @@ func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.Crea
 	offer := mapNewJobOffer(request.JobOffer)
 	err := handler.service.InsertJobOffer(offer)
 	if err != nil {
-		handler.logger.WarnLogger.Warn("WJOC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
+		handler.logger.WarnLogger.Warnf("WJOC {%s}", ctx.Value(interceptor.LoggedInUserKey{}).(string))
 		return nil, err
 	}
 	return &pb.Empty{}, nil
