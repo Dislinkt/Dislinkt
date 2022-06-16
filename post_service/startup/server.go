@@ -54,7 +54,7 @@ func (server *Server) Start() {
 	server.initUpdateUserHandler(postService, updateReplyPublisher, updateCommandSubscriber)
 
 	server.startGrpcServer(postHandler)
-	server.logger.InfoLogger.Infof("SS")
+	server.logger.InfoLogger.Info("SS")
 }
 
 func (server *Server) initMongoClient() *mongo.Client {

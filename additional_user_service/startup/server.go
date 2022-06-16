@@ -61,7 +61,7 @@ func (server *Server) Start() {
 	server.initData(additionalUserService, additionalUserStore)
 
 	server.startGrpcServer(additionalUserHandler)
-	server.logger.InfoLogger.Infof("SS")
+	server.logger.InfoLogger.Info("SS")
 }
 
 func (server *Server) initAdditionalUserClient() *mongo.Client {
