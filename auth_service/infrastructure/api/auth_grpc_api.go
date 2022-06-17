@@ -3,8 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
-
-	//"github.com/dislinkt/auth_service/domain"
+	// "github.com/dislinkt/auth_service/domain"
 	"net/http"
 
 	"github.com/dislinkt/auth_service/application"
@@ -24,12 +23,45 @@ func NewAuthHandler(service *application.AuthService) *AuthHandler {
 
 func (handler *AuthHandler) AuthenticateUser(ctx context.Context, request *pb.LoginRequest) (*pb.JwtTokenResponse, error) {
 	loginRequest := mapLoginRequest(request.UserData)
-	token, err := handler.service.AuthenticateUser(loginRequest)
+	is2FA, token, err := handler.service.AuthenticateUser(loginRequest)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.JwtTokenResponse{
-		Jwt: mapJwtToken(token),
+		Jwt:   mapJwtToken(token),
+		Is2FA: is2FA,
+	}, nil
+}
+
+func (handler *AuthHandler) Get2FA(ctx context.Context, request *pb.Get2FARequest) (*pb.Get2FAResponse,
+	error) {
+	is2FA, err := handler.service.Get2FA(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Get2FAResponse{
+		Is2FA: is2FA,
+	}, nil
+}
+
+func (handler *AuthHandler) Set2FA(ctx context.Context, request *pb.Set2FARequest) (*pb.Set2FAResponse,
+	error) {
+	token, qr, err := handler.service.Set2FA(ctx, request)
+	var returnToken string
+	var returnQR string
+	if token == nil {
+		returnToken = ""
+		returnQR = ""
+	} else {
+		returnToken = *token
+		returnQR = convertByteToBase64(*qr)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &pb.Set2FAResponse{
+		TotpToken: returnToken,
+		TotpQR:    returnQR,
 	}, nil
 }
 

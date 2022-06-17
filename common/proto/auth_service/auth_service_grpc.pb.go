@@ -23,6 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	AuthenticateUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error)
+	Set2FA(ctx context.Context, in *Set2FARequest, opts ...grpc.CallOption) (*Set2FAResponse, error)
+	Get2FA(ctx context.Context, in *Get2FARequest, opts ...grpc.CallOption) (*Get2FAResponse, error)
 	AuthenticateTwoFactoryUser(ctx context.Context, in *LoginTwoFactoryRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error)
 	GenerateTwoFactoryCode(ctx context.Context, in *TwoFactoryLoginForCode, opts ...grpc.CallOption) (*TwoFactoryCode, error)
 	ValidateToken(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
@@ -47,6 +49,24 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 func (c *authServiceClient) AuthenticateUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*JwtTokenResponse, error) {
 	out := new(JwtTokenResponse)
 	err := c.cc.Invoke(ctx, "/proto.AuthService/AuthenticateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) Set2FA(ctx context.Context, in *Set2FARequest, opts ...grpc.CallOption) (*Set2FAResponse, error) {
+	out := new(Set2FAResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/Set2FA", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) Get2FA(ctx context.Context, in *Get2FARequest, opts ...grpc.CallOption) (*Get2FAResponse, error) {
+	out := new(Get2FAResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/Get2FA", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +177,8 @@ func (c *authServiceClient) CheckApiToken(ctx context.Context, in *JobPostingDto
 // for forward compatibility
 type AuthServiceServer interface {
 	AuthenticateUser(context.Context, *LoginRequest) (*JwtTokenResponse, error)
+	Set2FA(context.Context, *Set2FARequest) (*Set2FAResponse, error)
+	Get2FA(context.Context, *Get2FARequest) (*Get2FAResponse, error)
 	AuthenticateTwoFactoryUser(context.Context, *LoginTwoFactoryRequest) (*JwtTokenResponse, error)
 	GenerateTwoFactoryCode(context.Context, *TwoFactoryLoginForCode) (*TwoFactoryCode, error)
 	ValidateToken(context.Context, *ValidateRequest) (*ValidateResponse, error)
@@ -177,6 +199,12 @@ type UnimplementedAuthServiceServer struct {
 
 func (UnimplementedAuthServiceServer) AuthenticateUser(context.Context, *LoginRequest) (*JwtTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateUser not implemented")
+}
+func (UnimplementedAuthServiceServer) Set2FA(context.Context, *Set2FARequest) (*Set2FAResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set2FA not implemented")
+}
+func (UnimplementedAuthServiceServer) Get2FA(context.Context, *Get2FARequest) (*Get2FAResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get2FA not implemented")
 }
 func (UnimplementedAuthServiceServer) AuthenticateTwoFactoryUser(context.Context, *LoginTwoFactoryRequest) (*JwtTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateTwoFactoryUser not implemented")
@@ -238,6 +266,42 @@ func _AuthService_AuthenticateUser_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).AuthenticateUser(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_Set2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Set2FARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).Set2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/Set2FA",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).Set2FA(ctx, req.(*Set2FARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_Get2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Get2FARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).Get2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/Get2FA",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).Get2FA(ctx, req.(*Get2FARequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -450,6 +514,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AuthenticateUser",
 			Handler:    _AuthService_AuthenticateUser_Handler,
+		},
+		{
+			MethodName: "Set2FA",
+			Handler:    _AuthService_Set2FA_Handler,
+		},
+		{
+			MethodName: "Get2FA",
+			Handler:    _AuthService_Get2FA_Handler,
 		},
 		{
 			MethodName: "AuthenticateTwoFactoryUser",

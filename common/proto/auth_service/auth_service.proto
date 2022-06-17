@@ -14,6 +14,19 @@ service AuthService{
     };
   }
 
+  rpc Set2FA(Set2FARequest) returns(Set2FAResponse){
+    option (google.api.http) = {
+      put: "/api/auth/set-2fa",
+      body: "activate"
+    };
+  }
+
+  rpc Get2FA(Get2FARequest) returns(Get2FAResponse){
+    option (google.api.http) = {
+      get: "/api/auth/get-2fa"
+    };
+  }
+
   rpc AuthenticateTwoFactoryUser(LoginTwoFactoryRequest) returns(JwtTokenResponse) {
     option (google.api.http) = {
       post: "/api/auth/two-factory-login",
@@ -21,7 +34,7 @@ service AuthService{
     };
   }
 
-  rpc GenerateTwoFactoryCode(TwoFactoryLoginForCodea) returns(TwoFactoryCode) {
+  rpc GenerateTwoFactoryCode(TwoFactoryLoginForCode) returns(TwoFactoryCode) {
     option (google.api.http) = {
       post: "/api/auth/generate-two-factory-code",
       body: "*"
@@ -96,6 +109,21 @@ message LoginRequest {
   UserData userData = 1;
 }
 
+message Set2FARequest{
+  bool activate = 1;
+}
+
+message Set2FAResponse{
+  string totpToken = 1;
+  string totpQR = 2;
+}
+message Get2FARequest{
+}
+
+message Get2FAResponse{
+  bool is2FA = 1;
+}
+
 message TwoFactoryLoginForCode {
   string username = 1;
   string password = 2;
@@ -112,6 +140,7 @@ message TwoFactoryCode {
 
 message JwtTokenResponse {
   JwtToken jwt = 1;
+  bool is2FA = 2;
 }
 
 message JwtToken {

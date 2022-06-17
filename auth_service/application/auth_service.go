@@ -1,12 +1,15 @@
 package application
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"image/png"
 	"log"
 	"net/smtp"
 	"regexp"
+
 	//	"github.com/nats-io/jwt/v2"
 	"time"
 
@@ -19,6 +22,8 @@ import (
 	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/auth_service"
 	"github.com/form3tech-oss/jwt-go"
+	"github.com/go-playground/validator/v10"
+	"github.com/pquerna/otp/totp"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -51,31 +56,37 @@ func NewAuthService(userService *UserService, permissionStore domain.PermissionS
 	}
 }
 
-func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (string, error) {
+func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (bool, string, error) {
 	if err := auth.validator.Struct(loginRequest); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return "", nil
 	}
+
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 	if err != nil || user == nil {
-		return "", errors.New("invalid username")
+		return false, "", errors.New("invalid username")
 	}
 
 	if !user.Active {
-		return "", errors.New("user account not activated!")
+		return false, "", errors.New("user account not activated!")
 	}
 
 	if !equalPasswords(user.Password, loginRequest.Password) {
-		return "", errors.New("invalid password")
+		return false, "", errors.New("invalid password")
 	}
 
-	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := auth.generateToken(user, expireTime)
-	if err != nil {
-		return "", errors.New("invalid password")
+	var is2FA = user.TotpToken != nil
+
+	var token string
+	if !is2FA {
+		expireTime := time.Now().Add(time.Hour).Unix()
+		token, err = auth.generateToken(user, expireTime)
+		if err != nil {
+			return false, "", errors.New("error creating token")
+		}
 	}
 
-	return token, err
+	return is2FA, token, err
 }
 
 func equalPasswords(hashedPwd string, passwordRequest string) bool {
@@ -139,6 +150,97 @@ func getRoleString(role int) string {
 	}
 }
 
+func (auth *AuthService) Get2FA(ctx context.Context, request *pb.Get2FARequest) (bool, error) {
+	username := ctx.Value(interceptor.LoggedInUserKey{}).(string)
+	user, err := auth.userService.GetByUsername(username)
+
+	var is2FA bool = false
+	if user.TotpQR != nil && user.TotpToken != nil {
+		is2FA = true
+	}
+
+	return is2FA, err
+}
+
+func (auth *AuthService) Set2FA(ctx context.Context, setRequest *pb.Set2FARequest) (*string, *[]byte, error) {
+	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	// defer span.Finish()
+
+	username := ctx.Value(interceptor.LoggedInUserKey{}).(string)
+	user, err := auth.userService.GetByUsername(username)
+
+	if setRequest.Activate {
+		totpSecret, img, err := GenerateTOTP(user.Email)
+		if err != nil {
+			return nil, nil, err
+		}
+		var buf bytes.Buffer
+		err = png.Encode(&buf, *img)
+		if err != nil {
+			return nil, nil, err
+		}
+		QRBytes := buf.Bytes()
+		if err != nil {
+			return nil, nil, err
+		}
+		user.TotpQR = &QRBytes
+		user.TotpToken = &totpSecret
+	} else {
+		user.TotpQR = nil
+		user.TotpToken = nil
+	}
+
+	err = auth.Send2FAMail(user)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = auth.userService.Update(user.Id, user)
+
+	return user.TotpToken, user.TotpQR, err
+}
+
+func set2FAMailMessage(username string, totpToken string) []byte {
+
+	subject := "Subject: Two Factor Authentication\n"
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	var body string
+	if totpToken != "" {
+		body = "<html><body>\n" +
+			"Hello " + username + "! You have set up two factor authentication on Dislinkt. " +
+			"<br> <br>\n" +
+			"</body>" +
+			"</html>"
+	} else {
+		body = "<html><body>\n" +
+			"Hello " + username + "! You successfully disabled two factor authentication. " +
+			"<br> <br>\n" +
+			"</body>" +
+			"</html>"
+	}
+
+	message := []byte(subject + mime + body)
+	return message
+}
+
+func (auth *AuthService) Send2FAMail(user *domain.User) error {
+	message := set2FAMailMessage(user.Username, *user.TotpToken)
+
+	from := config.NewConfig().EmailSender
+	emailPassword := config.NewConfig().EmailPassword
+	to := []string{user.Email}
+
+	host := config.NewConfig().EmailHost
+	port := config.NewConfig().EmailPort
+	smtpAddress := host + ":" + port
+	authMail := smtp.PlainAuth("", from, emailPassword, host)
+	errSendingMail := smtp.SendMail(smtpAddress, authMail, from, to, message)
+	if errSendingMail != nil {
+		fmt.Println("err:  ", errSendingMail)
+		return errSendingMail
+	}
+	return nil
+}
+
 func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFactoryRequest) (string, error) {
 	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
 	// defer span.Finish()
@@ -153,7 +255,7 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 		return "", errors.New("user account not activated!")
 	}
 
-	valid := totp.Validate(loginRequest.Code, user.TotpToken)
+	valid := totp.Validate(loginRequest.Code, *user.TotpToken)
 
 	if !valid {
 		return "", errors.New("Token not valid!")
@@ -186,7 +288,7 @@ func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLogin
 		return "", errors.New("invalid password")
 	}
 	n := time.Now().UTC()
-	code, err := totp.GenerateCode(user.TotpToken, n)
+	code, err := totp.GenerateCode(*user.TotpToken, n)
 
 	if err != nil {
 		return "", errors.New("Error generating token!")
@@ -274,7 +376,7 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 }
 
 func passwordlessLoginMailMessage(token string, username string) []byte {
-	urlRedirection := "http://localhost:4200/passwordless-login-validation/" + token
+	urlRedirection := "https://localhost:4200/passwordless-login-validation/" + token
 
 	subject := "Subject: Passwordless login\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
@@ -410,7 +512,7 @@ func (auth *AuthService) SendActivationMail(username string) error {
 
 func verificationMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
-	urlRedirection := "http://localhost:4200/activate-account/" + token
+	urlRedirection := "https://localhost:4200/activate-account/" + token
 	fmt.Println("MAIL MESSAGE")
 
 	subject := "Subject: Account activation\n"
@@ -443,7 +545,7 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 		return nil, fmt.Errorf("Couldn't parse claims")
 	}
 
-	if !claims.VerifyExpiresAt(time.Now().Local().Unix(), true) {
+	if !claims.VerifyExpiresAt(time.Now().Unix(), true) {
 		return nil, fmt.Errorf("JWT is expired")
 	}
 
@@ -491,7 +593,7 @@ func (auth *AuthService) SendAccountRecoveryMail(ctx context.Context, request *p
 
 func recoverAccountMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
-	urlRedirection := "http://localhost:4200/recover-account/" + token
+	urlRedirection := "https://localhost:4200/recover-account/" + token
 
 	subject := "Subject: Account recovery\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"

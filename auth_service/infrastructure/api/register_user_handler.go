@@ -2,11 +2,10 @@ package api
 
 import (
 	"fmt"
+
 	"github.com/dislinkt/auth_service/application"
-	"github.com/dislinkt/auth_service/startup/config"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	"github.com/pquerna/otp/totp"
 )
 
 type CreateUserCommandHandler struct {
@@ -42,12 +41,12 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 			return
 		}
 
-		key, err := totp.Generate(totp.GenerateOpts{
-			Issuer:      config.NewConfig().PublicKey,
-			AccountName: user.Username,
-		})
-
-		user.TotpToken = key.Secret()
+		// key, err := totp.Generate(totp.GenerateOpts{
+		// 	Issuer:      config.NewConfig().PublicKey,
+		// 	AccountName: user.Username,
+		// })
+		//
+		// user.TotpToken = key.Secret()
 		uuid, err := handler.userService.Insert(user)
 
 		reply.User.Id = uuid.String()

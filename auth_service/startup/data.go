@@ -143,4 +143,14 @@ var permissions = []*domain.Permission{
 		Role: 0,
 		Name: "createJobOffer",
 	},
+	{
+		Id:   29,
+		Role: 0,
+		Name: "get2faPermission",
+	},
+	{
+		Id:   30,
+		Role: 0,
+		Name: "set2faPermission",
+	},
 }
