@@ -1,7 +1,9 @@
 package api
 
 import (
+	"context"
 	"fmt"
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/auth_service/application"
 	"github.com/dislinkt/common/saga/events"
@@ -12,14 +14,17 @@ type UpdateUserCommandHandler struct {
 	userService       *application.UserService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
+	logger            *logger.Logger
 }
 
 func NewUpdateUserCommandHandler(userService *application.UserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) (*UpdateUserCommandHandler, error) {
+	logger := logger.InitLogger(context.TODO())
 	o := &UpdateUserCommandHandler{
 		userService:       userService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
+		logger:            logger,
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
@@ -42,6 +47,8 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 			return
 		}
 		reply.Type = events.UserUpdatedInAuth
+		handler.logger.InfoLogger.Infof("SC-UU {%s}", reply.User.Username)
+
 	default:
 		reply.Type = events.UnknownUpdateReply
 	}
