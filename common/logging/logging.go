@@ -52,7 +52,7 @@ func InitLoggerPerLevel(logFile string) *logrus.Logger {
 	// })
 
 	logger.SetFormatter(&easy.Formatter{
-		TimestampFormat: "2006-01-02 19:10:10",
+		TimestampFormat: "2006-01-02 15:04:05",
 		LogFormat:       "[%lvl%] %time% | %msg% \n",
 	})
 

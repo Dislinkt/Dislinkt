@@ -3,8 +3,9 @@ package persistence
 import (
 	"context"
 	"fmt"
-	logger "github.com/dislinkt/common/logging"
 	"log"
+
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/additional_user_service/domain"
 	"go.mongodb.org/mongo-driver/bson"
@@ -258,7 +259,7 @@ func (store *AdditionalUserMongoDBStore) UpdateUserEducation(educationId string,
 		return err
 	}
 
-	store.logger.InfoLogger.Infof("EU {%s}", education.Id.Hex())
+	store.logger.InfoLogger.Infof("EU {%s}", educationId)
 	return nil
 }
 

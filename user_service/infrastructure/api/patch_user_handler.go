@@ -1,23 +1,18 @@
 package api
 
 import (
-	"github.com/dislinkt/common/validator"
-	goValidator "github.com/go-playground/validator/v10"
-
 	"context"
 
 	logger "github.com/dislinkt/common/logging"
 	saga "github.com/dislinkt/common/saga/messaging"
 	events "github.com/dislinkt/common/saga/patch_user"
 	"github.com/dislinkt/user_service/application"
-	"github.com/go-playground/validator/v10"
 )
 
 type PatchUserCommandHandler struct {
 	userService       *application.UserService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
-	validator         *goValidator.Validate
 	logger            *logger.Logger
 }
 
@@ -28,7 +23,6 @@ func NewPatchUserCommandHandler(userService *application.UserService, publisher 
 		userService:       userService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
-		validator:         validator.InitValidator(),
 		logger:            logger,
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)

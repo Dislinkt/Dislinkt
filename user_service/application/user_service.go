@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/dislinkt/common/validator"
-	"github.com/go-playground/validator/v10"
 	goValidator "github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
 
@@ -45,6 +44,9 @@ func (service *UserService) Register(ctx context.Context, user *domain.User) err
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
 	}
+	if user.Password == "" {
+		return errors.New("Invalid user data")
+	}
 	err := service.registerUserOrchestrator.Start(user)
 	if err != nil {
 		return err
@@ -60,6 +62,7 @@ func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error)
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		fmt.Println(err)
 		return nil, errors.New("Invalid user data")
 	}
 	dbUser, err := service.store.FindByID(user.Id)
@@ -207,9 +210,5 @@ func (service *UserService) FindByUsername(username string) (*domain.User, error
 }
 
 func (service *UserService) Delete(user *domain.User) error {
-	if err := validator.New().Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return err
-	}
 	return service.store.Delete(user)
 }

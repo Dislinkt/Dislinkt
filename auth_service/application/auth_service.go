@@ -9,13 +9,10 @@ import (
 	"log"
 	"net/smtp"
 	"regexp"
-
-	logger "github.com/dislinkt/common/logging"
-	"github.com/go-playground/validator/v10"
-	"github.com/pquerna/otp/totp"
-
 	//	"github.com/nats-io/jwt/v2"
 	"time"
+
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/common/validator"
 	goValidator "github.com/go-playground/validator/v10"
@@ -26,8 +23,6 @@ import (
 	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/auth_service"
 	"github.com/form3tech-oss/jwt-go"
-	"github.com/go-playground/validator/v10"
-	"github.com/pquerna/otp/totp"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -66,7 +61,7 @@ func NewAuthService(userService *UserService, permissionStore domain.PermissionS
 func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (bool, string, error) {
 	if err := auth.validator.Struct(loginRequest); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return "", nil
+		return false, "", nil
 	}
 
 	user, err := auth.userService.GetByUsername(loginRequest.Username)

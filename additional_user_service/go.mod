@@ -6,6 +6,7 @@ replace github.com/dislinkt/common => ../common
 
 require (
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
+	github.com/go-playground/validator/v10 v10.11.0
 	github.com/gofrs/uuid v4.2.0+incompatible
 	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.46.0
@@ -14,6 +15,8 @@ require (
 
 require (
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
@@ -21,6 +24,7 @@ require (
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/klauspost/compress v1.15.3 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/nats-io/jwt/v2 v2.2.1-0.20220113022732-58e87895b296 // indirect
 	github.com/nats-io/nats.go v1.15.0 // indirect

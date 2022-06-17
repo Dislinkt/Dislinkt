@@ -7,9 +7,6 @@ replace github.com/dislinkt/common => ../common
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
 	google.golang.org/grpc v1.46.0
-)
-
-require (
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	github.com/gorilla/handlers v1.5.1
 )

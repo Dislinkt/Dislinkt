@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+
 	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/auth_service/application"

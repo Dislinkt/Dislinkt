@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+
 	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/common/interceptor"
@@ -89,18 +90,18 @@ func (handler *UserHandler) GetOne(ctx context.Context, request *pb.GetOneMessag
 }
 
 func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.RegisterUserRequest) (*pb.
-RegisterUserResponse, error) {
+	RegisterUserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
-	handler.logger.InfoLogger.Infof("POST rr: UC {%s}", username)
+	// username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("POST rr: UC {%s}", request.User.Username)
 
 	user := mapNewUser(request.User)
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	err := handler.service.Register(ctx, user)
 	if err != nil {
-		handler.logger.WarnLogger.Warnf("UC {%s}", username)
+		handler.logger.WarnLogger.Warnf("UC {%s}", request.User.Username)
 		return nil, err
 	}
 
@@ -110,7 +111,7 @@ RegisterUserResponse, error) {
 }
 
 func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUserRequest) (*pb.
-UserResponse, error) {
+	UserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
@@ -142,7 +143,7 @@ UserResponse, error) {
 }
 
 func (handler *UserHandler) PatchUser(ctx context.Context, request *pb.PatchUserRequest) (*pb.
-UserResponse, error) {
+	UserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
