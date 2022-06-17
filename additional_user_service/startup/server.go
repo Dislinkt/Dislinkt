@@ -1,11 +1,14 @@
 package startup
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
 	"path/filepath"
+
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/common/interceptor"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -25,15 +28,18 @@ import (
 
 type Server struct {
 	config *config.Config
+	logger *logger.Logger
 	// tracer otgo.Tracer
 	// closer io.Closer
 }
 
 func NewServer(config *config.Config) *Server {
+	logger := logger.InitLogger(context.TODO())
 	// newTracer, closer := tracer.Init(config.JaegerServiceName)
 	// otgo.SetGlobalTracer(newTracer)
 	return &Server{
 		config: config,
+		logger: logger,
 		// tracer: newTracer,
 		// closer: closer,
 	}
@@ -58,11 +64,13 @@ func (server *Server) Start() {
 	server.initData(additionalUserService, additionalUserStore)
 
 	server.startGrpcServer(additionalUserHandler)
+	server.logger.InfoLogger.Info("SS")
 }
 
 func (server *Server) initAdditionalUserClient() *mongo.Client {
 	client, err := persistence.GetClient(server.config.AdditionalUserDBHost, server.config.AdditionalUserDBPort)
 	if err != nil {
+		server.logger.ErrorLogger.Error("IC")
 		log.Fatal(err)
 	}
 	return client
@@ -112,6 +120,7 @@ func (server *Server) initAdditionalUserHandler(service *application.AdditionalU
 func (server *Server) startGrpcServer(additionalUserHandler *api.AdditionalUserHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
+		server.logger.ErrorLogger.Error("FTL")
 		log.Fatalf("failed to listen: %v", err)
 	}
 
@@ -123,6 +132,7 @@ func (server *Server) startGrpcServer(additionalUserHandler *api.AdditionalUserH
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()), grpc.Creds(tlsCredentials))
 	additionalUserProto.RegisterAdditionalUserServiceServer(grpcServer, additionalUserHandler)
 	if err := grpcServer.Serve(listener); err != nil {
+		server.logger.ErrorLogger.Error("FTS")
 		log.Fatalf("failed to serve: %s", err)
 	}
 }
@@ -179,8 +189,10 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Fine/Studio Arts, General"})
 	_, err := store.InsertFieldOfStudy(fields)
 	if err != nil {
+		server.logger.WarnLogger.Warn("FOSC")
 		return
 	}
+	server.logger.InfoLogger.Info("FOSC")
 
 	var skills []*domain.Skill
 	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Communication"})
@@ -203,8 +215,10 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 	skills = append(skills, &domain.Skill{Id: primitive.NewObjectID(), Name: "Online Marketing"})
 	_, err = store.InsertSkills(skills)
 	if err != nil {
+		server.logger.WarnLogger.Warn("SC")
 		return
 	}
+	server.logger.InfoLogger.Info("SC")
 
 	var industries []*domain.Industry
 	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(),
@@ -236,8 +250,10 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 	industries = append(industries, &domain.Industry{Id: primitive.NewObjectID(), Name: "Blogs"})
 	_, err = store.InsertIndustries(industries)
 	if err != nil {
+		server.logger.WarnLogger.Warn("IC")
 		return
 	}
+	server.logger.InfoLogger.Info("IC")
 
 	var degrees []*domain.Degree
 	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(),
@@ -250,7 +266,9 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 	degrees = append(degrees, &domain.Degree{Id: primitive.NewObjectID(), Name: "High school diploma"})
 	_, err = store.InsertDegrees(degrees)
 	if err != nil {
+		server.logger.WarnLogger.Warn("DC")
 		return
 	}
+	server.logger.InfoLogger.Info("DC")
 
 }

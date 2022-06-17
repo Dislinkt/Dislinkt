@@ -3,9 +3,10 @@ package interceptor
 import (
 	"context"
 	"fmt"
-	"github.com/form3tech-oss/jwt-go"
 	"strings"
 	"time"
+
+	"github.com/form3tech-oss/jwt-go"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -40,6 +41,7 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 
 func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string) (context.Context, error) {
 	fmt.Println("USAOOOOOOOOOO")
+	fmt.Println(method)
 	accessiblePermission, ok := interceptor.accessiblePermissions[method]
 	// u mapi ne postoje role za ovu metodu => javno dostupna putanja
 	if !ok {
@@ -85,7 +87,7 @@ func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string
 
 func (interceptor *AuthInterceptor) verifyToken(accessToken string) (claims *Claims, err error) {
 	token, err := jwt.ParseWithClaims(accessToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
+		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

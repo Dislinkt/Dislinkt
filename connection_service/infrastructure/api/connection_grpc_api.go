@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/dislinkt/common/interceptor"
+	logger "github.com/dislinkt/common/logging"
 
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/application"
@@ -11,16 +13,23 @@ import (
 type ConnectionHandler struct {
 	pb.UnimplementedConnectionServiceServer
 	service *application.ConnectionService
+	logger  *logger.Logger
 }
 
 func NewConnectionHandler(service *application.ConnectionService) *ConnectionHandler {
+	logger := logger.InitLogger(context.TODO())
 	return &ConnectionHandler{
 		service: service,
+		logger:  logger,
 	}
 }
 
 func (handler *ConnectionHandler) Register(ctx context.Context, request *pb.RegisterRequest) (response *pb.RegisterResponse, err error) {
 	fmt.Println("[ConnectionHandler]:Register")
+
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("POST rr: UC {%s}", username)
+
 	userID := request.User.UserID
 	status := request.User.Status
 	item, err := handler.service.Register(userID, status)
@@ -42,6 +51,8 @@ func (handler *ConnectionHandler) Register(ctx context.Context, request *pb.Regi
 
 func (handler *ConnectionHandler) CreateConnection(ctx context.Context, request *pb.NewConnectionRequest) (response *pb.NewConnectionResponse, err error) {
 	fmt.Println("[ConnectionHandler]:CreateConnection")
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("POST rr: CC {%s}", username)
 	return handler.service.CreateConnection(request.Connection.BaseUserUUID, request.Connection.ConnectUserUUID)
 }
 

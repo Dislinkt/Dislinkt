@@ -1,11 +1,14 @@
 package startup
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
 	"path/filepath"
+
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/common/interceptor"
 	saga "github.com/dislinkt/common/saga/messaging"
@@ -24,11 +27,14 @@ import (
 
 type Server struct {
 	config *config.Config
+	logger *logger.Logger
 }
 
 func NewServer(config *config.Config) *Server {
+	logger := logger.InitLogger(context.TODO())
 	return &Server{
 		config: config,
+		logger: logger,
 	}
 }
 
@@ -57,6 +63,7 @@ func (server *Server) Start() {
 	authHandler := server.initAuthHandler(authService)
 
 	server.startGrpcServer(authHandler)
+	server.logger.InfoLogger.Infof("SS")
 }
 
 func (server *Server) initUserClient() *gorm.DB {
@@ -65,6 +72,7 @@ func (server *Server) initUserClient() *gorm.DB {
 		server.config.AuthDBPass, server.config.AuthDBName,
 		server.config.AuthDBPort)
 	if err != nil {
+		server.logger.ErrorLogger.Error("IC")
 		log.Fatal(err)
 	}
 	return client
@@ -147,6 +155,7 @@ func (server *Server) initAuthHandler(service *application.AuthService) *api.Aut
 func (server *Server) startGrpcServer(authHandler *api.AuthHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
+		server.logger.ErrorLogger.Error("FTL")
 		log.Fatalf("failed to listen: %v", err)
 	}
 
@@ -163,6 +172,7 @@ func (server *Server) startGrpcServer(authHandler *api.AuthHandler) {
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()), grpc.Creds(tlsCredentials))
 	authProto.RegisterAuthServiceServer(grpcServer, authHandler)
 	if err := grpcServer.Serve(listener); err != nil {
+		server.logger.ErrorLogger.Error("FTS")
 		log.Fatalf("failed to serve: %s", err)
 	}
 }

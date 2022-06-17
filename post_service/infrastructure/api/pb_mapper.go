@@ -2,7 +2,6 @@ package api
 
 import (
 	b64 "encoding/base64"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -78,9 +77,7 @@ func mapNewComment(commentPb *pb.Comment) *domain.Comment {
 func convertBase64ToByte(images []string) [][]byte {
 	var decodedImages [][]byte
 	for _, image := range images {
-		fmt.Println(image)
 		imageDec, _ := b64.StdEncoding.DecodeString(image)
-		fmt.Println(string(imageDec))
 		decodedImages = append(decodedImages, imageDec)
 	}
 	return decodedImages
@@ -88,9 +85,7 @@ func convertBase64ToByte(images []string) [][]byte {
 func convertByteToBase64(images [][]byte) []string {
 	var encodedImages []string
 	for _, image := range images {
-		fmt.Println(image)
 		imageEnc := b64.StdEncoding.EncodeToString(image)
-		fmt.Println(string(imageEnc))
 		encodedImages = append(encodedImages, imageEnc)
 	}
 	return encodedImages

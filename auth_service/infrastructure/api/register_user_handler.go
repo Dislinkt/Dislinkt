@@ -1,9 +1,11 @@
 package api
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/dislinkt/auth_service/application"
+	logger "github.com/dislinkt/common/logging"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
 )
@@ -13,15 +15,18 @@ type CreateUserCommandHandler struct {
 	authService       *application.AuthService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
+	logger            *logger.Logger
 }
 
 func NewRegisterUserCommandHandler(userService *application.UserService, authService *application.AuthService, publisher saga.Publisher,
 	subscriber saga.Subscriber) (*CreateUserCommandHandler, error) {
+	logger := logger.InitLogger(context.TODO())
 	o := &CreateUserCommandHandler{
 		userService:       userService,
 		authService:       authService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
+		logger:            logger,
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
@@ -61,6 +66,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 			reply.Type = events.AuthNotUpdated
 			return
 		}
+		handler.logger.InfoLogger.Infof("SC-RU {%s}", reply.User.Username)
 		reply.Type = events.AuthUpdated
 	case events.RollbackAuth:
 		fmt.Println("RollbackAuth")

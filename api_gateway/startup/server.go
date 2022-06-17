@@ -5,11 +5,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/api_gateway/infrastructure/api"
 	"github.com/gorilla/handlers"
@@ -24,23 +25,25 @@ import (
 	postGw "github.com/dislinkt/common/proto/post_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	otgo "github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
 	config *cfg.Config
 	mux    *runtime.ServeMux
-	tracer otgo.Tracer
-	closer io.Closer
+	logger *logger.Logger
+	// tracer otgo.Tracer
+	// closer io.Closer
 }
 
 func NewServer(config *cfg.Config) *Server {
+	logger := logger.InitLogger(context.TODO())
 	server := &Server{
 		config: config,
 		mux: runtime.NewServeMux(
 			runtime.WithIncomingHeaderMatcher(customMatcher),
 		),
+		logger: logger,
 	}
 	server.initHandlers()
 	server.initCustomHandlers()
@@ -64,21 +67,36 @@ func (server *Server) initHandlers() {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(tlsCredentials)}
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err = userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
+	if err != nil {
+		server.logger.ErrorLogger.Error("UMI")
+		panic(err)
+	}
+
 	additionalUserEndpoint := fmt.Sprintf("%s:%s", server.config.AdditionalUserHost, server.config.AdditionalUserPort)
 	err = additionalUserGw.RegisterAdditionalUserServiceHandlerFromEndpoint(context.TODO(), server.mux, additionalUserEndpoint, opts)
 	if err != nil {
+		server.logger.ErrorLogger.Error("AUMI")
 		panic(err)
 	}
+
 	postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
 	err = postGw.RegisterPostServiceHandlerFromEndpoint(context.TODO(), server.mux, postEndpoint, opts)
+	if err != nil {
+		server.logger.ErrorLogger.Error("PMI")
+		panic(err)
+	}
+
 	connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
 	err = connectionGw.RegisterConnectionServiceHandlerFromEndpoint(context.TODO(), server.mux, connectionEndpoint, opts)
 	if err != nil {
+		server.logger.ErrorLogger.Error("CMI")
 		panic(err)
 	}
+
 	authEndpoint := fmt.Sprintf("%s:%s", server.config.AuthHost, server.config.AuthPort)
 	err = authGw.RegisterAuthServiceHandlerFromEndpoint(context.TODO(), server.mux, authEndpoint, opts)
 	if err != nil {
+		server.logger.ErrorLogger.Error("AMI")
 		panic(err)
 	}
 }

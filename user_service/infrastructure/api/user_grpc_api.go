@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	logger "github.com/dislinkt/common/logging"
 
 	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/user_service"
@@ -14,11 +15,14 @@ import (
 type UserHandler struct {
 	service *application.UserService
 	pb.UnimplementedUserServiceServer
+	logger *logger.Logger
 }
 
 func NewUserHandler(service *application.UserService) *UserHandler {
+	logger := logger.InitLogger(context.TODO())
 	return &UserHandler{
 		service: service,
+		logger:  logger,
 	}
 }
 
@@ -85,19 +89,18 @@ func (handler *UserHandler) GetOne(ctx context.Context, request *pb.GetOneMessag
 }
 
 func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.RegisterUserRequest) (*pb.
-	RegisterUserResponse, error) {
+RegisterUserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("POST rr: UC {%s}", username)
 
-	fmt.Println("Register user")
 	user := mapNewUser(request.User)
-	fmt.Println("mapper zavrsio")
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// err := handler.service.Register( ctx, user)
-	err := handler.service.Register(user)
-	fmt.Println("Register zavrsio")
+	err := handler.service.Register(ctx, user)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("UC {%s}", username)
 		return nil, err
 	}
 
@@ -107,9 +110,12 @@ func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.Regist
 }
 
 func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUserRequest) (*pb.
-	UserResponse, error) {
+UserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("PUT rr: UU {%s}", username)
+
 	fmt.Println("*************************************************")
 	fmt.Println(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	user := mapUpdateUser(request.User)
@@ -121,10 +127,10 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	fmt.Println(parsedUUID)
 	user.Id = parsedUUID
 	dbUser, err := handler.service.StartUpdate(user)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("UU {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}
@@ -136,18 +142,20 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 }
 
 func (handler *UserHandler) PatchUser(ctx context.Context, request *pb.PatchUserRequest) (*pb.
-	UserResponse, error) {
+UserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
 	// defer span.Finish()
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
 	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	handler.logger.InfoLogger.Infof("PATCH rr: UP {%s}", username)
 	fmt.Println("Patch : " + username)
 	user := mapNewUser(request.User)
 	user.Username = &username
 	err := handler.service.PatchUserStart(user)
 	if err != nil {
+		handler.logger.WarnLogger.Warnf("UP {%s}", username)
 		fmt.Println(err.Error())
 		return nil, err
 	}

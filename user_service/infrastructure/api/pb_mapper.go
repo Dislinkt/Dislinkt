@@ -1,12 +1,11 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -45,8 +44,6 @@ func mapUser(userD *domain.User) *pb.User {
 }
 
 func mapNewUser(userPb *pb.NewUser) *domain.User {
-	fmt.Println("PROTO")
-	fmt.Println(userPb.Private)
 	userUuid, _ := uuid.NewV4()
 	userD := &domain.User{
 		Id:        userUuid,
@@ -61,8 +58,6 @@ func mapNewUser(userPb *pb.NewUser) *domain.User {
 		Private:   userPb.Private,
 		Password:  userPb.Password,
 	}
-	fmt.Println("DOMAIN")
-	fmt.Println(userD.Private)
 	return userD
 }
 

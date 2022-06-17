@@ -1,5 +1,7 @@
 package events
 
+import "context"
+
 type Role int
 
 const (
@@ -50,8 +52,9 @@ const (
 )
 
 type RegisterUserCommand struct {
-	User User
-	Type RegisterUserCommandType
+	User    User
+	Type    RegisterUserCommandType
+	Context context.Context
 }
 
 type RegisterUserReplyType int8

@@ -1,11 +1,20 @@
 package startup
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
 	"path/filepath"
+
+	logger "github.com/dislinkt/common/logging"
+
+	"post_service/application"
+	"post_service/domain"
+	"post_service/infrastructure/api"
+	"post_service/infrastructure/persistence"
+	"post_service/startup/config"
 
 	"github.com/dislinkt/common/interceptor"
 	postProto "github.com/dislinkt/common/proto/post_service"
@@ -14,19 +23,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"post_service/application"
-	"post_service/domain"
-	"post_service/infrastructure/api"
-	"post_service/infrastructure/persistence"
-	"post_service/startup/config"
 )
 
 type Server struct {
 	config *config.Config
+	logger *logger.Logger
 }
 
 func NewServer(config *config.Config) *Server {
-	return &Server{config: config}
+	logger := logger.InitLogger(context.TODO())
+	return &Server{
+		config: config,
+		logger: logger,
+	}
 }
 
 const (
@@ -50,11 +59,13 @@ func (server *Server) Start() {
 	server.initUpdateUserHandler(postService, updateReplyPublisher, updateCommandSubscriber)
 
 	server.startGrpcServer(postHandler)
+	server.logger.InfoLogger.Info("SS")
 }
 
 func (server *Server) initMongoClient() *mongo.Client {
 	client, err := persistence.GetClient(server.config.PostDBHost, server.config.PostDBPort)
 	if err != nil {
+		server.logger.ErrorLogger.Error("IC")
 		log.Fatalln(err)
 	}
 	return client
@@ -111,6 +122,7 @@ func (server *Server) initUpdateUserHandler(service *application.PostService, pu
 func (server *Server) startGrpcServer(postHandler *api.PostHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
+		server.logger.ErrorLogger.Error("FTL")
 		log.Fatalf("failed to listen: %v", err)
 	}
 
@@ -122,6 +134,7 @@ func (server *Server) startGrpcServer(postHandler *api.PostHandler) {
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()), grpc.Creds(tlsCredentials))
 	postProto.RegisterPostServiceServer(grpcServer, postHandler)
 	if err := grpcServer.Serve(listener); err != nil {
+		server.logger.ErrorLogger.Error("FTS")
 		log.Fatalf("failed to serve: %s", err)
 	}
 }

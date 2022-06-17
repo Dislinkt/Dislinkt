@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	logger "github.com/dislinkt/common/logging"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,16 +22,20 @@ type PostMongoDBStore struct {
 	posts     *mongo.Collection
 	jobOffers *mongo.Collection
 	users     *mongo.Collection
+	logger    *logger.Logger
 }
 
 func NewPostMongoDBStore(client *mongo.Client) domain.PostStore {
 	posts := client.Database(DATABASE).Collection(COLLECTION_POST)
 	jobOffers := client.Database(DATABASE).Collection(COLLECTION_JOB_OFFER)
 	users := client.Database(DATABASE).Collection(COLLECTION_USER)
+
+	logger := logger.InitLogger(context.TODO())
 	return &PostMongoDBStore{
 		posts:     posts,
 		jobOffers: jobOffers,
 		users:     users,
+		logger:    logger,
 	}
 }
 
@@ -76,7 +81,7 @@ func (store *PostMongoDBStore) Insert(post *domain.Post) error {
 		return err
 	}
 	post.Id = result.InsertedID.(primitive.ObjectID)
-
+	store.logger.InfoLogger.Infof("PC {%s}", post.Id)
 	return nil
 }
 
@@ -203,6 +208,7 @@ func (store *PostMongoDBStore) InsertJobOffer(offer *domain.JobOffer) error {
 		return err
 	}
 	offer.Id = result.InsertedID.(primitive.ObjectID)
+	store.logger.InfoLogger.Infof("JOC {%s}", offer.Id)
 
 	return nil
 }

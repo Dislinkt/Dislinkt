@@ -1,16 +1,14 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/dislinkt/common/saga/events"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
-	fmt.Println("COMMAND: " + command.User.Password)
 	id, _ := uuid.FromString(command.User.Id)
 	userD := &domain.User{
 		Id:          id,
@@ -29,6 +27,5 @@ func mapCommandUser(command *events.RegisterUserCommand) *domain.User {
 		Private:     command.User.Private,
 		Password:    command.User.Password,
 	}
-	fmt.Println("DOMAIN: " + userD.Password)
 	return userD
 }

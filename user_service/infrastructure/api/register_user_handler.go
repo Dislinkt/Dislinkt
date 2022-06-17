@@ -1,8 +1,9 @@
 package api
 
 import (
-	"fmt"
+	"context"
 
+	logger "github.com/dislinkt/common/logging"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/validator"
@@ -15,15 +16,18 @@ type CreateUserCommandHandler struct {
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
 	validator         *goValidator.Validate
+	logger            *logger.Logger
 }
 
 func NewRegisterUserCommandHandler(userService *application.UserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) (*CreateUserCommandHandler, error) {
+	logger := logger.InitLogger(context.TODO())
 	o := &CreateUserCommandHandler{
 		userService:       userService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
 		validator:         validator.InitValidator(),
+		logger:            logger,
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
@@ -34,24 +38,29 @@ func NewRegisterUserCommandHandler(userService *application.UserService, publish
 
 func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserCommand) {
 	reply := events.RegisterUserReply{User: command.User}
+	handler.logger.InfoLogger.Infof("SS-RU {%s}", reply.User.Username)
 
 	switch command.Type {
 	case events.UpdateUser:
-		fmt.Println("userhandler-update")
-		fmt.Println(command.User)
 		user := mapCommandUser(command)
-		err := handler.userService.Insert(user)
+		err := handler.userService.Insert(command.Context, user)
 		if err != nil {
+			handler.logger.WarnLogger.Warnf("SF-RU {%s}", reply.User.Username)
+			//	handler.logger.WarnLogger.Warn(err.Error())
 			reply.Type = events.UserServiceNotUpdated
 			return
 		}
+
+		//	handler.logger.InfoLogger.Infof("New user registered: {%s}", command.User.Id)
 		reply.Type = events.UserServiceUpdated
 	case events.RollbackUser:
-		fmt.Println("userhandler-rollback")
 		err := handler.userService.Delete(mapCommandUser(command))
 		if err != nil {
+			//	handler.logger.WarnLogger.Warn(err.Error())
 			return
 		}
+		//	handler.logger.InfoLogger.Infof("User deleted: {%s}", command.User.Id)
+		handler.logger.WarnLogger.Warnf("SF-RU {%s}", reply.User.Username)
 		reply.Type = events.UserServiceRolledBack
 	default:
 		reply.Type = events.UnknownReply

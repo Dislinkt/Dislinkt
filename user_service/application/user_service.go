@@ -1,11 +1,13 @@
 package application
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dislinkt/common/validator"
+	"github.com/go-playground/validator/v10"
 	goValidator "github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
 
@@ -34,7 +36,7 @@ func NewUserService(store domain.UserStore, registerUserOrchestrator *RegisterUs
 	}
 }
 
-func (service *UserService) Register(user *domain.User) error {
+func (service *UserService) Register(ctx context.Context, user *domain.User) error {
 	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
 	// defer span.Finish()
 	//
@@ -88,16 +90,16 @@ func (service *UserService) PatchUserStart(requestUser *domain.User) error {
 }
 
 // From RegisterUser Saga
-func (service *UserService) Insert(user *domain.User) error {
+func (service *UserService) Insert(ctx context.Context, user *domain.User) error {
 	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
 	// defer span.Finish()
-	//
+
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
 	}
-	err := service.store.Insert(user)
+	err := service.store.Insert(context.TODO(), user)
 	return err
 }
 
@@ -204,7 +206,10 @@ func (service *UserService) FindByUsername(username string) (*domain.User, error
 	return service.store.FindByUsername(username)
 }
 
-// From RegisterUser Saga
-func (service *UserService) Delete(user *domain.User) interface{} {
+func (service *UserService) Delete(user *domain.User) error {
+	if err := validator.New().Struct(user); err != nil {
+		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return err
+	}
 	return service.store.Delete(user)
 }

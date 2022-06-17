@@ -1,11 +1,13 @@
 package domain
 
 import (
-	uuid "github.com/gofrs/uuid"
+	"context"
+
+	"github.com/gofrs/uuid"
 )
 
 type UserStore interface {
-	Insert(user *User) error
+	Insert(ctx context.Context, user *User) error
 	Update(user *User) (*User, error)
 	GetAll() (*[]User, error)
 	FindByID(uuid uuid.UUID) (*User, error)
