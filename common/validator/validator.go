@@ -21,7 +21,7 @@ func InitValidator() *goValidator.Validate {
 }
 
 func UsernameValidation(fl goValidator.FieldLevel) bool {
-	usernameRegExp := "[a-zA-Z0-9!?#$@.*+_]*[!?#$@.*+_][a-zA-Z0-9!?#$@.*+_]*"
+	usernameRegExp := "[a-zA-Z0-9!?#$@.*+_]*"
 	matched, err := regexp.MatchString(usernameRegExp, fl.Field().String())
 	if err != nil {
 		return false
@@ -53,6 +53,34 @@ func PreconditionValidation(fl goValidator.FieldLevel) bool {
 	return matched
 }
 
+func PasswordStringValidation(password string) bool {
+	const uppercase = `[A-Z]{1}`
+	const lowercase = `[a-z]{1}`
+	const number = `[0-9]{1}`
+	const specialCharacters = `[!?#$@.*+_]{1}`
+
+	if matched, err := regexp.MatchString(uppercase, password); !matched || err != nil {
+		fmt.Println("Your password should contain at least one uppercase letter.")
+		return false
+	}
+
+	if matched, err := regexp.MatchString(lowercase, password); !matched || err != nil {
+		fmt.Println("Your password should contain at least one lowercase letter.")
+		return false
+	}
+
+	if matched, err := regexp.MatchString(number, password); !matched || err != nil {
+		fmt.Println("Your password should contain at least one number.")
+		return false
+	}
+
+	if matched, err := regexp.MatchString(specialCharacters, password); !matched || err != nil {
+		fmt.Println("Your password should contain at least one special character.")
+		return false
+	}
+	fmt.Println("Thanks, you have entered a password in a valid format!")
+	return true
+}
 func PasswordValidation(fl goValidator.FieldLevel) bool {
 	const uppercase = `[A-Z]{1}`
 	const lowercase = `[a-z]{1}`
@@ -83,7 +111,7 @@ func PasswordValidation(fl goValidator.FieldLevel) bool {
 }
 
 func UsernameValidationString(username string) bool {
-	usernameRegExp := "[a-zA-Z0-9!?#$@.*+_]*[!?#$@.*+_][a-zA-Z0-9!?#$@.*+_]*"
+	usernameRegExp := "[a-zA-Z0-9!?#$@.*+_]*"
 	matched, err := regexp.MatchString(usernameRegExp, username)
 	if err != nil {
 		return false
@@ -116,6 +144,22 @@ func JobOfferSearchValidation(search string) bool {
 }
 func UserSearchValidation(search string) bool {
 	RegExp := "[a-zA-Z0-9!?#$@.*+_]*"
+	matched, err := regexp.MatchString(RegExp, search)
+	if err != nil {
+		return false
+	}
+	return matched
+}
+func LetterValidation(search string) bool {
+	RegExp := "[a-zA-Z]*"
+	matched, err := regexp.MatchString(RegExp, search)
+	if err != nil {
+		return false
+	}
+	return matched
+}
+func NumberValidation(search string) bool {
+	RegExp := "[0-9]*"
 	matched, err := regexp.MatchString(RegExp, search)
 	if err != nil {
 		return false

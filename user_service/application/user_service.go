@@ -42,9 +42,11 @@ func (service *UserService) Register(ctx context.Context, user *domain.User) err
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
 	if err := service.validator.Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		fmt.Println(err)
 		return errors.New("Invalid user data")
 	}
-	if user.Password == "" {
+	if !validator.PasswordStringValidation(user.Password) {
+		fmt.Println("pass")
 		return errors.New("Invalid user data")
 	}
 	err := service.registerUserOrchestrator.Start(user)
@@ -60,9 +62,25 @@ func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error)
 	// defer span.Finish()
 	//
 	// newCtx := tracer.ContextWithSpan(context.Background(), span)
-	if err := service.validator.Struct(user); err != nil {
-		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		fmt.Println(err)
+	// if err := service.validator.Struct(user); err != nil {
+	// 	//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+	// 	fmt.Println(err)
+	// 	return nil, errors.New("Invalid user data")
+	// }
+	if !validator.UsernameValidationString(*user.Username) {
+		return nil, errors.New("Invalid user data")
+	}
+	if !validator.EmailValidationString(*user.Email) {
+		return nil, errors.New("Invalid user data")
+	}
+	if !validator.LetterValidation(user.Name) {
+		return nil, errors.New("Invalid user data")
+	}
+
+	if !validator.LetterValidation(user.Surname) {
+		return nil, errors.New("Invalid user data")
+	}
+	if !validator.NumberValidation(user.Number) {
 		return nil, errors.New("Invalid user data")
 	}
 	dbUser, err := service.store.FindByID(user.Id)

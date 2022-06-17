@@ -29,11 +29,11 @@ type User struct {
 	Name        string    `validate:"alpha"`
 	Surname     string    `validate:"alpha"`
 	Username    *string   `gorm:"unique" validate:"username"`
-	Email       *string   `gorm:"unique" validate:"omitempty,email"`
+	Email       *string   `gorm:"unique" validate:"email"`
 	Number      string    `validate:"omitempty,numeric"`
 	Gender      Gender
 	DateOfBirth string
-	Password    string `gorm:"-" validate:"omitempty,password"`
+	Password    string `gorm:"-" validate:"password"`
 	UserRole    Role
 	Biography   string
 	Blocked     bool
