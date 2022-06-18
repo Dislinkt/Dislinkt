@@ -70,8 +70,10 @@ func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error)
 	if !validator.UsernameValidationString(*user.Username) {
 		return nil, errors.New("Invalid user data")
 	}
-	if !validator.EmailValidationString(*user.Email) {
-		return nil, errors.New("Invalid user data")
+	if user.Email != nil {
+		if !validator.EmailValidationString(*user.Email) {
+			return nil, errors.New("Invalid user data")
+		}
 	}
 	if !validator.LetterValidation(user.Name) {
 		return nil, errors.New("Invalid user data")
@@ -80,8 +82,10 @@ func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error)
 	if !validator.LetterValidation(user.Surname) {
 		return nil, errors.New("Invalid user data")
 	}
-	if !validator.NumberValidation(user.Number) {
-		return nil, errors.New("Invalid user data")
+	if user.Number != "" {
+		if !validator.NumberValidation(user.Number) {
+			return nil, errors.New("Invalid user data")
+		}
 	}
 	dbUser, err := service.store.FindByID(user.Id)
 	if err != nil {
