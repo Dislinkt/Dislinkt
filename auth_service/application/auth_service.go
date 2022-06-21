@@ -259,7 +259,7 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 }
 
 func passwordlessLoginMailMessage(token string, username string) []byte {
-	urlRedirection := "http://localhost:4200/passwordless-login-validation/" + token
+	urlRedirection := "https://localhost:4200/passwordless-login-validation/" + token
 
 	subject := "Subject: Passwordless login\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
@@ -386,7 +386,7 @@ func (auth *AuthService) SendActivationMail(username string) error {
 
 func verificationMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
-	urlRedirection := "http://localhost:4200/activate-account/" + token
+	urlRedirection := "https://localhost:4200/activate-account/" + token
 	fmt.Println("MAIL MESSAGE")
 
 	subject := "Subject: Account activation\n"
@@ -467,7 +467,7 @@ func (auth *AuthService) SendAccountRecoveryMail(ctx context.Context, request *p
 
 func recoverAccountMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
-	urlRedirection := "http://localhost:4200/recover-account/" + token
+	urlRedirection := "https://localhost:4200/recover-account/" + token
 
 	subject := "Subject: Account recovery\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"

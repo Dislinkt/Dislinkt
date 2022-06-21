@@ -50,7 +50,7 @@ type JobOffer struct {
 type User struct {
 	Id       primitive.ObjectID `bson:"_id"`
 	UserUUID string             `bson:"userUUID"`
-	Username string             `bson:"username" validate:"alphanum"`
+	Username string             `bson:"username"`
 	Name     string             `bson:"name" validate:"alpha"`
 	Surname  string             `bson:"surname" validate:"alpha"`
 }
