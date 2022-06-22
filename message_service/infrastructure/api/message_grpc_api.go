@@ -18,7 +18,7 @@ func NewMessageHandler(service *application.MessageService) *MessageHandler {
 }
 
 func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
-	userResponse, _ := persistence.UserClient("").GetMe(context.TODO(), &userGw.GetMeMessage{})
+	userResponse, _ := persistence.UserClient("user_service:8O00").GetMe(context.TODO(), &userGw.GetMeMessage{})
 	messageHistories, err := handler.service.GetMessageHistoriesByUser(userResponse.User.Id)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, re
 }
 
 func (handler *MessageHandler) GetMessageHistory(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
-	userResponse, _ := persistence.UserClient("").GetMe(context.TODO(), &userGw.GetMeMessage{})
+	userResponse, _ := persistence.UserClient("user_service:8O00").GetMe(context.TODO(), &userGw.GetMeMessage{})
 	messageHistory, err := handler.service.GetMessageHistory(userResponse.User.Id, request.ReceiverId)
 	if err != nil {
 		return nil, err
