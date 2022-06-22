@@ -50,6 +50,7 @@ message MessageHistory {
   string User1Id = 2;
   string User2Id = 3;
   repeated Message Messages = 4;
+  int32 UnreadMessagesNumber = 5;
 }
 
 message Message {
