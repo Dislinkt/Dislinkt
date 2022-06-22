@@ -3,7 +3,9 @@ package api
 import (
 	"context"
 	pb "github.com/dislinkt/common/proto/message_service"
+	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/message_service/application"
+	"github.com/dislinkt/message_service/infrastructure/persistence"
 )
 
 type MessageHandler struct {
@@ -16,8 +18,8 @@ func NewMessageHandler(service *application.MessageService) *MessageHandler {
 }
 
 func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
-	userId := "1" //TODO: get from jwt token
-	messageHistories, err := handler.service.GetMessageHistoriesByUser(userId)
+	userResponse, _ := persistence.UserClient("").GetMe(context.TODO(), &userGw.GetMeMessage{})
+	messageHistories, err := handler.service.GetMessageHistoriesByUser(userResponse.User.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +32,8 @@ func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, re
 }
 
 func (handler *MessageHandler) GetMessageHistory(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
-	messageHistory, err := handler.service.GetMessageHistory("1", request.ReceiverId) //TODO: get first id from jwt token
+	userResponse, _ := persistence.UserClient("").GetMe(context.TODO(), &userGw.GetMeMessage{})
+	messageHistory, err := handler.service.GetMessageHistory(userResponse.User.Id, request.ReceiverId)
 	if err != nil {
 		return nil, err
 	}
