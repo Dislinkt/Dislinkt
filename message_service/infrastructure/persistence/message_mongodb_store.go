@@ -36,12 +36,22 @@ func (store *MessageMongoDBStore) GetMessageHistory(user1Id, user2Id string) (*d
 		},
 	}
 
-	return store.filterOne(filter)
+	messageHistory, err := store.filterOne(filter)
+
+	for _, message := range messageHistory.Messages {
+		if !message.IsRead {
+			message.IsRead = true
+		}
+	}
+
+	return messageHistory, err
 }
 
 func (store *MessageMongoDBStore) InsertMessage(message *domain.Message, historyId string) (*domain.MessageHistory, error) {
 	id, _ := primitive.ObjectIDFromHex(historyId)
 	messageHistory, err := store.GetHistoryById(id)
+
+	message.IsRead = false
 
 	if messageHistory == nil {
 		messHistory := &domain.MessageHistory{

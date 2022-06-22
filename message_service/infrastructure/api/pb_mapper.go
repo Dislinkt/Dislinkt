@@ -10,9 +10,10 @@ func mapMessageHistory(messageHistory *domain.MessageHistory) *pb.MessageHistory
 	id := messageHistory.Id.Hex()
 
 	messageHistoryPb := &pb.MessageHistory{
-		Id:      id,
-		User1Id: messageHistory.UserOneId,
-		User2Id: messageHistory.UserTwoId,
+		Id:                   id,
+		User1Id:              messageHistory.UserOneId,
+		User2Id:              messageHistory.UserTwoId,
+		UnreadMessagesNumber: 0,
 	}
 	for _, message := range messageHistory.Messages {
 		messageHistoryPb.Messages = append(messageHistoryPb.Messages, &pb.Message{
@@ -21,6 +22,10 @@ func mapMessageHistory(messageHistory *domain.MessageHistory) *pb.MessageHistory
 			MessageText: message.MessageText,
 			DateSent:    message.DateSent.String(),
 		})
+
+		if !message.IsRead {
+			messageHistoryPb.UnreadMessagesNumber++
+		}
 	}
 
 	return messageHistoryPb
