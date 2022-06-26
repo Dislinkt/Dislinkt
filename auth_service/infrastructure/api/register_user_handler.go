@@ -48,6 +48,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		})
 
 		user.TotpToken = key.Secret()
+		user.Active = true
 		uuid, err := handler.userService.Insert(user)
 
 		reply.User.Id = uuid.String()

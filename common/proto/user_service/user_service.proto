@@ -42,6 +42,11 @@ service UserService{
       body: "*"
     };
   }
+  rpc GetUserByUsername(GetOneByUsernameMessage) returns(UserResponse) {
+    option (google.api.http) = {
+      get: "/user/username/{username}"
+    };
+  }
 }
 
 message GetMeMessage{
@@ -61,6 +66,10 @@ message SearchMessage{
 
 message GetOneMessage{
   string id = 1;
+}
+
+message GetOneByUsernameMessage{
+  string username = 1;
 }
 
 message PatchUserRequest{

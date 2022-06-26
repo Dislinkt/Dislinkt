@@ -23,28 +23,40 @@ func NewMessagesMongoDBStore(client *mongo.Client) domain.MessageStore {
 }
 
 func (store *MessageMongoDBStore) GetMessageHistory(user1Id, user2Id string) (*domain.MessageHistory, error) {
-	filter := bson.M{
-		"$or": []bson.M{
-			{"$and": []bson.M{
-				{"user_one_id": user1Id},
-				{"user_two_id": user2Id},
-			}},
-			{"$and": []bson.M{
-				{"user_one_id": user2Id},
-				{"user_two_id": user1Id},
-			}},
-		},
-	}
+	messageHistory, err := store.getMessageHistoryByUsers(user1Id, user2Id)
 
-	messageHistory, err := store.filterOne(filter)
-
+	var messages []domain.Message
 	for _, message := range messageHistory.Messages {
 		if !message.IsRead {
 			message.IsRead = true
 		}
+		messages = append(messages, message)
+	}
+
+	_, err = store.messages.UpdateOne(context.TODO(), bson.M{"_id": messageHistory.Id}, bson.D{
+		{"$set", bson.D{{"messages", messages}}},
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return messageHistory, err
+}
+
+func (store *MessageMongoDBStore) getMessageHistoryByUsers(user1Id string, user2Id string) (*domain.MessageHistory, error) {
+	filter := bson.M{
+		"$or": []bson.M{
+			{
+				"user_one_id": user1Id,
+				"user_two_id": user2Id,
+			},
+			{
+				"user_one_id": user2Id,
+				"user_two_id": user1Id,
+			},
+		}}
+
+	return store.filterOne(filter)
 }
 
 func (store *MessageMongoDBStore) InsertMessage(message *domain.Message, historyId string) (*domain.MessageHistory, error) {
@@ -54,32 +66,44 @@ func (store *MessageMongoDBStore) InsertMessage(message *domain.Message, history
 	message.IsRead = false
 
 	if messageHistory == nil {
-		messHistory := &domain.MessageHistory{
-			Id:        primitive.NewObjectID(),
-			UserOneId: message.SenderId,
-			UserTwoId: message.ReceiverId,
-			Messages:  nil,
+		history, _ := store.getMessageHistoryByUsers(message.SenderId, message.ReceiverId)
+		if history == nil {
+			newId := primitive.NewObjectID()
+			messHistory := &domain.MessageHistory{
+				Id:        newId,
+				UserOneId: message.SenderId,
+				UserTwoId: message.ReceiverId,
+				Messages:  nil,
+			}
+			messHistory.Messages = append(messHistory.Messages, *message)
+			_, err = store.messages.InsertOne(context.TODO(), messHistory)
+			if err != nil {
+				return nil, err
+			}
+			messageHistory, err = store.GetHistoryById(newId)
 		}
-		result, err := store.messages.InsertOne(context.TODO(), messHistory)
-		if err != nil {
-			return nil, err
-		}
-
-		filter := bson.M{"_id": result.InsertedID.(primitive.ObjectID)}
-		messageHistory, err = store.filterOne(filter)
 	} else {
-		messages := append(messageHistory.Messages, *message)
+		if areUsersMatching(messageHistory, message) {
+			messages := append(messageHistory.Messages, *message)
 
-		_, err := store.messages.UpdateOne(context.TODO(), bson.M{"_id": messageHistory.Id}, bson.D{
-			{"$set", bson.D{{"messages", messages}}},
-		})
-		if err != nil {
+			_, err = store.messages.UpdateOne(context.TODO(), bson.M{"_id": messageHistory.Id}, bson.D{
+				{"$set", bson.D{{"messages", messages}}},
+			})
+			if err != nil {
+				return nil, err
+			}
+			messageHistory, err = store.GetHistoryById(id)
+		} else {
 			return nil, err
 		}
 	}
-	messageHistory.Messages = append(messageHistory.Messages, *message)
 
 	return messageHistory, err
+}
+
+func areUsersMatching(history *domain.MessageHistory, message *domain.Message) bool {
+	return (message.SenderId == history.UserOneId && message.ReceiverId == history.UserTwoId) ||
+		(message.SenderId == history.UserTwoId && message.ReceiverId == history.UserOneId)
 }
 
 func (store *MessageMongoDBStore) GetMessageHistoriesByUser(userId string) ([]*domain.MessageHistory, error) {

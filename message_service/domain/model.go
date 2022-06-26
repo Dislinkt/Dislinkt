@@ -16,7 +16,7 @@ type MessageHistory struct {
 type Message struct {
 	SenderId    string    `bson:"sender_one_id"`
 	ReceiverId  string    `bson:"receiver_two_id"`
-	MessageText string    `bson:"receiver_two_id"`
+	MessageText string    `bson:"message_text"`
 	DateSent    time.Time `bson:"date_posted"`
 	IsRead      bool      `bson:"is_read"`
 }

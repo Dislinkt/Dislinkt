@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/message_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/message_service/application"
@@ -18,7 +20,8 @@ func NewMessageHandler(service *application.MessageService) *MessageHandler {
 }
 
 func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
-	userResponse, _ := persistence.UserClient("user_service:8O00").GetMe(context.TODO(), &userGw.GetMeMessage{})
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
 	messageHistories, err := handler.service.GetMessageHistoriesByUser(userResponse.User.Id)
 	if err != nil {
 		return nil, err
@@ -32,7 +35,8 @@ func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, re
 }
 
 func (handler *MessageHandler) GetMessageHistory(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
-	userResponse, _ := persistence.UserClient("user_service:8O00").GetMe(context.TODO(), &userGw.GetMeMessage{})
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
 	messageHistory, err := handler.service.GetMessageHistory(userResponse.User.Id, request.ReceiverId)
 	if err != nil {
 		return nil, err

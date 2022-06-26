@@ -85,6 +85,22 @@ func (handler *UserHandler) GetOne(ctx context.Context, request *pb.GetOneMessag
 	return response, nil
 }
 
+func (handler *UserHandler) GetUserByUsername(ctx context.Context, request *pb.GetOneByUsernameMessage) (*pb.UserResponse, error) {
+	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
+	// defer span.Finish()
+
+	// ctx = tracer.ContextWithSpan(context.Background(), span)
+	// users, err := handler.service.GetAll(ctx)
+	user, err := handler.service.FindByUsername(request.Username)
+	if err != nil || user == nil {
+		return nil, err
+	}
+	response := &pb.UserResponse{
+		User: mapUser(user),
+	}
+	return response, nil
+}
+
 func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.RegisterUserRequest) (*pb.
 	RegisterUserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
