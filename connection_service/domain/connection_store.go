@@ -11,4 +11,7 @@ type ConnectionStore interface {
 	GetAllConnectionForUser(userUid string) ([]*UserNode, error)
 	GetAllConnectionRequestsForUser(userUid string) ([]*UserNode, error)
 	UpdateUser(userUUID string, private bool) error
+	BlockUser(currentUserUUID string, blockedUserUUID string) (*pb.BlockedUserStatus, error)
+	GetAllBlockedForCurrentUser(currentUserUUID string) ([]*UserNode, error)
+	GetAllUserBlockingCurrentUser(currentUserUUID string) ([]*UserNode, error)
 }

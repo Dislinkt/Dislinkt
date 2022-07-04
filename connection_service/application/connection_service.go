@@ -64,6 +64,18 @@ func (service *ConnectionService) UpdateUser(userUUID string,
 	return service.store.UpdateUser(userUUID, private)
 }
 
+func (service *ConnectionService) BlockUser(currentUserUUID string, blockedUserUUid string) (*pb.BlockedUserStatus, error) {
+	return service.store.BlockUser(currentUserUUID, blockedUserUUid)
+}
+
+func (servioe *ConnectionService) GetAllBlockedForCurrentUser(currentUserUUID string) ([]*domain.UserNode, error) {
+	return servioe.store.GetAllBlockedForCurrentUser(currentUserUUID)
+}
+
+func (servioe *ConnectionService) GetAllUserBlockingCurrentUser(currentUserUUID string) ([]*domain.UserNode, error) {
+	return servioe.store.GetAllUserBlockingCurrentUser(currentUserUUID)
+}
+
 func IsValidUUID(u string) bool {
 	_, err := uuid.FromString(u)
 	return err == nil

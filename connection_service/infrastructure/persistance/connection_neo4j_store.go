@@ -365,3 +365,208 @@ func (store *ConnectionDBStore) UpdateUser(userUUID string, private bool) error 
 	}
 	return nil
 }
+
+func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string) (*pb.BlockedUserStatus, error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		if checkIfUserExist(currentUser, tx) && checkIfUserExist(blockedUser, tx) {
+
+			records, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $requestSender MATCH (u2:UserNode) WHERE u2.uid = $requestGet  MATCH (u1)-[r1:CONNECTION]->(u2) return r1.status", map[string]interface{}{
+				"requestSender": currentUser,
+				"requestGet":    blockedUser,
+			})
+
+			if err != nil {
+				return nil, err
+			}
+			record, err := records.Single()
+			if err != nil {
+				return nil, err
+			}
+
+			status := record.Values[0].(string)
+			dateNow := time.Now().Local().Unix()
+			fmt.Println(status)
+			if status == "CONNECTED" {
+				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $currentUser "+
+					"Match (u2:UserNode) WHERE u2.uid = $blocked_user "+
+					"MATCH (u1)-[r1:CONNECTION {status: 'CONNECTED'}]->(u2) "+
+					"MATCH (u2)-[r2:CONNECTION {status: 'CONNECTED'}]->(u1) "+
+					"SET r1.status = $status "+
+					"SET r2.status = $status1", map[string]interface{}{
+					"currentUser":  currentUser,
+					"blocked_user": blockedUser,
+					"status":       "BLOCK",
+					"status1":      "BLOCKED",
+					"date":         dateNow,
+				})
+				if err != nil {
+					return nil, err
+				}
+			} else if status == "BLOCKED" {
+				fmt.Println("uslo")
+				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $currentUser "+
+					"Match (u2:UserNode) WHERE u2.uid = $blocked_user "+
+					"MATCH (u1)-[r1:CONNECTION {status: 'BLOCKED'}]->(u2) "+
+					"SET r1.status = $status ", map[string]interface{}{
+					"currentUser":  currentUser,
+					"blocked_user": blockedUser,
+					"status":       "BLOCK",
+					"date":         dateNow,
+				})
+				if err != nil {
+					return nil, err
+				}
+			} else if status == "BLOCK" {
+				return &pb.BlockedUserStatus{
+					CurrentUserUUID:    currentUser,
+					BlockedUserUUID:    blockedUser,
+					ConnectionResponse: "Action refused: user blocked",
+				}, nil
+			} else {
+				return &pb.BlockedUserStatus{
+					CurrentUserUUID:    currentUser,
+					BlockedUserUUID:    blockedUser,
+					ConnectionResponse: "Action refused: users not connected",
+				}, nil
+			}
+
+		} else {
+			return &pb.BlockedUserStatus{
+				CurrentUserUUID:    "",
+				BlockedUserUUID:    "",
+				ConnectionResponse: "Connection refused - user not found",
+			}, nil
+		}
+
+		return &pb.BlockedUserStatus{
+			CurrentUserUUID:    "",
+			BlockedUserUUID:    "",
+			ConnectionResponse: "Connection refused - user not found",
+		}, nil
+
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result.(*pb.BlockedUserStatus), nil
+}
+
+func (store *ConnectionDBStore) GetAllBlockedForCurrentUser(currentUserUUID string) (blockedUsers []*domain.UserNode, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		if !checkIfUserExist(currentUserUUID, tx) {
+			return &domain.UserNode{
+				UserUID: "",
+				Status:  "",
+			}, nil
+		}
+
+		records, err := tx.Run("match (u1:UserNode) where u1.uid = $userUid "+
+			"match (u2:UserNode) "+
+			"MATCH (u1)-[r1:CONNECTION {status: 'BLOCK'}]->(u2) "+
+			"return u2.uid, u2.status", map[string]interface{}{
+			"userUid": currentUserUUID,
+		})
+
+		for records.Next() {
+			node := domain.UserNode{}
+			if records.Record().Values[1].(string) == "PRIVATE" {
+				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Private}
+			} else {
+				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Public}
+			}
+			blockedUsers = append(blockedUsers, &node)
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		//re, err := records.Single()
+		if err != nil {
+			return nil, err
+		}
+		// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
+		return &blockedUsers, nil
+	})
+
+	if err != nil {
+		return nil, err
+
+	}
+
+	return blockedUsers, nil
+}
+
+func (store *ConnectionDBStore) GetAllUserBlockingCurrentUser(currentUserUUID string) (usersThatBlockedYou []*domain.UserNode, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		if !checkIfUserExist(currentUserUUID, tx) {
+			return &domain.UserNode{
+				UserUID: "",
+				Status:  "",
+			}, nil
+		}
+
+		records, err := tx.Run("match (u1:UserNode) where u1.uid = $userUid "+
+			"match (u2:UserNode) "+
+			"MATCH (u2)-[r1:CONNECTION {status: 'BLOCK'}]->(u1) "+
+			"return u2.uid, u2.status", map[string]interface{}{
+			"userUid": currentUserUUID,
+		})
+
+		for records.Next() {
+			node := domain.UserNode{}
+			if records.Record().Values[1].(string) == "PRIVATE" {
+				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Private}
+			} else {
+				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Public}
+			}
+
+			usersThatBlockedYou = append(usersThatBlockedYou, &node)
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		//re, err := records.Single()
+		if err != nil {
+			return nil, err
+		}
+		// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
+		return &usersThatBlockedYou, nil
+	})
+
+	if err != nil {
+		return nil, err
+
+	}
+
+	return usersThatBlockedYou, nil
+}

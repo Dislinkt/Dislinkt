@@ -27,6 +27,9 @@ type ConnectionServiceClient interface {
 	AcceptConnection(ctx context.Context, in *AcceptConnectionMessage, opts ...grpc.CallOption) (*NewConnectionResponse, error)
 	GetAllConnectionForUser(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	GetAllConnectionRequestsForUser(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockedUserStatus, error)
+	GetAllBlockedForCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	GetAllUserBlockingCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 }
 
 type connectionServiceClient struct {
@@ -82,6 +85,33 @@ func (c *connectionServiceClient) GetAllConnectionRequestsForUser(ctx context.Co
 	return out, nil
 }
 
+func (c *connectionServiceClient) BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockedUserStatus, error) {
+	out := new(BlockedUserStatus)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/BlockUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) GetAllBlockedForCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/GetAllBlockedForCurrentUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) GetAllUserBlockingCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/GetAllUserBlockingCurrentUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConnectionServiceServer is the server API for ConnectionService service.
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
@@ -91,6 +121,9 @@ type ConnectionServiceServer interface {
 	AcceptConnection(context.Context, *AcceptConnectionMessage) (*NewConnectionResponse, error)
 	GetAllConnectionForUser(context.Context, *GetConnectionRequest) (*GetAllResponse, error)
 	GetAllConnectionRequestsForUser(context.Context, *GetConnectionRequest) (*GetAllResponse, error)
+	BlockUser(context.Context, *BlockUserRequest) (*BlockedUserStatus, error)
+	GetAllBlockedForCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error)
+	GetAllUserBlockingCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -112,6 +145,15 @@ func (UnimplementedConnectionServiceServer) GetAllConnectionForUser(context.Cont
 }
 func (UnimplementedConnectionServiceServer) GetAllConnectionRequestsForUser(context.Context, *GetConnectionRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllConnectionRequestsForUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) BlockUser(context.Context, *BlockUserRequest) (*BlockedUserStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlockUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) GetAllBlockedForCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllBlockedForCurrentUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) GetAllUserBlockingCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllUserBlockingCurrentUser not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -216,6 +258,60 @@ func _ConnectionService_GetAllConnectionRequestsForUser_Handler(srv interface{},
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_BlockUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlockUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).BlockUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/BlockUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).BlockUser(ctx, req.(*BlockUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_GetAllBlockedForCurrentUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlockUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).GetAllBlockedForCurrentUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/GetAllBlockedForCurrentUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).GetAllBlockedForCurrentUser(ctx, req.(*BlockUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_GetAllUserBlockingCurrentUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlockUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).GetAllUserBlockingCurrentUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/GetAllUserBlockingCurrentUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).GetAllUserBlockingCurrentUser(ctx, req.(*BlockUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +338,18 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllConnectionRequestsForUser",
 			Handler:    _ConnectionService_GetAllConnectionRequestsForUser_Handler,
+		},
+		{
+			MethodName: "BlockUser",
+			Handler:    _ConnectionService_BlockUser_Handler,
+		},
+		{
+			MethodName: "GetAllBlockedForCurrentUser",
+			Handler:    _ConnectionService_GetAllBlockedForCurrentUser_Handler,
+		},
+		{
+			MethodName: "GetAllUserBlockingCurrentUser",
+			Handler:    _ConnectionService_GetAllUserBlockingCurrentUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

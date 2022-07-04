@@ -48,6 +48,28 @@ service ConnectionService{
     };
   }
 
+  rpc BlockUser(BlockUserRequest) returns (BlockedUserStatus) {
+    option (google.api.http) = {
+      post: "/connection/user/{uuid}/block/{uuid1}"
+      body: ""
+    };
+  }
+
+  rpc GetAllBlockedForCurrentUser(BlockUserRequest) returns (GetAllResponse){
+    option (google.api.http) = {
+      get: "/connection/user/block/{uuid}"
+      body: ""
+    };
+  }
+
+  rpc GetAllUserBlockingCurrentUser(BlockUserRequest) returns (GetAllResponse){
+    option (google.api.http) = {
+      get: "/connection/user/blocked/{uuid}"
+      body: ""
+    };
+  }
+
+
 }
 
 message RegisterRequest{
@@ -65,8 +87,21 @@ message  NewConnectionResponse {
     string  ConnectionResponse = 3;
 }
 
+
+message  BlockedUserStatus {
+  string  CurrentUserUUID = 1;
+  string  BlockedUserUUID = 2;
+  string  ConnectionResponse = 3;
+}
+
+
 message GetConnectionRequest{
     string uuid = 1;
+}
+
+message BlockUserRequest {
+  string uuid = 1;
+  string uuid1 = 2;
 }
 
 message Connection {
