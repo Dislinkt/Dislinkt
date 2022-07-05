@@ -3,13 +3,12 @@ package startup
 import (
 	"context"
 	"fmt"
+	"github.com/dislinkt/api_gateway/infrastructure/api"
+	"github.com/gorilla/handlers"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"io"
 	"log"
 	"net/http"
-	"path/filepath"
-
-	"github.com/dislinkt/api_gateway/infrastructure/api"
-	"github.com/gorilla/handlers"
 
 	// "github.com/dislinkt/api_gateway/infrastructure/api"
 
@@ -86,18 +85,19 @@ func (server *Server) initCustomHandlers() {
 }
 
 func (server *Server) Start() {
-	crtPath, _ := filepath.Abs("./cert.crt")
-	keyPath, _ := filepath.Abs("./cert.key")
+	//crtPath, _ := filepath.Abs("./cert.crt")
+	//keyPath, _ := filepath.Abs("./cert.key")
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**",
 			"http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**",
-			"http://localhost:3000/**", "http://localhost:3000"}),
+			"http://localhost:3000/**", "http://localhost:3000", "http://localhost:9090"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}),
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
 		handlers.AllowCredentials(),
 	)
-	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
-	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
+	http.Handle("/metrics", promhttp.Handler())
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
+	//	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
 	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
 }
 

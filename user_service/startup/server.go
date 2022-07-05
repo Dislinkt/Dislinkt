@@ -2,11 +2,7 @@ package startup
 
 import (
 	"fmt"
-	"log"
-	"net"
-
 	"github.com/dislinkt/common/interceptor"
-
 	userProto "github.com/dislinkt/common/proto/user_service"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
@@ -15,8 +11,13 @@ import (
 	"github.com/dislinkt/user_service/infrastructure/api"
 	"github.com/dislinkt/user_service/infrastructure/persistence"
 	"github.com/dislinkt/user_service/startup/config"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
+	"log"
+	"net"
+	"net/http"
 )
 
 type Server struct {
@@ -72,7 +73,6 @@ func (server *Server) Start() {
 	server.initUpdateUserHandler(userService, updateReplyPublisher, updateCommandSubscriber)
 
 	userHandler := server.initUserHandler(userService)
-
 	server.startGrpcServer(userHandler)
 
 }
@@ -186,9 +186,12 @@ func (server *Server) startGrpcServer(userHandler *api.UserHandler) {
 	}
 
 	interceptor := interceptor.NewAuthInterceptor(config.AccessiblePermissions(), server.config.PublicKey)
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()))
-	// grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.ChainUnaryInterceptor(interceptor.Unary(), grpc_prometheus.UnaryServerInterceptor))
 	userProto.RegisterUserServiceServer(grpcServer, userHandler)
+	grpc_prometheus.Register(grpcServer)
+	// Register Prometheus metrics handler.
+	http.Handle("/metrics", promhttp.Handler())
+	// grpcServer := grpc.NewServer()
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
