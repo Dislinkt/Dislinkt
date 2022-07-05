@@ -408,8 +408,16 @@ func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string
 					"status1":      "BLOCKED",
 					"date":         dateNow,
 				})
+				fmt.Println("Korisnici izblokirani")
+
 				if err != nil {
 					return nil, err
+				} else {
+					return &pb.BlockedUserStatus{
+						CurrentUserUUID:    currentUser,
+						BlockedUserUUID:    blockedUser,
+						ConnectionResponse: "BLOCK",
+					}, nil
 				}
 			} else if status == "BLOCKED" {
 				fmt.Println("uslo")
@@ -424,6 +432,12 @@ func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string
 				})
 				if err != nil {
 					return nil, err
+				} else {
+					return &pb.BlockedUserStatus{
+						CurrentUserUUID:    currentUser,
+						BlockedUserUUID:    blockedUser,
+						ConnectionResponse: "BLOCK",
+					}, nil
 				}
 			} else if status == "BLOCK" {
 				return &pb.BlockedUserStatus{
@@ -447,12 +461,6 @@ func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string
 			}, nil
 		}
 
-		return &pb.BlockedUserStatus{
-			CurrentUserUUID:    "",
-			BlockedUserUUID:    "",
-			ConnectionResponse: "Connection refused - user not found",
-		}, nil
-
 	})
 
 	if err != nil {
@@ -463,6 +471,8 @@ func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string
 }
 
 func (store *ConnectionDBStore) GetAllBlockedForCurrentUser(currentUserUUID string) (blockedUsers []*domain.UserNode, err error) {
+	fmt.Println("ConnectionDBStore [GetAllBlockedForCurrentUser]")
+
 	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer func(session neo4j.Session) {
 		err := session.Close()
@@ -470,7 +480,7 @@ func (store *ConnectionDBStore) GetAllBlockedForCurrentUser(currentUserUUID stri
 
 		}
 	}(session)
-
+	fmt.Println("ConnectionDBStore [GetAllBlockedForCurrentUser] 1")
 	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		if !checkIfUserExist(currentUserUUID, tx) {
@@ -479,14 +489,15 @@ func (store *ConnectionDBStore) GetAllBlockedForCurrentUser(currentUserUUID stri
 				Status:  "",
 			}, nil
 		}
-
+		fmt.Println("ConnectionDBStore [GetAllBlockedForCurrentUser] 2")
 		records, err := tx.Run("match (u1:UserNode) where u1.uid = $userUid "+
 			"match (u2:UserNode) "+
-			"MATCH (u1)-[r1:CONNECTION {status: 'BLOCK'}]->(u2) "+
+			"MATCH (u1)-[r1:CONNECTION {status: $status}]->(u2) "+
 			"return u2.uid, u2.status", map[string]interface{}{
 			"userUid": currentUserUUID,
+			"status":  "BLOCK",
 		})
-
+		fmt.Println(records)
 		for records.Next() {
 			node := domain.UserNode{}
 			if records.Record().Values[1].(string) == "PRIVATE" {
@@ -494,6 +505,7 @@ func (store *ConnectionDBStore) GetAllBlockedForCurrentUser(currentUserUUID stri
 			} else {
 				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Public}
 			}
+			fmt.Println("dodaj korisnika")
 			blockedUsers = append(blockedUsers, &node)
 		}
 
@@ -536,9 +548,10 @@ func (store *ConnectionDBStore) GetAllUserBlockingCurrentUser(currentUserUUID st
 
 		records, err := tx.Run("match (u1:UserNode) where u1.uid = $userUid "+
 			"match (u2:UserNode) "+
-			"MATCH (u2)-[r1:CONNECTION {status: 'BLOCK'}]->(u1) "+
+			"MATCH (u2)-[r1:CONNECTION {status: $status}]->(u1) "+
 			"return u2.uid, u2.status", map[string]interface{}{
 			"userUid": currentUserUUID,
+			"status":  "BLOCK",
 		})
 
 		for records.Next() {

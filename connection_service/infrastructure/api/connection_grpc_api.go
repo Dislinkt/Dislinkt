@@ -94,7 +94,7 @@ func (handler *ConnectionHandler) BlockUser(ctx context.Context, request *pb.Blo
 
 func (handler *ConnectionHandler) GetAllBlockedForCurrentUser(ctx context.Context, request *pb.BlockUserRequest) (*pb.GetAllResponse, error) {
 	fmt.Println("[ConnectionHandler]:GetAllBlockedForCurrentUser")
-	users, err := handler.service.GetAllBlockedForCurrentUser(request.Uuid1)
+	users, err := handler.service.GetAllBlockedForCurrentUser(request.Uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +103,7 @@ func (handler *ConnectionHandler) GetAllBlockedForCurrentUser(ctx context.Contex
 	}
 
 	for _, user := range users {
+		fmt.Println("Uslo je")
 		current := pb.User{UserID: user.UserUID, Status: string(user.Status)}
 		response.Users = append(response.Users, &current)
 	}
@@ -112,7 +113,8 @@ func (handler *ConnectionHandler) GetAllBlockedForCurrentUser(ctx context.Contex
 
 func (handler *ConnectionHandler) GetAllUserBlockingCurrentUser(ctx context.Context, request *pb.BlockUserRequest) (*pb.GetAllResponse, error) {
 	fmt.Println("[ConnectionHandler]:GetAllUserBlockingCurrentUser")
-	users, err := handler.service.GetAllUserBlockingCurrentUser(request.Uuid1)
+	users, err := handler.service.GetAllUserBlockingCurrentUser(request.Uuid)
+	fmt.Println(len(users))
 	if err != nil {
 		return nil, err
 	}

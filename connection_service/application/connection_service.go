@@ -65,14 +65,17 @@ func (service *ConnectionService) UpdateUser(userUUID string,
 }
 
 func (service *ConnectionService) BlockUser(currentUserUUID string, blockedUserUUid string) (*pb.BlockedUserStatus, error) {
+	fmt.Println("[ConnectionService BlockUser")
 	return service.store.BlockUser(currentUserUUID, blockedUserUUid)
 }
 
 func (servioe *ConnectionService) GetAllBlockedForCurrentUser(currentUserUUID string) ([]*domain.UserNode, error) {
+	fmt.Println("[ConnectionService GetAllBlockedForCurrentUser")
 	return servioe.store.GetAllBlockedForCurrentUser(currentUserUUID)
 }
 
 func (servioe *ConnectionService) GetAllUserBlockingCurrentUser(currentUserUUID string) ([]*domain.UserNode, error) {
+	fmt.Println("[ConnectionService GetAllUserBlockingCurrentUser")
 	return servioe.store.GetAllUserBlockingCurrentUser(currentUserUUID)
 }
 
