@@ -21,6 +21,7 @@ func mapMessageHistory(messageHistory *domain.MessageHistory) *pb.MessageHistory
 			ReceiverId:  message.ReceiverId,
 			MessageText: message.MessageText,
 			DateSent:    message.DateSent.String(),
+			IsRead:      message.IsRead,
 		})
 
 		if !message.IsRead {

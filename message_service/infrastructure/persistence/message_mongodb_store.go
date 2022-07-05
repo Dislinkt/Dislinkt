@@ -27,7 +27,7 @@ func (store *MessageMongoDBStore) GetMessageHistory(user1Id, user2Id string) (*d
 
 	var messages []domain.Message
 	for _, message := range messageHistory.Messages {
-		if !message.IsRead {
+		if !message.IsRead && message.SenderId != user1Id {
 			message.IsRead = true
 		}
 		messages = append(messages, message)

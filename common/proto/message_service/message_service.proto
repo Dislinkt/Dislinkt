@@ -58,6 +58,7 @@ message Message {
   string ReceiverId = 2;
   string MessageText = 3;
   string DateSent = 4;
+  bool IsRead = 5;
 }
 
 
