@@ -9,7 +9,7 @@ import (
 	pb "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/user_service/application"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type UserHandler struct {
@@ -64,6 +64,27 @@ func (handler *UserHandler) GetMe(ctx context.Context, request *pb.GetMeMessage)
 	}
 	response := &pb.GetMeResponse{
 		User: mapUser(user),
+	}
+	return response, nil
+}
+
+func (handler *UserHandler) GetPublicUsers(ctx context.Context, request *pb.GetMeMessage) (*pb.GetAllResponse, error) {
+	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
+	// defer span.Finish()
+
+	// ctx = tracer.ContextWithSpan(context.Background(), span)
+	// users, err := handler.service.GetAll(ctx)
+
+	users, err := handler.service.GetPublicUsers()
+	if err != nil || users == nil {
+		return nil, err
+	}
+	response := &pb.GetAllResponse{
+		Users: []*pb.User{},
+	}
+	for _, user := range *users {
+		current := mapUser(&user)
+		response.Users = append(response.Users, current)
 	}
 	return response, nil
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 
@@ -57,6 +57,17 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 	// defer span.Finish()
 	var users []domain.User
 	result := store.db.Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &users, nil
+}
+
+func (store *UserPostgresStore) GetPublicUsers() (*[]domain.User, error) {
+	// span := tracer.StartSpanFromContext(ctx, "GetAll-DB")
+	// defer span.Finish()
+	var users []domain.User
+	result := store.db.Where("private = false").Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}

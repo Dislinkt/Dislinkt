@@ -3,9 +3,10 @@ package application
 import (
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator/v10"
-	uuid "github.com/gofrs/uuid"
 	"time"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/gofrs/uuid"
 
 	"github.com/dislinkt/user_service/domain"
 	"google.golang.org/grpc/codes"
@@ -202,4 +203,8 @@ func (service *UserService) Delete(user *domain.User) interface{} {
 		return err
 	}
 	return service.store.Delete(user)
+}
+
+func (service *UserService) GetPublicUsers() (*[]domain.User, error) {
+	return service.store.GetPublicUsers()
 }

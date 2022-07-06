@@ -1,7 +1,7 @@
 package domain
 
 import (
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type UserStore interface {
@@ -12,4 +12,5 @@ type UserStore interface {
 	FindByUsername(username string) (*User, error)
 	Search(searchText string) (*[]User, error)
 	Delete(user *User) error
+	GetPublicUsers() (*[]User, error)
 }

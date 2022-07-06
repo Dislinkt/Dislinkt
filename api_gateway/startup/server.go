@@ -105,6 +105,8 @@ func (server *Server) initCustomHandlers() {
 	connectionBlockHandler.Init(server.mux)
 	connectionAllHandler := api.NewConnectionAllHandler(server.config)
 	connectionAllHandler.Init(server.mux)
+	publicUserFeedHandler := api.NewPublicUserFeedHandler(server.config)
+	publicUserFeedHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {

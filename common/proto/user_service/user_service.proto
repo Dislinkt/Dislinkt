@@ -47,6 +47,11 @@ service UserService{
       get: "/user/username/{username}"
     };
   }
+  rpc GetPublicUsers(GetMeMessage) returns(GetAllResponse) {
+    option (google.api.http) = {
+      get: "/user/public"
+    };
+  }
 }
 
 message GetMeMessage{
