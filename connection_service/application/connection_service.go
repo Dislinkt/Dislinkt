@@ -79,6 +79,11 @@ func (servioe *ConnectionService) GetAllUserBlockingCurrentUser(currentUserUUID 
 	return servioe.store.GetAllUserBlockingCurrentUser(currentUserUUID)
 }
 
+func (servioe *ConnectionService) RecommendUsersByConnection(currentUserUUID string) (users []*domain.UserNode, err error) {
+	fmt.Println("[ConnectionService RecommendUsersByConnection")
+	return servioe.store.RecommendUsersByConnection(currentUserUUID)
+}
+
 func IsValidUUID(u string) bool {
 	_, err := uuid.FromString(u)
 	return err == nil

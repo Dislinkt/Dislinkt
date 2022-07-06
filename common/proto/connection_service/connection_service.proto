@@ -70,6 +70,14 @@ service ConnectionService{
   }
 
 
+  rpc RecommendUsersByConnection(GetConnectionRequest) returns (GetAllResponse){
+    option (google.api.http) = {
+      get: "/connection/recommend/users/{uuid}"
+      body: ""
+    };
+  }
+
+
 }
 
 message RegisterRequest{

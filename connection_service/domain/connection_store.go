@@ -14,4 +14,5 @@ type ConnectionStore interface {
 	BlockUser(currentUserUUID string, blockedUserUUID string) (*pb.BlockedUserStatus, error)
 	GetAllBlockedForCurrentUser(currentUserUUID string) ([]*UserNode, error)
 	GetAllUserBlockingCurrentUser(currentUserUUID string) ([]*UserNode, error)
+	RecommendUsersByConnection(currentUserUUID string) (users []*UserNode, err error)
 }
