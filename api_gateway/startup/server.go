@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"github.com/dislinkt/api_gateway/infrastructure/api"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	muxprom "gitlab.com/msvechla/mux-prometheus/pkg/middleware"
 	"io"
 	"log"
 	"net/http"
+	"path/filepath"
 
 	// "github.com/dislinkt/api_gateway/infrastructure/api"
 
@@ -85,8 +88,8 @@ func (server *Server) initCustomHandlers() {
 }
 
 func (server *Server) Start() {
-	//crtPath, _ := filepath.Abs("./cert.crt")
-	//keyPath, _ := filepath.Abs("./cert.key")
+	crtPath, _ := filepath.Abs("./cert.crt")
+	keyPath, _ := filepath.Abs("./cert.key")
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**",
 			"http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**",
@@ -95,9 +98,13 @@ func (server *Server) Start() {
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
 		handlers.AllowCredentials(),
 	)
-	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
-	//	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
+	r := mux.NewRouter()
+	instrumentation := muxprom.NewDefaultInstrumentation()
+	r.Use(instrumentation.Middleware)
+	r.Path("/metrics").Handler(promhttp.Handler())
+	r.PathPrefix("/").Handler(cors(muxMiddleware(server)))
+	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
+	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, r))
 	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
 }
 

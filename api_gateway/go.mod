@@ -13,7 +13,9 @@ require (
 require (
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
 	github.com/prometheus/client_golang v1.12.2
+	gitlab.com/msvechla/mux-prometheus v0.0.2
 )
 
 require (

@@ -40,6 +40,7 @@ services:
     #      - tracing
     networks:
       - network
+      - monitoring
     ports:
       - "8081:8000"
 
@@ -66,6 +67,7 @@ services:
       - post_db
     networks:
       - network
+      - monitoring
     ports:
       - "8082:8000"
 
@@ -90,6 +92,7 @@ services:
       - additional_user_db
     networks:
       - network
+      - monitoring
     ports:
       - "8083:8000"
 
@@ -118,6 +121,7 @@ services:
       - neo4j
     networks:
       - network
+      - monitoring
     ports:
       - "8084:8000"
 
@@ -147,6 +151,7 @@ services:
       - auth_db
     networks:
       - network
+      - monitoring
     ports:
       - "8085:8000"
 
@@ -173,6 +178,7 @@ services:
       CONNECTION_SERVICE_PORT: ${CONNECTION_SERVICE_PORT}
     networks:
       - network
+      - monitoring
   #      - jaeger-demo
   #    depends_on:
   #      - tracing
@@ -187,6 +193,7 @@ services:
       POSTGRES_DB: ${USER_DB_NAME}
     networks:
       - network
+      - monitoring
 
   auth_db:
     image: postgres
@@ -198,6 +205,7 @@ services:
       POSTGRES_DB: ${AUTH_DB_NAME}
     networks:
       - network
+      - monitoring
 
   post_db:
     image: mongo
@@ -205,6 +213,7 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   neo4j:
     image: neo4j:4.3.3-community #4.3.3-community  latest
@@ -214,6 +223,7 @@ services:
       - "7687:7687"
     networks:
       - network
+      - monitoring
     environment:
       - NEO4J_AUTH=neo4j/password
       - NEO4J_dbms_memory_pagecache_size=512M
@@ -224,6 +234,7 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   #  tracing:
   #    image: jaegertracing/all-in-one
@@ -243,39 +254,11 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
     ports:
       - 8222:8222
       - 4222:4222
       - 6222:6222
-
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    ports:
-      - 9090:9090
-    restart: unless-stopped
-    volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus-data:/prometheus
-    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
-    networks:
-      - network
-
-  grafana:
-    image: grafana/grafana:8.0.4
-    container_name: grafana
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-    environment:
-      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-    restart: unless-stopped
-    ports:
-      - 3031:3000
-    networks:
-      - network
 
 #  postman:
 #    image: postman/newman_ubuntu1404:4.5.5
@@ -307,5 +290,7 @@ volumes:
 networks:
   network:
     driver: bridge
+  monitoring:
+    external: true
 
 #  jaeger-demo:
