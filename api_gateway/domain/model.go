@@ -28,7 +28,7 @@ type Links struct {
 	Dislike string
 }
 
-type ConnectionRequest struct {
+type ConnectionUser struct {
 	UserId    string
 	Name      string
 	Surname   string

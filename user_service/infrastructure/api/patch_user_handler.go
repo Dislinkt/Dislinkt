@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
 
 	saga "github.com/dislinkt/common/saga/messaging"
 	events "github.com/dislinkt/common/saga/patch_user"
@@ -39,11 +38,6 @@ func (handler *PatchUserCommandHandler) handle(command *events.PatchUserCommand)
 		var paths []string
 		paths = append(paths, "private")
 		user := mapPatchUser(command.User)
-		if err := validator.New().Struct(user); err != nil {
-			//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-			reply.Type = events.PatchFailedInUser
-			return
-		}
 		dbUser, err := handler.userService.PatchUser(paths, user, command.User.Username)
 		if err != nil {
 			fmt.Println(err)
