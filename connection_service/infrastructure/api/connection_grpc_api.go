@@ -148,3 +148,82 @@ func (handler *ConnectionHandler) RecommendUsersByConnection(ctx context.Context
 
 	return response, nil
 }
+
+func (handler *ConnectionHandler) UnblockConnection(ctx context.Context, request *pb.BlockUserRequest) (response *pb.BlockedUserStatus, err error) {
+	fmt.Println("[ConnectionHandler]:UnblockConnection")
+	return handler.service.UnblockConnection(request.Uuid, request.Uuid1)
+}
+
+func (handler *ConnectionHandler) InsertField(ctx context.Context, request *pb.Field) (response *pb.Response, err error) {
+	fmt.Println("[ConnectionHandler]:InsertField")
+	name, err := handler.service.InsertField(request.Name)
+	response = &pb.Response{
+		Name: name,
+	}
+	return response, err
+}
+
+func (handler *ConnectionHandler) InsertSkill(ctx context.Context, request *pb.Field) (response *pb.Response, err error) {
+	fmt.Println("[ConnectionHandler]:InsertSkill")
+	name, err := handler.service.InsertSkill(request.Name)
+	response = &pb.Response{
+		Name: name,
+	}
+	return response, err
+}
+
+func (handler *ConnectionHandler) InsertJobOffer(ctx context.Context, request *pb.JobOffer) (response *pb.Response, err error) {
+	fmt.Println("[ConnectionHandler]:InsertJobOffer")
+	name, err := handler.service.InsertJobOffer(*mapJobOfferPb(request))
+	response = &pb.Response{
+		Name: name,
+	}
+	return response, err
+}
+
+func (handler *ConnectionHandler) InsertSkillToUser(ctx context.Context, request *pb.UserInfoItem) (response *pb.Response, err error) {
+	fmt.Println("[ConnectionHandler]:InsertSkillToUser")
+	name, err := handler.service.InsertSkillToUser(request.Name, request.Uuid)
+	response = &pb.Response{
+		Name: name,
+	}
+	return response, err
+}
+
+func (handler *ConnectionHandler) InsertFieldToUser(ctx context.Context, request *pb.UserInfoItem) (response *pb.Response, err error) {
+	fmt.Println("[ConnectionHandler]:InsertFieldToUser")
+	name, err := handler.service.InsertFieldToUser(request.Name, request.Uuid)
+	response = &pb.Response{
+		Name: name,
+	}
+	return response, err
+}
+
+func (handler *ConnectionHandler) RecommendJobBySkill(ctx context.Context, request *pb.GetConnectionRequest) (response *pb.JobOffers, err error) {
+	fmt.Println("[ConnectionHandler]:InsertFieldToUser")
+	response = &pb.JobOffers{
+		Jobs: []*pb.JobOffer{},
+	}
+	jobs, err := handler.service.RecommendJobBySkill(request.Uuid)
+
+	for _, job := range jobs {
+		fmt.Println("Uslo je")
+		current := mapJobOffer(job)
+		response.Jobs = append(response.Jobs, current)
+	}
+	return response, err
+}
+
+func (handler *ConnectionHandler) RecommendJobByField(ctx context.Context, request *pb.GetConnectionRequest) (response *pb.JobOffers, err error) {
+	fmt.Println("[ConnectionHandler]:RecommendJobByField")
+	response = &pb.JobOffers{
+		Jobs: []*pb.JobOffer{},
+	}
+	jobs, err := handler.service.RecommendJobByField(request.Uuid)
+
+	for _, job := range jobs {
+		current := mapJobOffer(job)
+		response.Jobs = append(response.Jobs, current)
+	}
+	return response, err
+}

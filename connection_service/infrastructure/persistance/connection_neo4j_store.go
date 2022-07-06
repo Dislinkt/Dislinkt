@@ -636,7 +636,7 @@ func (store *ConnectionDBStore) RecommendUsersByConnection(currentUserUUID strin
 	return users, err
 }
 
-func (store *ConnectionDBStore) unblockConnection(driver neo4j.Driver, currentUser string, blockedUser string) (*pb.BlockedUserStatus, error) {
+func (store *ConnectionDBStore) UnblockConnection(currentUser string, blockedUser string) (*pb.BlockedUserStatus, error) {
 	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer func(session neo4j.Session) {
 		err := session.Close()
@@ -728,7 +728,7 @@ func (store *ConnectionDBStore) unblockConnection(driver neo4j.Driver, currentUs
 	return result.(*pb.BlockedUserStatus), nil
 }
 
-func (store *ConnectionDBStore) InsertField(driver neo4j.Driver, name string) (string, error) {
+func (store *ConnectionDBStore) InsertField(name string) (string, error) {
 	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer func(session neo4j.Session) {
 		err := session.Close()
@@ -762,7 +762,7 @@ func (store *ConnectionDBStore) InsertField(driver neo4j.Driver, name string) (s
 	return result.(string), nil
 }
 
-func (store *ConnectionDBStore) InsertSkill(driver neo4j.Driver, name string) (string, error) {
+func (store *ConnectionDBStore) InsertSkill(name string) (string, error) {
 	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer func(session neo4j.Session) {
 		err := session.Close()
@@ -796,7 +796,7 @@ func (store *ConnectionDBStore) InsertSkill(driver neo4j.Driver, name string) (s
 	return result.(string), nil
 }
 
-func (store *ConnectionDBStore) InsertJobOffer(driver neo4j.Driver, jobOffer domain.JobOffer) (string, error) {
+func (store *ConnectionDBStore) InsertJobOffer(jobOffer domain.JobOffer) (string, error) {
 	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer func(session neo4j.Session) {
 		err := session.Close()
@@ -858,9 +858,14 @@ func (store *ConnectionDBStore) InsertJobOffer(driver neo4j.Driver, jobOffer dom
 	return result.(string), nil
 }
 
-func InsertSkillToUser(driver neo4j.Driver, name string, uuid string) (string, error) {
-	session := driver.NewSession(neo4j.SessionConfig{})
-	defer session.Close()
+func (store *ConnectionDBStore) InsertSkillToUser(name string, uuid string) (string, error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
 
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
@@ -890,9 +895,14 @@ func InsertSkillToUser(driver neo4j.Driver, name string, uuid string) (string, e
 	return result.(string), nil
 }
 
-func InsertFieldToUser(driver neo4j.Driver, name string, uuid string) (string, error) {
-	session := driver.NewSession(neo4j.SessionConfig{})
-	defer session.Close()
+func (store *ConnectionDBStore) InsertFieldToUser(name string, uuid string) (string, error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
 
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
@@ -922,10 +932,15 @@ func InsertFieldToUser(driver neo4j.Driver, name string, uuid string) (string, e
 	return result.(string), nil
 }
 
-func RecommendJobBySkill(driver neo4j.Driver, userUid string) (jobs []*domain.JobOffer, error) {
-	session := driver.NewSession(neo4j.SessionConfig{})
-	defer session.Close()
-	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+func (store *ConnectionDBStore) RecommendJobBySkill(userUid string) (jobs []*domain.JobOffer, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		if !checkIfUserExist(userUid, tx) {
 			return nil, nil
@@ -969,10 +984,15 @@ func RecommendJobBySkill(driver neo4j.Driver, userUid string) (jobs []*domain.Jo
 	return jobs, err
 }
 
-func RecommendJobByField(driver neo4j.Driver, userUid string) (jobs []*domain.JobOffer, error) {
-	session := driver.NewSession(neo4j.SessionConfig{})
-	defer session.Close()
-	_, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+func (store *ConnectionDBStore) RecommendJobByField(userUid string) (jobs []*domain.JobOffer, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		if !checkIfUserExist(userUid, tx) {
 			return nil, nil

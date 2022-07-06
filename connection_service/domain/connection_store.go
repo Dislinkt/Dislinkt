@@ -15,4 +15,12 @@ type ConnectionStore interface {
 	GetAllBlockedForCurrentUser(currentUserUUID string) ([]*UserNode, error)
 	GetAllUserBlockingCurrentUser(currentUserUUID string) ([]*UserNode, error)
 	RecommendUsersByConnection(currentUserUUID string) (users []*UserNode, err error)
+	UnblockConnection(currentUser string, blockedUser string) (*pb.BlockedUserStatus, error)
+	InsertField(name string) (string, error)
+	InsertSkill(name string) (string, error)
+	InsertJobOffer(jobOffer JobOffer) (string, error)
+	InsertSkillToUser(name string, uuid string) (string, error)
+	InsertFieldToUser(name string, uuid string) (string, error)
+	RecommendJobBySkill(userUid string) (jobs []*JobOffer, err error)
+	RecommendJobByField(userUid string) (jobs []*JobOffer, err error)
 }
