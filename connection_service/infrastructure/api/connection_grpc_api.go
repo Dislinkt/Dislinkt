@@ -129,3 +129,22 @@ func (handler *ConnectionHandler) GetAllUserBlockingCurrentUser(ctx context.Cont
 
 	return response, nil
 }
+
+func (handler *ConnectionHandler) RecommendUsersByConnection(ctx context.Context, request *pb.GetConnectionRequest) (*pb.GetAllResponse, error) {
+	fmt.Println("[ConnectionHandler]:RecommendUsersByConnection")
+	users, err := handler.service.RecommendUsersByConnection(request.Uuid)
+	fmt.Println(len(users))
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllResponse{
+		Users: []*pb.User{},
+	}
+
+	for _, user := range users {
+		current := pb.User{UserID: user.UserUID, Status: string(user.Status)}
+		response.Users = append(response.Users, &current)
+	}
+
+	return response, nil
+}

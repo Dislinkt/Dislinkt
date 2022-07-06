@@ -583,3 +583,54 @@ func (store *ConnectionDBStore) GetAllUserBlockingCurrentUser(currentUserUUID st
 
 	return usersThatBlockedYou, nil
 }
+
+func (store *ConnectionDBStore) RecommendUsersByConnection(currentUserUUID string) (users []*domain.UserNode, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		if !checkIfUserExist(currentUserUUID, tx) {
+			return &domain.UserNode{
+				UserUID: "",
+				Status:  "",
+			}, nil
+		}
+
+		records, err := tx.Run("match(u1:UserNode) where u1.uid = $userUid "+
+			"match (u2:UserNode) where u2.uid <> $userUid "+
+			"match (u3:UserNode) where u3.uid <> $userUid "+
+			"MATCH (u1)-[r1:CONNECTION {status: 'CONNECTED'}]->(u2) "+
+			"MATCH (u2)-[r2:CONNECTION {status: 'CONNECTED'}]->(u3) "+
+			"RETURN u3.uid, u3.status", map[string]interface{}{
+			"userUid": currentUserUUID,
+		})
+
+		for records.Next() {
+			node := domain.UserNode{}
+			if records.Record().Values[1].(string) == "PRIVATE" {
+				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Private}
+			} else {
+				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Public}
+			}
+
+			users = append(users, &node)
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		//re, err := records.Single()
+		if err != nil {
+			return nil, err
+		}
+		// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
+		return users, nil
+	})
+
+	return users, err
+}
