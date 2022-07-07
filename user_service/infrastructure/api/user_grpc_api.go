@@ -24,11 +24,10 @@ func NewUserHandler(service *application.UserService) *UserHandler {
 }
 
 func (handler *UserHandler) GetAll(ctx context.Context, request *pb.SearchMessage) (*pb.GetAllResponse, error) {
-	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
-	// defer span.Finish()
+	span := tracer.StartSpanFromContext(ctx, "GetAllAPI")
+	defer span.Finish()
 
-	// ctx = tracer.ContextWithSpan(context.Background(), span)
-	// users, err := handler.service.GetAll(ctx)
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	var users *[]domain.User
 	var err error
 	if len(request.SearchText) == 0 {
