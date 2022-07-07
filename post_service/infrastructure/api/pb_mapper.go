@@ -3,6 +3,7 @@ package api
 import (
 	b64 "encoding/base64"
 	"fmt"
+	pbNotification "github.com/dislinkt/common/proto/notification_service"
 	"strconv"
 	"time"
 
@@ -157,4 +158,12 @@ func mapNewJobOffer(offerPb *pb.JobOffer) *domain.JobOffer {
 	}
 
 	return offer
+}
+
+func mapNotification(subjectUsername string) *pbNotification.NewNotification {
+	notificationPb := &pbNotification.NewNotification{
+		NotificationType: 3,
+		SubjectUsername:  subjectUsername,
+	}
+	return notificationPb
 }

@@ -54,3 +54,8 @@ type User struct {
 	Name     string             `bson:"name" validate:"alpha"`
 	Surname  string             `bson:"surname" validate:"alpha"`
 }
+
+type NewNotification struct {
+	NotificationType string
+	SubjectUsername  string
+}

@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/dislinkt/common/interceptor"
+	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	pb "github.com/dislinkt/common/proto/notification_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/notification_service/application"
 	"github.com/dislinkt/notification_service/domain"
 	"github.com/dislinkt/notification_service/infrastructure/persistence"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type NotificationHandler struct {
@@ -42,14 +44,28 @@ func (handler *NotificationHandler) GetNotificationsForUser(ctx context.Context,
 
 func (handler *NotificationHandler) SaveNotification(ctx context.Context, request *pb.SaveNotificationRequest) (*pb.Empty, error) {
 	notification := mapNewNotification(request.Notification)
-	notification.UserId = request.UserId
-	notification.NotificationText = generateNotificationText(notification, request.Notification.SubjectUsername)
-	err := handler.service.InsertNotification(notification)
-	if err != nil {
-		return nil, err
+	if notification.NotificationType == domain.POST {
+		handler.saveNotificationsForNewPost(notification, request.UserId, request.Notification.SubjectUsername)
+	} else {
+		notification.UserId = request.UserId
+		notification.NotificationText = generateNotificationText(notification, request.Notification.SubjectUsername)
+		err := handler.service.InsertNotification(notification)
+		if err != nil {
+			return nil, err
+		}
 	}
-
 	return &pb.Empty{}, nil
+}
+
+func (handler *NotificationHandler) saveNotificationsForNewPost(notification *domain.Notification, userId string, username string) {
+	connections, _ := persistence.ConnectionClient("connection_service:8000").GetAllConnectionForUser(context.TODO(), &connectionGw.GetConnectionRequest{Uuid: userId})
+	notification.NotificationText = generateNotificationText(notification, username)
+
+	for _, user := range connections.Users {
+		notification.Id = primitive.NewObjectID()
+		notification.UserId = user.UserID
+		_ = handler.service.InsertNotification(notification)
+	}
 }
 
 func generateNotificationText(notification *domain.Notification, subjectUsername string) string {

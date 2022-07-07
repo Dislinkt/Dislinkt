@@ -2,6 +2,11 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"github.com/dislinkt/common/interceptor"
+	notificationGw "github.com/dislinkt/common/proto/notification_service"
+	userGw "github.com/dislinkt/common/proto/user_service"
+	"post_service/infrastructure/persistence"
 	"time"
 
 	"post_service/domain"
@@ -93,11 +98,16 @@ func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.
 }
 
 func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePostRequest) (*pb.Empty, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
 	post := mapNewPost(request.Post)
+	post.UserId = userResponse.User.Id
 	err := handler.service.Insert(post)
 	if err != nil {
 		return nil, err
 	}
+	_, _ = persistence.NotificationClient("notification_service:8000").SaveNotification(context.TODO(),
+		&notificationGw.SaveNotificationRequest{Notification: mapNotification(username), UserId: userResponse.User.Id})
 	return &pb.Empty{}, nil
 }
 

@@ -29,7 +29,7 @@ func UserClient(address string) userGw.UserServiceClient {
 func NotificationClient(address string) notificationGw.NotificationServiceClient {
 	conn, err := getConnection(address)
 	if err != nil {
-		log.Fatalf("Failed to start gRPC connection to User service: %v", err)
+		log.Fatalf("Failed to start gRPC connection to Notification service: %v", err)
 	}
 	return notificationGw.NewNotificationServiceClient(conn)
 }
