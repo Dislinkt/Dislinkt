@@ -2,9 +2,13 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/notification_service"
+	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/notification_service/application"
 	"github.com/dislinkt/notification_service/domain"
+	"github.com/dislinkt/notification_service/infrastructure/persistence"
 )
 
 type NotificationHandler struct {
@@ -16,9 +20,10 @@ func NewNotificationHandler(service *application.NotificationService) *Notificat
 	return &NotificationHandler{service: service}
 }
 
-func (handler *NotificationHandler) GetNotificationsForUser(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
-
-	notifications, err := handler.service.GetNotificationsForUser(request.UserId)
+func (handler *NotificationHandler) GetNotificationsForUser(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
+	notifications, err := handler.service.GetNotificationsForUser(userResponse.User.Id)
 	if err != nil {
 		return nil, err
 	}

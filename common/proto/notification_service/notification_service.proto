@@ -8,9 +8,9 @@ import "google/api/annotations.proto";
 
 
 service NotificationService{
-    rpc getNotificationsForUser(GetRequest) returns(GetMultipleResponse) {
+    rpc getNotificationsForUser(Empty) returns(GetMultipleResponse) {
       option (google.api.http) = {
-        get: "/notification/user/{UserId}"
+        get: "/notification"
       };
     }
     rpc saveNotification(SaveNotificationRequest) returns(Empty) {
@@ -19,10 +19,6 @@ service NotificationService{
         body: "Notification"
       };
     }
-}
-
-message GetRequest {
-  string UserId = 1;
 }
 
 message Empty {}

@@ -32,25 +32,8 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 func request_NotificationService_GetNotificationsForUser_0(ctx context.Context, marshaler runtime.Marshaler, client NotificationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetRequest
+	var protoReq Empty
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["UserId"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "UserId")
-	}
-
-	protoReq.UserId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "UserId", err)
-	}
 
 	msg, err := client.GetNotificationsForUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -58,25 +41,8 @@ func request_NotificationService_GetNotificationsForUser_0(ctx context.Context, 
 }
 
 func local_request_NotificationService_GetNotificationsForUser_0(ctx context.Context, marshaler runtime.Marshaler, server NotificationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetRequest
+	var protoReq Empty
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["UserId"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "UserId")
-	}
-
-	protoReq.UserId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "UserId", err)
-	}
 
 	msg, err := server.GetNotificationsForUser(ctx, &protoReq)
 	return msg, metadata, err
@@ -164,7 +130,7 @@ func RegisterNotificationServiceHandlerServer(ctx context.Context, mux *runtime.
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/notification_service_proto.NotificationService/GetNotificationsForUser", runtime.WithHTTPPathPattern("/notification/user/{UserId}"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/notification_service_proto.NotificationService/GetNotificationsForUser", runtime.WithHTTPPathPattern("/notification"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -251,7 +217,7 @@ func RegisterNotificationServiceHandlerClient(ctx context.Context, mux *runtime.
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/notification_service_proto.NotificationService/GetNotificationsForUser", runtime.WithHTTPPathPattern("/notification/user/{UserId}"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/notification_service_proto.NotificationService/GetNotificationsForUser", runtime.WithHTTPPathPattern("/notification"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -292,7 +258,7 @@ func RegisterNotificationServiceHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_NotificationService_GetNotificationsForUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"notification", "user", "UserId"}, ""))
+	pattern_NotificationService_GetNotificationsForUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"notification"}, ""))
 
 	pattern_NotificationService_SaveNotification_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"notification", "UserId"}, ""))
 )
