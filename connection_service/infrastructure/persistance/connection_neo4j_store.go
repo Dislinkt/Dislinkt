@@ -607,19 +607,33 @@ func (store *ConnectionDBStore) RecommendUsersByConnection(currentUserUUID strin
 			"match (u3:UserNode) where u3.uid <> $userUid "+
 			"MATCH (u1)-[r1:CONNECTION {status: 'CONNECTED'}]->(u2) "+
 			"MATCH (u2)-[r2:CONNECTION {status: 'CONNECTED'}]->(u3) "+
-			"RETURN u3.uid, u3.status", map[string]interface{}{
+			"RETURN u3.uid, u3.status ", map[string]interface{}{
 			"userUid": currentUserUUID,
 		})
-
+		var brojac = 0
 		for records.Next() {
-			node := domain.UserNode{}
-			if records.Record().Values[1].(string) == "PRIVATE" {
-				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Private}
-			} else {
-				node = domain.UserNode{UserUID: records.Record().Values[0].(string), Status: domain.Public}
+			result, _ := tx.Run("match(u1:UserNode) where u1.uid = $userUid "+
+				"match (u2:UserNode) where u2.uid = $userUid1 "+
+				"MATCH (u1)-[r1:CONNECTION]->(u2) "+
+				"RETURN r1.status", map[string]interface{}{
+				"userUid":  currentUserUUID,
+				"userUid1": records.Record().Values[0].(string),
+			})
+
+			if !result.Next() {
+				brojac = brojac + 1
+				if brojac <= 5 {
+					fmt.Println("uslo")
+					node := domain.UserNode{}
+					if records.Record().Values[1].(string) == "PRIVATE" {
+						node = domain.UserNode{records.Record().Values[0].(string), domain.Private}
+					} else {
+						node = domain.UserNode{records.Record().Values[0].(string), domain.Public}
+					}
+					users = append(users, &node)
+				}
 			}
 
-			users = append(users, &node)
 		}
 
 		if err != nil {
@@ -953,7 +967,8 @@ func (store *ConnectionDBStore) RecommendJobBySkill(userUid string) (jobs []*dom
 			"match (j:JobOffer) "+
 			"MATCH (u1)-[r1:SKILLS]->(s) "+
 			"MATCH (j)-[r2:SKILLS]->(s) "+
-			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field", map[string]interface{}{
+			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field "+
+			"LIMIT 5", map[string]interface{}{
 			"uuid": userUid,
 		})
 
@@ -1005,7 +1020,8 @@ func (store *ConnectionDBStore) RecommendJobByField(userUid string) (jobs []*dom
 			"match (j:JobOffer) "+
 			"MATCH (u1)-[r1:FIELDS]->(s) "+
 			"MATCH (j)-[r2:FIELDS]->(s) "+
-			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field", map[string]interface{}{
+			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field "+
+			"LIMIT 5", map[string]interface{}{
 			"uuid": userUid,
 		})
 
