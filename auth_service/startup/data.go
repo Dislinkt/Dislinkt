@@ -148,4 +148,9 @@ var permissions = []*domain.Permission{
 		Role: 0,
 		Name: "sendMessage",
 	},
+	{
+		Id:   30,
+		Role: 0,
+		Name: "readNotifications",
+	},
 }

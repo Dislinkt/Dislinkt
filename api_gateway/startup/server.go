@@ -18,6 +18,7 @@ import (
 	authGw "github.com/dislinkt/common/proto/auth_service"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	messageGw "github.com/dislinkt/common/proto/message_service"
+	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -77,6 +78,12 @@ func (server *Server) initHandlers() {
 
 	messageEndpoint := fmt.Sprintf("%s:%s", server.config.MessageHost, server.config.MessagePort)
 	err = messageGw.RegisterMessageServiceHandlerFromEndpoint(context.TODO(), server.mux, messageEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	notificationEndpoint := fmt.Sprintf("%s:%s", server.config.NotificationHost, server.config.NotificationPort)
+	err = notificationGw.RegisterNotificationServiceHandlerFromEndpoint(context.TODO(), server.mux, notificationEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}
