@@ -227,3 +227,16 @@ func (handler *ConnectionHandler) RecommendJobByField(ctx context.Context, reque
 	}
 	return response, err
 }
+
+func (handler *ConnectionHandler) CheckIfUsersConnected(ctx context.Context, request *pb.CheckConnection) (response *pb.CheckResult, err error) {
+	fmt.Println("[ConnectionHandler]:CheckIfUsersConnected")
+	isConnected, err := handler.service.CheckIfUsersConnected(request.Uuid1, request.Uuid2)
+	if err != nil {
+		return nil, err
+	}
+	response = &pb.CheckResult{
+		IsConnected: isConnected,
+	}
+
+	return response, err
+}

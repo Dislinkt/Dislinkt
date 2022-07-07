@@ -26,4 +26,5 @@ type ConnectionStore interface {
 	DeleteAllSkills() (res string, err error)
 	DeleteAllFields() (res string, err error)
 	DeleteSkillForUser(userId string, skillName string) (res string, err error)
+	CheckIfUsersConnected(uuid1 string, uuid2 string) (isConnected bool, err error)
 }

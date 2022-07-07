@@ -124,6 +124,11 @@ func (servioe *ConnectionService) RecommendJobByField(userUid string) (jobs []*d
 	return servioe.store.RecommendJobByField(userUid)
 }
 
+func (servioe *ConnectionService) CheckIfUsersConnected(userUUID1 string, userUUID2 string) (bool, error) {
+	fmt.Println("[ConnectionService CHeckIfUsersConnected")
+	return servioe.store.CheckIfUsersConnected(userUUID1, userUUID2)
+}
+
 func IsValidUUID(u string) bool {
 	_, err := uuid.FromString(u)
 	return err == nil
