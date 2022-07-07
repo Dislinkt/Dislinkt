@@ -951,7 +951,7 @@ func (store *ConnectionDBStore) RecommendJobBySkill(userUid string) (jobs []*dom
 			"match (j:JobOffer) "+
 			"MATCH (u1)-[r1:SKILLS]->(s) "+
 			"MATCH (j)-[r2:SKILLS]->(s) "+
-			"return j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field", map[string]interface{}{
+			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field", map[string]interface{}{
 			"uuid": userUid,
 		})
 
@@ -1003,7 +1003,7 @@ func (store *ConnectionDBStore) RecommendJobByField(userUid string) (jobs []*dom
 			"match (j:JobOffer) "+
 			"MATCH (u1)-[r1:FIELDS]->(s) "+
 			"MATCH (j)-[r2:FIELDS]->(s) "+
-			"return j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field", map[string]interface{}{
+			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field", map[string]interface{}{
 			"uuid": userUid,
 		})
 
@@ -1034,4 +1034,146 @@ func (store *ConnectionDBStore) RecommendJobByField(userUid string) (jobs []*dom
 	})
 
 	return jobs, err
+}
+
+func (store *ConnectionDBStore) DeleteAllSkills() (res string, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		_, err := tx.Run("match (s:Skill) "+
+			"match (u1:UserNode) "+
+			"match (j:JobOffer) "+
+			"match (u1)-[r1:SKILLS]->(s) "+
+			"match (j)-[r2:SKILLS]->(s) "+
+			"return r1,r2,s", map[string]interface{}{})
+
+		if err != nil {
+			return nil, err
+		}
+		//re, err := records.Single()
+		if err != nil {
+			return nil, err
+		}
+		// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
+		return "done", nil
+	})
+
+	return "done", err
+}
+
+func (store *ConnectionDBStore) DeleteAllFields() (res string, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		_, err := tx.Run("match (s:Field) "+
+			"match (u1:UserNode) "+
+			"match (j:JobOffer) "+
+			"match (u1)-[r1:FIELDS]->(s) "+
+			"match (j)-[r2:FIELDS]->(s) "+
+			"return r1,r2,s", map[string]interface{}{})
+
+		if err != nil {
+			return nil, err
+		}
+		//re, err := records.Single()
+		if err != nil {
+			return nil, err
+		}
+		// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
+		return "done", nil
+	})
+
+	return "done", err
+}
+
+func (store *ConnectionDBStore) DeleteSkillForUser(userUUID string, skillName string) (res string, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		_, err := tx.Run("match (s:Skill) where s.name = $name "+
+			"match (u1:UserNode) where u1.uid = $uuid "+
+			"match (u1)-[r1:SKILLS]->(s) "+
+			"delete r1", map[string]interface{}{
+			"uuid": userUUID,
+			"name": skillName,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+		return "done", nil
+	})
+
+	return "done", err
+}
+
+func (store *ConnectionDBStore) DeleteFieldForUser(userUUID string, fieldName string) (res string, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+
+		_, err := tx.Run("match (s:Field) where s.name = $name "+
+			"match (u1:UserNode) where u1.uid = $uuid "+
+			"match (u1)-[r1:FIELDS]->(s) "+
+			"delete r1", map[string]interface{}{
+			"uuid": userUUID,
+			"name": fieldName,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+		return "done", nil
+	})
+
+	return "done", err
+}
+
+func (store *ConnectionDBStore) UpdateSkillForUser(userUUID string, skillNameOld string, skillNameNew string) (res string, err error) {
+
+	res, err = store.DeleteSkillForUser(userUUID, skillNameOld)
+	if res == "done" {
+		res, err = store.InsertSkillToUser(userUUID, skillNameNew)
+		if res != "done" {
+			return "error", err
+		}
+	}
+
+	return "done", err
+}
+
+func (store *ConnectionDBStore) UpdateFieldForUser(userUUID string, fieldNameOld string, fieldNameNew string) (res string, err error) {
+
+	res, err = store.DeleteFieldForUser(userUUID, fieldNameOld)
+	if res == "done" {
+		res, err = store.InsertFieldToUser(userUUID, fieldNameNew)
+		if res != "done" {
+			return "error", err
+		}
+	}
+
+	return "done", err
 }

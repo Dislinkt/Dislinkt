@@ -91,7 +91,7 @@ service ConnectionService{
     };
   }
 
-  rpc InsertSkill(BlockUserRequest) returns (Response) {
+  rpc InsertSkill(Skill) returns (Response) {
     option (google.api.http) = {
       post: "/skill"
       body: "*"
@@ -122,14 +122,14 @@ service ConnectionService{
   rpc RecommendJobBySkill(GetConnectionRequest) returns (JobOffers) {
     option (google.api.http) = {
       post: "/user/recommend/skill/{uuid}"
-      body: "*"
+      body: ""
     };
   }
 
   rpc RecommendJobByField(GetConnectionRequest) returns (JobOffers) {
     option (google.api.http) = {
-      post: "/user/recommend/field/{uuid}"
-      body: "*"
+      get: "/user/recommend/field/{uuid}"
+      body: ""
     };
   }
 }

@@ -608,7 +608,7 @@ func local_request_ConnectionService_InsertField_0(ctx context.Context, marshale
 }
 
 func request_ConnectionService_InsertSkill_0(ctx context.Context, marshaler runtime.Marshaler, client ConnectionServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq BlockUserRequest
+	var protoReq Skill
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -625,7 +625,7 @@ func request_ConnectionService_InsertSkill_0(ctx context.Context, marshaler runt
 }
 
 func local_request_ConnectionService_InsertSkill_0(ctx context.Context, marshaler runtime.Marshaler, server ConnectionServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq BlockUserRequest
+	var protoReq Skill
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

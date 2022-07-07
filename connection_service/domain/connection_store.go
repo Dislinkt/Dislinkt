@@ -23,4 +23,7 @@ type ConnectionStore interface {
 	InsertFieldToUser(name string, uuid string) (string, error)
 	RecommendJobBySkill(userUid string) (jobs []*JobOffer, err error)
 	RecommendJobByField(userUid string) (jobs []*JobOffer, err error)
+	DeleteAllSkills() (res string, err error)
+	DeleteAllFields() (res string, err error)
+	DeleteSkillForUser(userId string, skillName string) (res string, err error)
 }

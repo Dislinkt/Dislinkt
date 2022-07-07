@@ -163,7 +163,7 @@ func (handler *ConnectionHandler) InsertField(ctx context.Context, request *pb.F
 	return response, err
 }
 
-func (handler *ConnectionHandler) InsertSkill(ctx context.Context, request *pb.Field) (response *pb.Response, err error) {
+func (handler *ConnectionHandler) InsertSkill(ctx context.Context, request *pb.Skill) (response *pb.Response, err error) {
 	fmt.Println("[ConnectionHandler]:InsertSkill")
 	name, err := handler.service.InsertSkill(request.Name)
 	response = &pb.Response{

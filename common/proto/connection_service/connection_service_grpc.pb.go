@@ -33,7 +33,7 @@ type ConnectionServiceClient interface {
 	GetAllUserBlockingCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	RecommendUsersByConnection(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	InsertField(ctx context.Context, in *Field, opts ...grpc.CallOption) (*Response, error)
-	InsertSkill(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*Response, error)
+	InsertSkill(ctx context.Context, in *Skill, opts ...grpc.CallOption) (*Response, error)
 	InsertJobOffer(ctx context.Context, in *JobOffer, opts ...grpc.CallOption) (*Response, error)
 	InsertSkillToUser(ctx context.Context, in *UserInfoItem, opts ...grpc.CallOption) (*Response, error)
 	InsertFieldToUser(ctx context.Context, in *UserInfoItem, opts ...grpc.CallOption) (*Response, error)
@@ -148,7 +148,7 @@ func (c *connectionServiceClient) InsertField(ctx context.Context, in *Field, op
 	return out, nil
 }
 
-func (c *connectionServiceClient) InsertSkill(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*Response, error) {
+func (c *connectionServiceClient) InsertSkill(ctx context.Context, in *Skill, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
 	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/InsertSkill", in, out, opts...)
 	if err != nil {
@@ -217,7 +217,7 @@ type ConnectionServiceServer interface {
 	GetAllUserBlockingCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error)
 	RecommendUsersByConnection(context.Context, *GetConnectionRequest) (*GetAllResponse, error)
 	InsertField(context.Context, *Field) (*Response, error)
-	InsertSkill(context.Context, *BlockUserRequest) (*Response, error)
+	InsertSkill(context.Context, *Skill) (*Response, error)
 	InsertJobOffer(context.Context, *JobOffer) (*Response, error)
 	InsertSkillToUser(context.Context, *UserInfoItem) (*Response, error)
 	InsertFieldToUser(context.Context, *UserInfoItem) (*Response, error)
@@ -263,7 +263,7 @@ func (UnimplementedConnectionServiceServer) RecommendUsersByConnection(context.C
 func (UnimplementedConnectionServiceServer) InsertField(context.Context, *Field) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertField not implemented")
 }
-func (UnimplementedConnectionServiceServer) InsertSkill(context.Context, *BlockUserRequest) (*Response, error) {
+func (UnimplementedConnectionServiceServer) InsertSkill(context.Context, *Skill) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertSkill not implemented")
 }
 func (UnimplementedConnectionServiceServer) InsertJobOffer(context.Context, *JobOffer) (*Response, error) {
@@ -493,7 +493,7 @@ func _ConnectionService_InsertField_Handler(srv interface{}, ctx context.Context
 }
 
 func _ConnectionService_InsertSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BlockUserRequest)
+	in := new(Skill)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -505,7 +505,7 @@ func _ConnectionService_InsertSkill_Handler(srv interface{}, ctx context.Context
 		FullMethod: "/connection_service_proto.ConnectionService/InsertSkill",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectionServiceServer).InsertSkill(ctx, req.(*BlockUserRequest))
+		return srv.(ConnectionServiceServer).InsertSkill(ctx, req.(*Skill))
 	}
 	return interceptor(ctx, in, info, handler)
 }
