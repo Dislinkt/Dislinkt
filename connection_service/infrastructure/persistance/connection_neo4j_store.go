@@ -771,6 +771,8 @@ func (store *ConnectionDBStore) InsertSkill(name string) (string, error) {
 		}
 	}(session)
 
+	fmt.Println("usloo")
+
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		records, err := tx.Run("CREATE (n:Skill { name: $name  }) RETURN n.name", map[string]interface{}{
@@ -1051,7 +1053,7 @@ func (store *ConnectionDBStore) DeleteAllSkills() (res string, err error) {
 			"match (j:JobOffer) "+
 			"match (u1)-[r1:SKILLS]->(s) "+
 			"match (j)-[r2:SKILLS]->(s) "+
-			"return r1,r2,s", map[string]interface{}{})
+			"delete r1,r2,s", map[string]interface{}{})
 
 		if err != nil {
 			return nil, err
@@ -1082,7 +1084,7 @@ func (store *ConnectionDBStore) DeleteAllFields() (res string, err error) {
 			"match (j:JobOffer) "+
 			"match (u1)-[r1:FIELDS]->(s) "+
 			"match (j)-[r2:FIELDS]->(s) "+
-			"return r1,r2,s", map[string]interface{}{})
+			"delete r1,r2,s", map[string]interface{}{})
 
 		if err != nil {
 			return nil, err
