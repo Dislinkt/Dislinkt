@@ -132,6 +132,13 @@ service ConnectionService{
       body: ""
     };
   }
+
+  rpc CheckIfUsersConnected(CheckConnection) returns (CheckResult) {
+    option (google.api.http) = {
+      post: "/user/connection/check"
+      body: "*"
+    };
+  }
 }
 
 message JobOffer {
@@ -221,7 +228,15 @@ message User {
   string status = 2;
 }
 
+message CheckConnection{
+ string uuid1 = 1;
+ string uuid2 = 2;
+}
+
 message GetAllResponse {
   repeated User users = 1;
 }
 
+message CheckResult{
+  bool isConnected = 1;
+}

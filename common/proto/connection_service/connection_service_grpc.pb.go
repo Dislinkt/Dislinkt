@@ -39,6 +39,7 @@ type ConnectionServiceClient interface {
 	InsertFieldToUser(ctx context.Context, in *UserInfoItem, opts ...grpc.CallOption) (*Response, error)
 	RecommendJobBySkill(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*JobOffers, error)
 	RecommendJobByField(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*JobOffers, error)
+	CheckIfUsersConnected(ctx context.Context, in *CheckConnection, opts ...grpc.CallOption) (*CheckResult, error)
 }
 
 type connectionServiceClient struct {
@@ -202,6 +203,15 @@ func (c *connectionServiceClient) RecommendJobByField(ctx context.Context, in *G
 	return out, nil
 }
 
+func (c *connectionServiceClient) CheckIfUsersConnected(ctx context.Context, in *CheckConnection, opts ...grpc.CallOption) (*CheckResult, error) {
+	out := new(CheckResult)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/CheckIfUsersConnected", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConnectionServiceServer is the server API for ConnectionService service.
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
@@ -223,6 +233,7 @@ type ConnectionServiceServer interface {
 	InsertFieldToUser(context.Context, *UserInfoItem) (*Response, error)
 	RecommendJobBySkill(context.Context, *GetConnectionRequest) (*JobOffers, error)
 	RecommendJobByField(context.Context, *GetConnectionRequest) (*JobOffers, error)
+	CheckIfUsersConnected(context.Context, *CheckConnection) (*CheckResult, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -280,6 +291,9 @@ func (UnimplementedConnectionServiceServer) RecommendJobBySkill(context.Context,
 }
 func (UnimplementedConnectionServiceServer) RecommendJobByField(context.Context, *GetConnectionRequest) (*JobOffers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RecommendJobByField not implemented")
+}
+func (UnimplementedConnectionServiceServer) CheckIfUsersConnected(context.Context, *CheckConnection) (*CheckResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckIfUsersConnected not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -600,6 +614,24 @@ func _ConnectionService_RecommendJobByField_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_CheckIfUsersConnected_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckConnection)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).CheckIfUsersConnected(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/CheckIfUsersConnected",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).CheckIfUsersConnected(ctx, req.(*CheckConnection))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -674,6 +706,10 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RecommendJobByField",
 			Handler:    _ConnectionService_RecommendJobByField_Handler,
+		},
+		{
+			MethodName: "CheckIfUsersConnected",
+			Handler:    _ConnectionService_CheckIfUsersConnected_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

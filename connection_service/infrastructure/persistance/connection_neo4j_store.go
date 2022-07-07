@@ -323,7 +323,7 @@ func checkIfUserExist(uid string, transaction neo4j.Transaction) bool {
 	return false
 }
 
-func (store *ConnectionDBStore) checkIfUsersConnected(uuid1 string, uuid2 string) (isConnected bool, err error) {
+func (store *ConnectionDBStore) CheckIfUsersConnected(uuid1 string, uuid2 string) (isConnected bool, err error) {
 	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer func(session neo4j.Session) {
 		err := session.Close()
