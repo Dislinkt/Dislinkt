@@ -1,4 +1,15 @@
 version: "3.8"
+x-logging: &fluent-bit
+  driver: fluentd
+  options:
+    fluentd-address: ${FLUENT_BIT_ADDRESS}:24224
+
+x-tracing: &jaeger-env
+  JAEGER_AGENT_HOST: ${JAEGER_HOST}
+  JAEGER_AGENT_PORT: 6831
+  JAEGER_SAMPLER_MANAGER_HOST_PORT: ${JAEGER_HOST}:5778
+  JAEGER_SAMPLER_TYPE: const
+  JAEGER_SAMPLER_PARAM: 1
 
 services:
   user_service:
@@ -9,6 +20,7 @@ services:
       dockerfile: ./user_service/Dockerfile
     restart: on-failure
     environment:
+      <<: *jaeger-env
       USER_DB_HOST: ${USER_DB_HOST}
       USER_DB_PORT: ${USER_DB_PORT}
       USER_DB_USER: ${USER_DB_USER}
@@ -38,6 +50,7 @@ services:
     depends_on:
       - user_db
     #      - tracing
+    logging:  *fluent-bit
     networks:
       - network
       - monitoring
@@ -51,7 +64,9 @@ services:
       context: .
       dockerfile: ./post_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
+      <<: *jaeger-env
       POST_DB_HOST: ${POST_DB_HOST}
       POST_DB_PORT: ${POST_DB_PORT}
       POST_SERVICE_PORT: ${POST_SERVICE_PORT}
@@ -78,7 +93,9 @@ services:
       context: .
       dockerfile: ./additional_user_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
+      <<: *jaeger-env
       ADDITIONAL_USER_DB_HOST: ${ADDITIONAL_USER_DB_HOST}
       ADDITIONAL_USER_DB_PORT: ${ADDITIONAL_USER_DB_PORT}
       ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
@@ -103,20 +120,22 @@ services:
       context: .
       dockerfile: ./connection_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
-      - CONNECTION_DB_HOST=${CONNECTION_DB_HOST}
-      - CONNECTION_DB_PORT=${CONNECTION_DB_PORT}
-      - CONNECTION_SERVICE_PORT=${CONNECTION_SERVICE_PORT}
-      - CONNECTION_DB_USER=${CONNECTION_DB_USER}
-      - CONNECTION_DB_PASS=${CONNECTION_DB_PASS}
-      - NATS_HOST=${NATS_HOST}
-      - NATS_PORT=${NATS_PORT}
-      - NATS_USER=${NATS_USER}
-      - NATS_PASS=${NATS_PASS}
-      - REGISTER_USER_COMMAND_SUBJECT=${REGISTER_USER_COMMAND_SUBJECT}
-      - REGISTER_USER_REPLY_SUBJECT=${REGISTER_USER_REPLY_SUBJECT}
-      - PATCH_USER_COMMAND_SUBJECT=${PATCH_USER_COMMAND_SUBJECT}
-      - PATCH_USER_REPLY_SUBJECT=${PATCH_USER_REPLY_SUBJECT}
+      <<: *jaeger-env
+      CONNECTION_DB_HOST: ${CONNECTION_DB_HOST}
+      CONNECTION_DB_PORT: ${CONNECTION_DB_PORT}
+      CONNECTION_SERVICE_PORT: ${CONNECTION_SERVICE_PORT}
+      CONNECTION_DB_USER: ${CONNECTION_DB_USER}
+      CONNECTION_DB_PASS: ${CONNECTION_DB_PASS}
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: ${NATS_PORT}
+      NATS_USER: ${NATS_USER}
+      NATS_PASS: ${NATS_PASS}
+      REGISTER_USER_COMMAND_SUBJECT: ${REGISTER_USER_COMMAND_SUBJECT}
+      REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
+      PATCH_USER_COMMAND_SUBJECT: ${PATCH_USER_COMMAND_SUBJECT}
+      PATCH_USER_REPLY_SUBJECT: ${PATCH_USER_REPLY_SUBJECT}
     depends_on:
       - neo4j
     networks:
@@ -132,7 +151,9 @@ services:
       context: .
       dockerfile: ./auth_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
+      <<: *jaeger-env
       AUTH_DB_HOST: ${AUTH_DB_HOST}
       AUTH_DB_PORT: ${AUTH_DB_PORT}
       AUTH_DB_USER: ${AUTH_DB_USER}
@@ -162,9 +183,11 @@ services:
       context: .
       dockerfile: ./api_gateway/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     ports:
       - ${GATEWAY_PORT}:${GATEWAY_PORT}
     environment:
+      <<: *jaeger-env
       GATEWAY_PORT: ${GATEWAY_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
@@ -187,6 +210,7 @@ services:
     image: postgres
     container_name: user_db
     restart: on-failure
+    logging:  *fluent-bit
     environment:
       POSTGRES_USER: ${USER_DB_USER}
       POSTGRES_PASSWORD: ${USER_DB_PASS}
@@ -199,6 +223,7 @@ services:
     image: postgres
     container_name: auth_db
     restart: on-failure
+    logging:  *fluent-bit
     environment:
       POSTGRES_USER: ${AUTH_DB_USER}
       POSTGRES_PASSWORD: ${AUTH_DB_PASS}
@@ -211,6 +236,7 @@ services:
     image: mongo
     container_name: post_db
     restart: on-failure
+    logging:  *fluent-bit
     networks:
       - network
       - monitoring
@@ -218,6 +244,7 @@ services:
   neo4j:
     image: neo4j:4.3.3-community #4.3.3-community  latest
     container_name: neo4j
+    logging:  *fluent-bit
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -225,11 +252,12 @@ services:
       - network
       - monitoring
     environment:
-      - NEO4J_AUTH=neo4j/password
-      - NEO4J_dbms_memory_pagecache_size=512M
+      NEO4J_AUTH: neo4j/password
+      NEO4J_dbms_memory_pagecache_size: 512M
 
   additional_user_db:
     image: mongo
+    logging:  *fluent-bit
     container_name: additional_user_db
     restart: on-failure
     networks:
@@ -252,6 +280,7 @@ services:
     image: nats
     container_name: nats
     restart: on-failure
+    logging:  *fluent-bit
     networks:
       - network
       - monitoring

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/dislinkt/common/interceptor"
-
 	pb "github.com/dislinkt/common/proto/user_service"
+	"github.com/dislinkt/common/tracer"
 	"github.com/dislinkt/user_service/application"
 	"github.com/dislinkt/user_service/domain"
 	uuid "github.com/satori/go.uuid"
@@ -87,8 +87,8 @@ func (handler *UserHandler) GetOne(ctx context.Context, request *pb.GetOneMessag
 
 func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.RegisterUserRequest) (*pb.
 	RegisterUserResponse, error) {
-	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
-	// defer span.Finish()
+	span := tracer.StartSpanFromContext(ctx, "RegisterUser")
+	defer span.Finish()
 
 	fmt.Println("Register user")
 	user := mapNewUser(request.User)

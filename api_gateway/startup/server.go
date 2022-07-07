@@ -3,15 +3,19 @@ package startup
 import (
 	"context"
 	"fmt"
-	"github.com/dislinkt/api_gateway/infrastructure/api"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	muxprom "gitlab.com/msvechla/mux-prometheus/pkg/middleware"
 	"io"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/dislinkt/api_gateway/infrastructure/api"
+	"github.com/dislinkt/common/tracer"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	"github.com/opentracing/opentracing-go"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	muxprom "gitlab.com/msvechla/mux-prometheus/pkg/middleware"
 
 	// "github.com/dislinkt/api_gateway/infrastructure/api"
 
@@ -56,7 +60,18 @@ func customMatcher(key string) (string, bool) {
 }
 
 func (server *Server) initHandlers() {
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials()),
+		// tracer
+		grpc.WithUnaryInterceptor(
+			grpc_opentracing.UnaryClientInterceptor(
+				grpc_opentracing.WithTracer(opentracing.GlobalTracer()),
+			),
+		),
+		grpc.WithStreamInterceptor(
+			grpc_opentracing.StreamClientInterceptor(
+				grpc_opentracing.WithTracer(opentracing.GlobalTracer()),
+			),
+		)}
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
 	additionalUserEndpoint := fmt.Sprintf("%s:%s", server.config.AdditionalUserHost, server.config.AdditionalUserPort)
@@ -88,6 +103,9 @@ func (server *Server) initCustomHandlers() {
 }
 
 func (server *Server) Start() {
+	// tracing
+	tracer, _ := tracer.Init("api_gateway")
+	opentracing.SetGlobalTracer(tracer)
 	crtPath, _ := filepath.Abs("./cert.crt")
 	keyPath, _ := filepath.Abs("./cert.key")
 	cors := handlers.CORS(
@@ -103,7 +121,7 @@ func (server *Server) Start() {
 	r.Use(instrumentation.Middleware)
 	r.Path("/metrics").Handler(promhttp.Handler())
 	r.PathPrefix("/").Handler(cors(muxMiddleware(server)))
-	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
+	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
 	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, r))
 	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
 }

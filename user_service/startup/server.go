@@ -2,34 +2,31 @@ package startup
 
 import (
 	"fmt"
+	"log"
+	"net"
+
 	"github.com/dislinkt/common/interceptor"
 	userProto "github.com/dislinkt/common/proto/user_service"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
+	"github.com/dislinkt/common/tracer"
 	"github.com/dislinkt/user_service/application"
 	"github.com/dislinkt/user_service/domain"
 	"github.com/dislinkt/user_service/infrastructure/api"
 	"github.com/dislinkt/user_service/infrastructure/persistence"
 	"github.com/dislinkt/user_service/startup/config"
+	otgo "github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
-	"log"
-	"net"
 )
 
 type Server struct {
 	config *config.Config
-	// tracer otgo.Tracer
-	// closer io.Closer
 }
 
 func NewServer(config *config.Config) *Server {
-	// newTracer, closer := tracer.Init(config.JaegerServiceName)
-	// otgo.SetGlobalTracer(newTracer)
 	return &Server{
 		config: config,
-		// tracer: newTracer,
-		// closer: closer,
 	}
 }
 
@@ -40,6 +37,10 @@ const (
 )
 
 func (server *Server) Start() {
+
+	tracer, _ := tracer.Init("user_service")
+	otgo.SetGlobalTracer(tracer)
+
 	postgresClient := server.initUserClient()
 	userStore := server.initUserStore(postgresClient)
 
