@@ -55,6 +55,14 @@ service ConnectionService{
     };
   }
 
+
+  rpc UnblockConnection(BlockUserRequest) returns (BlockedUserStatus) {
+    option (google.api.http) = {
+      post: "/connection/user/{uuid}/unblock/{uuid1}"
+      body: ""
+    };
+  }
+
   rpc GetAllBlockedForCurrentUser(BlockUserRequest) returns (GetAllResponse){
     option (google.api.http) = {
       get: "/connection/user/block/{uuid}"
@@ -69,7 +77,6 @@ service ConnectionService{
     };
   }
 
-
   rpc RecommendUsersByConnection(GetConnectionRequest) returns (GetAllResponse){
     option (google.api.http) = {
       get: "/connection/recommend/users/{uuid}"
@@ -77,16 +84,95 @@ service ConnectionService{
     };
   }
 
+  rpc InsertField(Field) returns (Response) {
+    option (google.api.http) = {
+      post: "/field"
+      body: "*"
+    };
+  }
 
+  rpc InsertSkill(Skill) returns (Response) {
+    option (google.api.http) = {
+      post: "/skill"
+      body: "*"
+    };
+  }
+
+  rpc InsertJobOffer(JobOffer) returns (Response) {
+    option (google.api.http) = {
+      post: "/jobOffer"
+      body: "*"
+    };
+  }
+
+  rpc InsertSkillToUser(UserInfoItem) returns (Response) {
+    option (google.api.http) = {
+      post: "/user/{uuid}/skill/{name}"
+      body: "*"
+    };
+  }
+
+  rpc InsertFieldToUser(UserInfoItem) returns (Response) {
+    option (google.api.http) = {
+      post: "/user/{uuid}/field/{name}"
+      body: "*"
+    };
+  }
+
+  rpc RecommendJobBySkill(GetConnectionRequest) returns (JobOffers) {
+    option (google.api.http) = {
+      post: "/user/recommend/skill/{uuid}"
+      body: ""
+    };
+  }
+
+  rpc RecommendJobByField(GetConnectionRequest) returns (JobOffers) {
+    option (google.api.http) = {
+      get: "/user/recommend/field/{uuid}"
+      body: ""
+    };
+  }
+}
+
+message JobOffer {
+  string  Id   = 1;
+  string  Position = 2;
+  string  Preconditions = 3;
+  string  Duration       = 4;
+  string  Location      = 5;
+  string  Title          = 6;
+  string  Field          = 7;
+
+}
+
+message JobOffers {
+  repeated JobOffer jobs = 1;
+}
+
+message UserInfoItem{
+  string uuid = 1;
+  string name = 2;
 }
 
 message RegisterRequest{
   User user = 1;
 }
 
+message Field{
+  string name = 1;
+}
+
+message Skill{
+  string name = 1;
+}
+
 message RegisterResponse{
   User user = 1;
   string message =2 ;
+}
+
+message Response{
+  string name = 1;
 }
 
 message  NewConnectionResponse {

@@ -84,6 +84,46 @@ func (servioe *ConnectionService) RecommendUsersByConnection(currentUserUUID str
 	return servioe.store.RecommendUsersByConnection(currentUserUUID)
 }
 
+func (servioe *ConnectionService) UnblockConnection(currentUser string, blockedUser string) (*pb.BlockedUserStatus, error) {
+	fmt.Println("[ConnectionService UnblockConnection")
+	return servioe.store.UnblockConnection(currentUser, blockedUser)
+}
+
+func (servioe *ConnectionService) InsertField(name string) (string, error) {
+	fmt.Println("[ConnectionService InsertField")
+	return servioe.store.InsertField(name)
+}
+
+func (servioe *ConnectionService) InsertSkill(name string) (string, error) {
+	fmt.Println("[ConnectionService InsertSkill")
+	return servioe.store.InsertSkill(name)
+}
+
+func (servioe *ConnectionService) InsertJobOffer(jobOffer domain.JobOffer) (string, error) {
+	fmt.Println("[ConnectionService InsertJobOffer")
+	return servioe.store.InsertJobOffer(jobOffer)
+}
+
+func (servioe *ConnectionService) InsertSkillToUser(name string, uuid string) (string, error) {
+	fmt.Println("[ConnectionService InsertSkillToUser")
+	return servioe.store.InsertSkillToUser(name, uuid)
+}
+
+func (servioe *ConnectionService) InsertFieldToUser(name string, uuid string) (string, error) {
+	fmt.Println("[ConnectionService InsertFieldToUser")
+	return servioe.store.InsertFieldToUser(name, uuid)
+}
+
+func (servioe *ConnectionService) RecommendJobBySkill(userUid string) (jobs []*domain.JobOffer, err error) {
+	fmt.Println("[ConnectionService RecommendJobBySkill")
+	return servioe.store.RecommendJobBySkill(userUid)
+}
+
+func (servioe *ConnectionService) RecommendJobByField(userUid string) (jobs []*domain.JobOffer, err error) {
+	fmt.Println("[ConnectionService RecommendJobByField")
+	return servioe.store.RecommendJobByField(userUid)
+}
+
 func IsValidUUID(u string) bool {
 	_, err := uuid.FromString(u)
 	return err == nil

@@ -28,9 +28,17 @@ type ConnectionServiceClient interface {
 	GetAllConnectionForUser(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	GetAllConnectionRequestsForUser(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	BlockUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockedUserStatus, error)
+	UnblockConnection(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockedUserStatus, error)
 	GetAllBlockedForCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	GetAllUserBlockingCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	RecommendUsersByConnection(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	InsertField(ctx context.Context, in *Field, opts ...grpc.CallOption) (*Response, error)
+	InsertSkill(ctx context.Context, in *Skill, opts ...grpc.CallOption) (*Response, error)
+	InsertJobOffer(ctx context.Context, in *JobOffer, opts ...grpc.CallOption) (*Response, error)
+	InsertSkillToUser(ctx context.Context, in *UserInfoItem, opts ...grpc.CallOption) (*Response, error)
+	InsertFieldToUser(ctx context.Context, in *UserInfoItem, opts ...grpc.CallOption) (*Response, error)
+	RecommendJobBySkill(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*JobOffers, error)
+	RecommendJobByField(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*JobOffers, error)
 }
 
 type connectionServiceClient struct {
@@ -95,6 +103,15 @@ func (c *connectionServiceClient) BlockUser(ctx context.Context, in *BlockUserRe
 	return out, nil
 }
 
+func (c *connectionServiceClient) UnblockConnection(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*BlockedUserStatus, error) {
+	out := new(BlockedUserStatus)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/UnblockConnection", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *connectionServiceClient) GetAllBlockedForCurrentUser(ctx context.Context, in *BlockUserRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
 	out := new(GetAllResponse)
 	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/GetAllBlockedForCurrentUser", in, out, opts...)
@@ -122,6 +139,69 @@ func (c *connectionServiceClient) RecommendUsersByConnection(ctx context.Context
 	return out, nil
 }
 
+func (c *connectionServiceClient) InsertField(ctx context.Context, in *Field, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/InsertField", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) InsertSkill(ctx context.Context, in *Skill, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/InsertSkill", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) InsertJobOffer(ctx context.Context, in *JobOffer, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/InsertJobOffer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) InsertSkillToUser(ctx context.Context, in *UserInfoItem, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/InsertSkillToUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) InsertFieldToUser(ctx context.Context, in *UserInfoItem, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/InsertFieldToUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) RecommendJobBySkill(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*JobOffers, error) {
+	out := new(JobOffers)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/RecommendJobBySkill", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) RecommendJobByField(ctx context.Context, in *GetConnectionRequest, opts ...grpc.CallOption) (*JobOffers, error) {
+	out := new(JobOffers)
+	err := c.cc.Invoke(ctx, "/connection_service_proto.ConnectionService/RecommendJobByField", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConnectionServiceServer is the server API for ConnectionService service.
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
@@ -132,9 +212,17 @@ type ConnectionServiceServer interface {
 	GetAllConnectionForUser(context.Context, *GetConnectionRequest) (*GetAllResponse, error)
 	GetAllConnectionRequestsForUser(context.Context, *GetConnectionRequest) (*GetAllResponse, error)
 	BlockUser(context.Context, *BlockUserRequest) (*BlockedUserStatus, error)
+	UnblockConnection(context.Context, *BlockUserRequest) (*BlockedUserStatus, error)
 	GetAllBlockedForCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error)
 	GetAllUserBlockingCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error)
 	RecommendUsersByConnection(context.Context, *GetConnectionRequest) (*GetAllResponse, error)
+	InsertField(context.Context, *Field) (*Response, error)
+	InsertSkill(context.Context, *Skill) (*Response, error)
+	InsertJobOffer(context.Context, *JobOffer) (*Response, error)
+	InsertSkillToUser(context.Context, *UserInfoItem) (*Response, error)
+	InsertFieldToUser(context.Context, *UserInfoItem) (*Response, error)
+	RecommendJobBySkill(context.Context, *GetConnectionRequest) (*JobOffers, error)
+	RecommendJobByField(context.Context, *GetConnectionRequest) (*JobOffers, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -160,6 +248,9 @@ func (UnimplementedConnectionServiceServer) GetAllConnectionRequestsForUser(cont
 func (UnimplementedConnectionServiceServer) BlockUser(context.Context, *BlockUserRequest) (*BlockedUserStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BlockUser not implemented")
 }
+func (UnimplementedConnectionServiceServer) UnblockConnection(context.Context, *BlockUserRequest) (*BlockedUserStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnblockConnection not implemented")
+}
 func (UnimplementedConnectionServiceServer) GetAllBlockedForCurrentUser(context.Context, *BlockUserRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllBlockedForCurrentUser not implemented")
 }
@@ -168,6 +259,27 @@ func (UnimplementedConnectionServiceServer) GetAllUserBlockingCurrentUser(contex
 }
 func (UnimplementedConnectionServiceServer) RecommendUsersByConnection(context.Context, *GetConnectionRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RecommendUsersByConnection not implemented")
+}
+func (UnimplementedConnectionServiceServer) InsertField(context.Context, *Field) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertField not implemented")
+}
+func (UnimplementedConnectionServiceServer) InsertSkill(context.Context, *Skill) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertSkill not implemented")
+}
+func (UnimplementedConnectionServiceServer) InsertJobOffer(context.Context, *JobOffer) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertJobOffer not implemented")
+}
+func (UnimplementedConnectionServiceServer) InsertSkillToUser(context.Context, *UserInfoItem) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertSkillToUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) InsertFieldToUser(context.Context, *UserInfoItem) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertFieldToUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) RecommendJobBySkill(context.Context, *GetConnectionRequest) (*JobOffers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RecommendJobBySkill not implemented")
+}
+func (UnimplementedConnectionServiceServer) RecommendJobByField(context.Context, *GetConnectionRequest) (*JobOffers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RecommendJobByField not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -290,6 +402,24 @@ func _ConnectionService_BlockUser_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_UnblockConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlockUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).UnblockConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/UnblockConnection",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).UnblockConnection(ctx, req.(*BlockUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ConnectionService_GetAllBlockedForCurrentUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BlockUserRequest)
 	if err := dec(in); err != nil {
@@ -344,6 +474,132 @@ func _ConnectionService_RecommendUsersByConnection_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_InsertField_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Field)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).InsertField(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/InsertField",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).InsertField(ctx, req.(*Field))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_InsertSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Skill)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).InsertSkill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/InsertSkill",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).InsertSkill(ctx, req.(*Skill))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_InsertJobOffer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JobOffer)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).InsertJobOffer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/InsertJobOffer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).InsertJobOffer(ctx, req.(*JobOffer))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_InsertSkillToUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfoItem)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).InsertSkillToUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/InsertSkillToUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).InsertSkillToUser(ctx, req.(*UserInfoItem))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_InsertFieldToUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfoItem)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).InsertFieldToUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/InsertFieldToUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).InsertFieldToUser(ctx, req.(*UserInfoItem))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_RecommendJobBySkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).RecommendJobBySkill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/RecommendJobBySkill",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).RecommendJobBySkill(ctx, req.(*GetConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_RecommendJobByField_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).RecommendJobByField(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection_service_proto.ConnectionService/RecommendJobByField",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).RecommendJobByField(ctx, req.(*GetConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -376,6 +632,10 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ConnectionService_BlockUser_Handler,
 		},
 		{
+			MethodName: "UnblockConnection",
+			Handler:    _ConnectionService_UnblockConnection_Handler,
+		},
+		{
 			MethodName: "GetAllBlockedForCurrentUser",
 			Handler:    _ConnectionService_GetAllBlockedForCurrentUser_Handler,
 		},
@@ -386,6 +646,34 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RecommendUsersByConnection",
 			Handler:    _ConnectionService_RecommendUsersByConnection_Handler,
+		},
+		{
+			MethodName: "InsertField",
+			Handler:    _ConnectionService_InsertField_Handler,
+		},
+		{
+			MethodName: "InsertSkill",
+			Handler:    _ConnectionService_InsertSkill_Handler,
+		},
+		{
+			MethodName: "InsertJobOffer",
+			Handler:    _ConnectionService_InsertJobOffer_Handler,
+		},
+		{
+			MethodName: "InsertSkillToUser",
+			Handler:    _ConnectionService_InsertSkillToUser_Handler,
+		},
+		{
+			MethodName: "InsertFieldToUser",
+			Handler:    _ConnectionService_InsertFieldToUser_Handler,
+		},
+		{
+			MethodName: "RecommendJobBySkill",
+			Handler:    _ConnectionService_RecommendJobBySkill_Handler,
+		},
+		{
+			MethodName: "RecommendJobByField",
+			Handler:    _ConnectionService_RecommendJobByField_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -51,6 +51,7 @@ func (server *Server) Start() {
 	server.iniPatchUserHandler(connectionService, patchReplyPublisher, patchCommandSubscriber)
 
 	connectionHandler := server.initConnectionHandler(connectionService)
+	server.initData(connectionStore)
 
 	server.startGrpcServer(connectionHandler)
 }
@@ -106,6 +107,67 @@ func (server *Server) iniPatchUserHandler(service *application.ConnectionService
 }
 func (server *Server) initConnectionHandler(service *application.ConnectionService) *api.ConnectionHandler {
 	return api.NewConnectionHandler(service)
+}
+
+func (server *Server) initData(store domain.ConnectionStore) {
+	_, err := store.DeleteAllFields()
+	if err != nil {
+		return
+	}
+	_, err = store.InsertField("Business Administration and Management, General")
+	if err != nil {
+		return
+	}
+	_, err = store.InsertField("Electrical and Electronics Engineering")
+	if err != nil {
+		return
+	}
+	_, err = store.InsertField("Accounting")
+	if err != nil {
+		return
+	}
+	_, err = store.InsertField("English Language and Literature/Letters")
+	if err != nil {
+		return
+	}
+	_, err = store.InsertField("Political Science and Government")
+	if err != nil {
+		return
+	}
+	_, err = store.InsertField("Computer and Information Sciences and Support Services")
+	if err != nil {
+		return
+	}
+	_, err = store.InsertField("Communication and Media Studies")
+	if err != nil {
+		return
+	}
+
+	_, err = store.DeleteAllSkills()
+	_, err = store.InsertSkill("Communication")
+	_, err = store.InsertSkill("Teamwork")
+	_, err = store.InsertSkill("Critical Thinking")
+	_, err = store.InsertSkill("Communication")
+	_, err = store.InsertSkill("Active Listening")
+	_, err = store.InsertSkill("Active Learning")
+	_, err = store.InsertSkill("Problem Solving")
+	_, err = store.InsertSkill("Management")
+	_, err = store.InsertSkill("Training")
+	_, err = store.InsertSkill("Design")
+	_, err = store.InsertSkill("Presentations")
+	_, err = store.InsertSkill("Data Analysis")
+	_, err = store.InsertSkill("Blogging")
+	_, err = store.InsertSkill("Business")
+	_, err = store.InsertSkill("Leadership")
+	_, err = store.InsertSkill("Time Management")
+	_, err = store.InsertSkill("Troubleshooting")
+	_, err = store.InsertSkill("Operating System")
+	_, err = store.InsertSkill("Online Marketing")
+
+	if err != nil {
+		return
+	}
+
 }
 
 func (server *Server) startGrpcServer(connectionHandler *api.ConnectionHandler) {
