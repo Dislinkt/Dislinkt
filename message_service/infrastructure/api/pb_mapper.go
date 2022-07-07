@@ -2,6 +2,7 @@ package api
 
 import (
 	pb "github.com/dislinkt/common/proto/message_service"
+	pbNotification "github.com/dislinkt/common/proto/notification_service"
 	"github.com/dislinkt/message_service/domain"
 	"time"
 )
@@ -40,4 +41,12 @@ func mapNewMessage(messagePb *pb.Message) *domain.Message {
 		DateSent:    time.Now(),
 	}
 	return message
+}
+
+func mapNotification(subjectUsername string) *pbNotification.NewNotification {
+	notificationPb := &pbNotification.NewNotification{
+		NotificationType: 2,
+		SubjectUsername:  subjectUsername,
+	}
+	return notificationPb
 }

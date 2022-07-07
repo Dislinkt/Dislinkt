@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/message_service"
+	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/dislinkt/message_service/application"
 	"github.com/dislinkt/message_service/infrastructure/persistence"
@@ -52,6 +53,8 @@ func (handler *MessageHandler) SendMessage(ctx context.Context, request *pb.Send
 	if err != nil {
 		return nil, err
 	}
-
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	_, _ = persistence.NotificationClient("notification_service:8000").SaveNotification(context.TODO(),
+		&notificationGw.SaveNotificationRequest{Notification: mapNotification(username), UserId: message.ReceiverId})
 	return &pb.GetResponse{MessageHistory: mapMessageHistory(messageHistory)}, nil
 }

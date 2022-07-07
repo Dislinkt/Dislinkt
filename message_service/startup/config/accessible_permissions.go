@@ -6,6 +6,6 @@ func AccessiblePermissions() map[string]string {
 	return map[string]string{
 		messageService + "getMessageHistoriesByUser": "sendMessage",
 		messageService + "getMessageHistory":         "sendMessage",
-		messageService + "SendMessage":               "sendMessage",
+		messageService + "sendMessage":               "sendMessage",
 	}
 }

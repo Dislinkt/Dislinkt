@@ -20,3 +20,8 @@ type Message struct {
 	DateSent    time.Time `bson:"date_posted"`
 	IsRead      bool      `bson:"is_read"`
 }
+
+type NewNotification struct {
+	NotificationType string
+	SubjectUsername  string
+}
