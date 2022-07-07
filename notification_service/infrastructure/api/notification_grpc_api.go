@@ -22,11 +22,16 @@ func (handler *NotificationHandler) GetNotificationsForUser(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	response := &pb.GetMultipleResponse{Notifications: []*pb.Notification{}}
+	response := &pb.GetMultipleResponse{Notifications: []*pb.Notification{}, UnreadNotificationsNumber: 0}
+	unreadNotificationsNumber := 0
 	for _, notification := range notifications {
 		current := mapNotification(notification)
 		response.Notifications = append(response.Notifications, current)
+		if !notification.IsRead {
+			unreadNotificationsNumber++
+		}
 	}
+	response.UnreadNotificationsNumber = int32(unreadNotificationsNumber)
 	return response, nil
 }
 
