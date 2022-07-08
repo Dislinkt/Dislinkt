@@ -121,14 +121,14 @@ service ConnectionService{
 
   rpc RecommendJobBySkill(GetConnectionRequest) returns (JobOffers) {
     option (google.api.http) = {
-      post: "/user/recommend/skill/{uuid}"
+      get: "user/recommend/skill/{uuid}"
       body: ""
     };
   }
 
   rpc RecommendJobByField(GetConnectionRequest) returns (JobOffers) {
     option (google.api.http) = {
-      get: "/user/recommend/field/{uuid}"
+      get: "user/recommend/field/{uuid}"
       body: ""
     };
   }
@@ -136,6 +136,13 @@ service ConnectionService{
   rpc CheckIfUsersConnected(CheckConnection) returns (CheckResult) {
     option (google.api.http) = {
       post: "/user/connection/check"
+      body: "*"
+    };
+  }
+
+  rpc CheckIfUsersBlocked(CheckConnection) returns (CheckResultBlock) {
+    option (google.api.http) = {
+      post: "/user/connection/block/check"
       body: "*"
     };
   }
@@ -240,4 +247,8 @@ message GetAllResponse {
 
 message CheckResult{
   bool isConnected = 1;
+}
+
+message CheckResultBlock{
+  bool isBlocked = 1;
 }

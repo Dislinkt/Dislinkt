@@ -338,8 +338,47 @@ func (store *ConnectionDBStore) CheckIfUsersConnected(uuid1 string, uuid2 string
 
 		result, _ := tx.Run("match(u1:UserNode) where u1.uid = $userUid "+
 			"match (u2:UserNode) where u2.uid = $userUid1 "+
-			"MATCH (u1)-[r1:CONNECTION]->(u2) "+
+			"MATCH (u1)-[r1:CONNECTION {status: $status}]->(u2) "+
 			"RETURN r1.status", map[string]interface{}{
+			"status":   "CONNECTED",
+			"userUid":  uuid1,
+			"userUid1": uuid2,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		if result.Next() {
+			return true, err
+		} else {
+			return false, err
+		}
+
+		//re, err := records.Single()
+	})
+
+	return res.(bool), err
+}
+
+func (store *ConnectionDBStore) CheckIfUsersBlocked(uuid1 string, uuid2 string) (isBlocked bool, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	res, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		if !checkIfUserExist(uuid1, tx) && !checkIfUserExist(uuid2, tx) {
+			return false, nil
+		}
+
+		result, _ := tx.Run("match(u1:UserNode) where u1.uid = $userUid "+
+			"match (u2:UserNode) where u2.uid = $userUid1 "+
+			"MATCH (u1)-[r1:CONNECTION {status: $status}]->(u2) "+
+			"RETURN r1.status", map[string]interface{}{
+			"status":   "BLOCK",
 			"userUid":  uuid1,
 			"userUid1": uuid2,
 		})
@@ -964,6 +1003,9 @@ func (store *ConnectionDBStore) InsertFieldToUser(name string, uuid string) (str
 		}
 	}(session)
 
+	fmt.Println("[ConnectionDBStore: InsertFieldToUser ]")
+	fmt.Println(name)
+	fmt.Println(uuid)
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		records, err := tx.Run("match (u1:UserNode) where u1.uid = $uuid "+
@@ -982,6 +1024,7 @@ func (store *ConnectionDBStore) InsertFieldToUser(name string, uuid string) (str
 			return "", err
 		}
 		// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
+
 		return record.Values[0].(string), nil
 
 	})
@@ -1059,6 +1102,7 @@ func (store *ConnectionDBStore) RecommendJobByField(userUid string) (jobs []*dom
 
 		}
 	}(session)
+	fmt.Println("[ConnectionDBStore: RecommendJobByField]")
 	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		if !checkIfUserExist(userUid, tx) {

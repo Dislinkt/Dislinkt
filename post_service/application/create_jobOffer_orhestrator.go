@@ -58,7 +58,6 @@ func (o *CreateJobOfferOrchestrator) nextCommandType(reply events.CreateJobOffer
 		fmt.Println("uslo orc")
 		return events.CreateJobOfferInGraph
 	case events.ConnectionServiceNotCreated:
-		fmt.Println("uslo orc55")
 		return events.RollbackJobOfferInPost
 	case events.PostServiceRolledBack:
 		return events.CancelJobOfferCreation

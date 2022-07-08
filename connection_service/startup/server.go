@@ -56,6 +56,10 @@ func (server *Server) Start() {
 	createJobOfferReplyPublisher := server.initPublisher(server.config.CreateJobOfferReplySubject)
 	server.initCreateJobOfferHandler(connectionService, createJobOfferReplyPublisher, createJobOfferSubscriber)
 
+	commandAddEducationSubscriber := server.initSubscriber(server.config.AddEducationCommandSubject, QueueGroup)
+	replyAddEducationPublisher := server.initPublisher(server.config.AddEducationReplySubject)
+	server.initAddEducationHandler(connectionService, replyAddEducationPublisher, commandAddEducationSubscriber)
+
 	connectionHandler := server.initConnectionHandler(connectionService)
 
 	server.startGrpcServer(connectionHandler)
@@ -197,3 +201,11 @@ func (server *Server) startGrpcServer(connectionHandler *api.ConnectionHandler) 
 		log.Fatalf("failed to serve: %s", err)
 	}
 }
+
+func (server *Server) initAddEducationHandler(service *application.ConnectionService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewAddEducationCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+

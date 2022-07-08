@@ -2,12 +2,14 @@ package application
 
 import (
 	"errors"
+	"fmt"
 	"github.com/dislinkt/additional_user_service/domain"
 	uuid "github.com/gofrs/uuid"
 )
 
 type AdditionalUserService struct {
-	store domain.AdditionalUserStore
+	store                    domain.AdditionalUserStore
+	addEducationOrchestrator *AddEducationOrchestrator
 }
 
 func (service *AdditionalUserService) CreateDocument(uuid string) error {
@@ -37,15 +39,17 @@ func (service *AdditionalUserService) DeleteDocument(uuid string) error {
 
 // EDUCATION
 
-func NewAdditionalUserService(store domain.AdditionalUserStore) *AdditionalUserService {
+func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *AddEducationOrchestrator) *AdditionalUserService {
 	return &AdditionalUserService{
-		store: store,
+		store:                    store,
+		addEducationOrchestrator: addEducationOrchestrator,
 	}
 }
 
 func (service *AdditionalUserService) CreateEducation(uuid string, education *domain.Education) (*domain.Education,
 	error) {
 	if !IsValidUUID(uuid) {
+		fmt.Println("invalid uuid")
 		return nil, errors.New("Invalid uuid")
 	}
 
@@ -60,6 +64,14 @@ func (service *AdditionalUserService) CreateEducation(uuid string, education *do
 	}
 
 	return insertEducation, nil
+}
+
+func (service *AdditionalUserService) CreateEducationStart(uuid string, education *domain.Education) error {
+	err := service.addEducationOrchestrator.Start(education, uuid)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 func (service *AdditionalUserService) FindUserEducations(uuid string) (*map[string]domain.Education,

@@ -200,7 +200,7 @@ func (handler *ConnectionHandler) InsertFieldToUser(ctx context.Context, request
 }
 
 func (handler *ConnectionHandler) RecommendJobBySkill(ctx context.Context, request *pb.GetConnectionRequest) (response *pb.JobOffers, err error) {
-	fmt.Println("[ConnectionHandler]:InsertFieldToUser")
+	fmt.Println("[ConnectionHandler]:RecommendJobBySkill")
 	response = &pb.JobOffers{
 		Jobs: []*pb.JobOffer{},
 	}
@@ -236,6 +236,19 @@ func (handler *ConnectionHandler) CheckIfUsersConnected(ctx context.Context, req
 	}
 	response = &pb.CheckResult{
 		IsConnected: isConnected,
+	}
+
+	return response, err
+}
+
+func (handler *ConnectionHandler) CheckIfUsersBlocked(ctx context.Context, request *pb.CheckConnection) (response *pb.CheckResultBlock, err error) {
+	fmt.Println("[ConnectionHandler]:CheckIfUsersConnected")
+	isBlocked, err := handler.service.CheckIfUsersBlocked(request.Uuid1, request.Uuid2)
+	if err != nil {
+		return nil, err
+	}
+	response = &pb.CheckResultBlock{
+		IsBlocked: isBlocked,
 	}
 
 	return response, err

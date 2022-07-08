@@ -41,7 +41,6 @@ const (
 	PostServiceRolledBack
 	ConnectionServiceCreated
 	ConnectionServiceNotCreated
-	ConnectionServiceRolledBack
 	UnknownCreateJobOfferReply
 )
 

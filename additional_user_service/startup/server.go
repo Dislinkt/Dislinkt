@@ -45,11 +45,19 @@ func (server *Server) Start() {
 	mongoClient := server.initAdditionalUserClient()
 	additionalUserStore := server.initAdditionalUserStore(mongoClient)
 
-	additionalUserService := server.initAdditionalUserService(additionalUserStore)
+	commandPublisher := server.initPublisher(server.config.AddEducationCommandSubject)
+	replySubscriber := server.initSubscriber(server.config.AddEducationReplySubject, QueueGroup)
+	addEducationOrchestrator := server.initAddEducationOrchestrator(commandPublisher, replySubscriber)
+
+	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
 	server.initRegisterUserHandler(additionalUserService, replyPublisher, commandSubscriber)
+
+	commandAddEducationSubscriber := server.initSubscriber(server.config.AddEducationCommandSubject, QueueGroup)
+	replyAddEducationPublisher := server.initPublisher(server.config.AddEducationReplySubject)
+	server.initAddEducationHandler(additionalUserService, replyAddEducationPublisher, commandAddEducationSubscriber)
 
 	additionalUserHandler := server.initAdditionalUserHandler(additionalUserService)
 
@@ -71,8 +79,8 @@ func (server *Server) initAdditionalUserStore(client *mongo.Client) domain.Addit
 	return store
 }
 
-func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore) *application.AdditionalUserService {
-	return application.NewAdditionalUserService(store)
+func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *application.AddEducationOrchestrator) *application.AdditionalUserService {
+	return application.NewAdditionalUserService(store, addEducationOrchestrator)
 }
 
 func (server *Server) initPublisher(subject string) saga.Publisher {
@@ -98,6 +106,14 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 func (server *Server) initRegisterUserHandler(service *application.AdditionalUserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initAddEducationHandler(service *application.AdditionalUserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewAddEducationCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -206,4 +222,13 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 		return
 	}
 
+}
+
+func (server *Server) initAddEducationOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.AddEducationOrchestrator {
+	orchestrator, err := application.NewAddEducationOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
 }

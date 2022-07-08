@@ -111,6 +111,7 @@ func (servioe *ConnectionService) InsertSkillToUser(name string, uuid string) (s
 
 func (servioe *ConnectionService) InsertFieldToUser(name string, uuid string) (string, error) {
 	fmt.Println("[ConnectionService InsertFieldToUser")
+	fmt.Println(name, uuid)
 	return servioe.store.InsertFieldToUser(name, uuid)
 }
 
@@ -120,13 +121,18 @@ func (servioe *ConnectionService) RecommendJobBySkill(userUid string) (jobs []*d
 }
 
 func (servioe *ConnectionService) RecommendJobByField(userUid string) (jobs []*domain.JobOffer, err error) {
-	fmt.Println("[ConnectionService RecommendJobByField")
+	fmt.Println("[ConnectionService RecommendJobByField11")
 	return servioe.store.RecommendJobByField(userUid)
 }
 
 func (servioe *ConnectionService) CheckIfUsersConnected(userUUID1 string, userUUID2 string) (bool, error) {
 	fmt.Println("[ConnectionService CHeckIfUsersConnected")
 	return servioe.store.CheckIfUsersConnected(userUUID1, userUUID2)
+}
+
+func (servioe *ConnectionService) CheckIfUsersBlocked(userUUID1 string, userUUID2 string) (bool, error) {
+	fmt.Println("[ConnectionService CheckIfUsersBlocked")
+	return servioe.store.CheckIfUsersBlocked(userUUID1, userUUID2)
 }
 
 func IsValidUUID(u string) bool {

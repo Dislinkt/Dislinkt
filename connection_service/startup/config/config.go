@@ -22,6 +22,8 @@ type Config struct {
 	PatchUserReplySubject        string
 	CreateJobOfferCommandSubject string
 	CreateJobOfferReplySubject   string
+	AddEducationCommandSubject   string
+	AddEducationReplySubject     string
 	PublicKey                    string
 }
 
@@ -57,6 +59,8 @@ func NewConfig() *Config {
 		//CreateJobOfferReplySubject:   "job.create.reply",
 		CreateJobOfferCommandSubject: os.Getenv("CREATE_JOB_COMMAND_SUBJECT"),
 		CreateJobOfferReplySubject:   os.Getenv("CREATE_JOB_REPLY_SUBJECT"),
+		AddEducationCommandSubject:   os.Getenv("ADD_EDUCATION_COMMAND_SUBJECT"),
+		AddEducationReplySubject:     os.Getenv("ADD_EDUCATION_REPLY_SUBJECT"),
 		PublicKey:                    "Dislinkt",
 	}
 }
