@@ -50,7 +50,13 @@ func (server *Server) Start() {
 	patchReplyPublisher := server.initPublisher(server.config.PatchUserReplySubject)
 	server.iniPatchUserHandler(connectionService, patchReplyPublisher, patchCommandSubscriber)
 
+	fmt.Println(server.config.CreateJobOfferCommandSubject + " start connection_service")
+	createJobOfferSubscriber := server.initSubscriber(server.config.CreateJobOfferCommandSubject, QueueGroup)
+	createJobOfferReplyPublisher := server.initPublisher(server.config.CreateJobOfferReplySubject)
+	server.initCreateJobOfferHandler(connectionService, createJobOfferReplyPublisher, createJobOfferSubscriber)
+
 	connectionHandler := server.initConnectionHandler(connectionService)
+
 	server.initData(connectionStore)
 
 	server.startGrpcServer(connectionHandler)
@@ -94,6 +100,14 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 func (server *Server) initRegisterUserHandler(service *application.ConnectionService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initCreateJobOfferHandler(service *application.ConnectionService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewJobOfferCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

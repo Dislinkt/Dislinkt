@@ -3,7 +3,7 @@ package api
 import (
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/domain"
-	"google.golang.org/genproto/googleapis/type/date"
+	"time"
 )
 
 func mapUserConn(userConn *domain.UserNode) *pb.User {
@@ -35,11 +35,12 @@ func mapJobOfferPb(jobOfferPb *pb.JobOffer) *domain.JobOffer {
 		Id:            jobOfferPb.Id,
 		Position:      jobOfferPb.Position,
 		Preconditions: jobOfferPb.Preconditions,
-		DatePosted:    date.Date{},
+		DatePosted:    time.Time{},
 		Duration:      jobOfferPb.Duration,
 		Location:      jobOfferPb.Location,
 		Title:         jobOfferPb.Title,
 		Field:         jobOfferPb.Field,
 	}
+
 	return jobOffer
 }

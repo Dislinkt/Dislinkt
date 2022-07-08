@@ -1,6 +1,8 @@
 package domain
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type PostStore interface {
 	Get(id primitive.ObjectID) (*Post, error)
@@ -16,6 +18,7 @@ type PostStore interface {
 	GetAllJobOffers() ([]*JobOffer, error)
 	InsertJobOffer(offer *JobOffer) error
 	SearchJobOffers(searchText string) ([]*JobOffer, error)
+	DeleteJobOffer(jobOffer *JobOffer) error
 
 	InsertUser(user *User) error
 	DeleteUser(user *User) error

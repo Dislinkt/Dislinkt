@@ -86,7 +86,7 @@ service ConnectionService{
 
   rpc InsertField(Field) returns (Response) {
     option (google.api.http) = {
-      post: "/field"
+      post: "/connection/field"
       body: "*"
     };
   }
@@ -100,7 +100,7 @@ service ConnectionService{
 
   rpc InsertJobOffer(JobOffer) returns (Response) {
     option (google.api.http) = {
-      post: "/jobOffer"
+      post: "/connection/jobOffer"
       body: "*"
     };
   }

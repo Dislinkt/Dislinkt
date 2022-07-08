@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -199,12 +200,18 @@ func decode(cursor *mongo.Cursor) (posts []*domain.Post, err error) {
 
 func (store *PostMongoDBStore) InsertJobOffer(offer *domain.JobOffer) error {
 	result, err := store.jobOffers.InsertOne(context.TODO(), offer)
+	fmt.Println("PostMongoDBStore: InsertJobOffer")
 	if err != nil {
 		return err
 	}
 	offer.Id = result.InsertedID.(primitive.ObjectID)
 
 	return nil
+}
+
+func (store *PostMongoDBStore) DeleteJobOffer(jobOffer *domain.JobOffer) error {
+	_, err := store.users.DeleteOne(context.TODO(), bson.M{"_id": jobOffer.Id})
+	return err
 }
 
 func (store *PostMongoDBStore) GetAllJobOffers() ([]*domain.JobOffer, error) {

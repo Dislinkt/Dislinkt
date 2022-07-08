@@ -858,6 +858,9 @@ func (store *ConnectionDBStore) InsertJobOffer(jobOffer domain.JobOffer) (string
 		}
 	}(session)
 
+	fmt.Println("ConnectionDBStore: InsertJobOffer")
+	fmt.Println(jobOffer)
+
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 		dateNow := time.Now().Local().Unix()
 		records, err := tx.Run("CREATE (n:JobOffer { Id: $id,Position: $position,DatePosted: $datePosted, Duration: $duration, "+
@@ -908,7 +911,9 @@ func (store *ConnectionDBStore) InsertJobOffer(jobOffer domain.JobOffer) (string
 		return "", err
 	}
 
-	return result.(string), nil
+	fmt.Println("ConnectionDBStore: InsertJobOffer ", result.(string))
+
+	return result.(string), err
 }
 
 func (store *ConnectionDBStore) InsertSkillToUser(name string, uuid string) (string, error) {
