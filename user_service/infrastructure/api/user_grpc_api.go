@@ -122,6 +122,21 @@ func (handler *UserHandler) GetUserByUsername(ctx context.Context, request *pb.G
 	return response, nil
 }
 
+func (handler *UserHandler) CheckIfUserIsPrivate(ctx context.Context, request *pb.GetOneMessage) (*pb.IsPrivateResponse, error) {
+	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
+	// defer span.Finish()
+
+	id, _ := uuid.FromString(request.Id)
+	user, err := handler.service.FindByID(id)
+	if err != nil || user == nil {
+		return nil, err
+	}
+	response := &pb.IsPrivateResponse{
+		IsPrivate: user.Private,
+	}
+	return response, nil
+}
+
 func (handler *UserHandler) RegisterUser(ctx context.Context, request *pb.RegisterUserRequest) (*pb.
 	RegisterUserResponse, error) {
 	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")

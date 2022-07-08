@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"fmt"
+	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -32,6 +33,14 @@ func NotificationClient(address string) notificationGw.NotificationServiceClient
 		log.Fatalf("Failed to start gRPC connection to Notification service: %v", err)
 	}
 	return notificationGw.NewNotificationServiceClient(conn)
+}
+
+func ConnectionClient(address string) connectionGw.ConnectionServiceClient {
+	conn, err := getConnection(address)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC connection to Connection service: %v", err)
+	}
+	return connectionGw.NewConnectionServiceClient(conn)
 }
 
 func getConnection(address string) (*grpc.ClientConn, error) {

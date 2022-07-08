@@ -8,7 +8,7 @@ func AccessiblePermissions() map[string]string {
 		postService + "CreateComment":  "createCommentPermission",
 		postService + "LikePost":       "likePostPermission",
 		postService + "DislikePost":    "dislikePostPermission",
-		postService + "GetRecent":      "getRecentPermission",
+		postService + "getRecent":      "getRecentPermission",
 		postService + "CreateJobOffer": "createJobOffer",
 	}
 }

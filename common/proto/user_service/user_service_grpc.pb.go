@@ -30,6 +30,7 @@ type UserServiceClient interface {
 	PatchUser(ctx context.Context, in *PatchUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUserByUsername(ctx context.Context, in *GetOneByUsernameMessage, opts ...grpc.CallOption) (*UserResponse, error)
 	GetPublicUsers(ctx context.Context, in *GetMeMessage, opts ...grpc.CallOption) (*GetAllResponse, error)
+	CheckIfUserIsPrivate(ctx context.Context, in *GetOneMessage, opts ...grpc.CallOption) (*IsPrivateResponse, error)
 }
 
 type userServiceClient struct {
@@ -112,6 +113,15 @@ func (c *userServiceClient) GetPublicUsers(ctx context.Context, in *GetMeMessage
 	return out, nil
 }
 
+func (c *userServiceClient) CheckIfUserIsPrivate(ctx context.Context, in *GetOneMessage, opts ...grpc.CallOption) (*IsPrivateResponse, error) {
+	out := new(IsPrivateResponse)
+	err := c.cc.Invoke(ctx, "/user_service_proto.UserService/CheckIfUserIsPrivate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -124,6 +134,7 @@ type UserServiceServer interface {
 	PatchUser(context.Context, *PatchUserRequest) (*UserResponse, error)
 	GetUserByUsername(context.Context, *GetOneByUsernameMessage) (*UserResponse, error)
 	GetPublicUsers(context.Context, *GetMeMessage) (*GetAllResponse, error)
+	CheckIfUserIsPrivate(context.Context, *GetOneMessage) (*IsPrivateResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -154,6 +165,9 @@ func (UnimplementedUserServiceServer) GetUserByUsername(context.Context, *GetOne
 }
 func (UnimplementedUserServiceServer) GetPublicUsers(context.Context, *GetMeMessage) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPublicUsers not implemented")
+}
+func (UnimplementedUserServiceServer) CheckIfUserIsPrivate(context.Context, *GetOneMessage) (*IsPrivateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckIfUserIsPrivate not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -312,6 +326,24 @@ func _UserService_GetPublicUsers_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CheckIfUserIsPrivate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOneMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CheckIfUserIsPrivate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_service_proto.UserService/CheckIfUserIsPrivate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CheckIfUserIsPrivate(ctx, req.(*GetOneMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -350,6 +382,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPublicUsers",
 			Handler:    _UserService_GetPublicUsers_Handler,
+		},
+		{
+			MethodName: "CheckIfUserIsPrivate",
+			Handler:    _UserService_CheckIfUserIsPrivate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

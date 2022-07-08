@@ -52,6 +52,11 @@ service UserService{
       get: "/user/public"
     };
   }
+  rpc CheckIfUserIsPrivate(GetOneMessage) returns(IsPrivateResponse) {
+    option (google.api.http) = {
+      get: "/user/privacy-check"
+    };
+  }
 }
 
 message GetMeMessage{
@@ -162,6 +167,10 @@ message Links{
   string skills = 6;
   string interests = 7;
   string feed = 8;
+}
+
+message IsPrivateResponse {
+  bool isPrivate = 1;
 }
 
 

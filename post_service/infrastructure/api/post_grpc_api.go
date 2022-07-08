@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dislinkt/common/interceptor"
+	connectionGw "github.com/dislinkt/common/proto/connection_service"
 	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"post_service/infrastructure/persistence"
@@ -42,14 +43,34 @@ func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb
 
 func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
 	id := request.Id
-	posts, err := handler.service.GetRecent(id)
-	if err != nil {
-		return nil, err
+
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	privacyResponse, _ := persistence.UserClient("user_service:8000").CheckIfUserIsPrivate(context.TODO(), &userGw.GetOneMessage{Id: id})
+	isPrivate := privacyResponse.IsPrivate
+	areUsersConnected := false
+	isUserTheSame := false
+	if username != "" {
+		userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
+		connectionResponse, _ := persistence.ConnectionClient("connection_service:8000").CheckIfUsersConnected(context.TODO(), &connectionGw.CheckConnection{Uuid1: userResponse.User.Id, Uuid2: id})
+		areUsersConnected = connectionResponse.IsConnected
+		if id == userResponse.User.Id {
+			isUserTheSame = true
+		}
 	}
+	var posts []*domain.Post
+	var err error
 	response := &pb.GetMultipleResponse{Posts: []*pb.Post{}}
-	for _, post := range posts {
-		current := mapPost(post)
-		response.Posts = append(response.Posts, current)
+
+	if areUsersConnected || (!areUsersConnected && !isPrivate) || isUserTheSame {
+		posts, err = handler.service.GetRecent(id)
+		if err != nil {
+			return nil, err
+		}
+		response = &pb.GetMultipleResponse{Posts: []*pb.Post{}}
+		for _, post := range posts {
+			current := mapPost(post)
+			response.Posts = append(response.Posts, current)
+		}
 	}
 	return response, nil
 }

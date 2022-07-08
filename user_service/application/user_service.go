@@ -208,3 +208,7 @@ func (service *UserService) Delete(user *domain.User) interface{} {
 func (service *UserService) GetPublicUsers() (*[]domain.User, error) {
 	return service.store.GetPublicUsers()
 }
+
+func (service *UserService) FindByID(uuid uuid.UUID) (*domain.User, error) {
+	return service.store.FindByID(uuid)
+}
