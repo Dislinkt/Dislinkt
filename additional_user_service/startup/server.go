@@ -130,18 +130,6 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Political Science and Government"})
 	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Computer and Information Sciences and Support Services"})
 	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Communication and Media Studies"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Human Resources Management/Personnel Administration/General"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Architecture"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Electronic, Electronics and Communications Engineering"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Liberal Arts and Sciences/Liberal Studies"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(),
-		Name: "International Relations and Affairs"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Computer Systems networking and Telecommunications"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Criminal Justice and Corrections"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Business, Management, Marketing, and Related Support Services"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Art/Art Studies, General"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Advertising"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Fine/Studio Arts, General"})
 	_, err := store.InsertFieldOfStudy(fields)
 	if err != nil {
 		return
