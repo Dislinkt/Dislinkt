@@ -1242,7 +1242,7 @@ func RegisterConnectionServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertField", runtime.WithHTTPPathPattern("/field"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertField", runtime.WithHTTPPathPattern("/connection/field"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1290,7 +1290,7 @@ func RegisterConnectionServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertJobOffer", runtime.WithHTTPPathPattern("/jobOffer"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertJobOffer", runtime.WithHTTPPathPattern("/connection/jobOffer"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1683,7 +1683,7 @@ func RegisterConnectionServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertField", runtime.WithHTTPPathPattern("/field"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertField", runtime.WithHTTPPathPattern("/connection/field"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1725,7 +1725,7 @@ func RegisterConnectionServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertJobOffer", runtime.WithHTTPPathPattern("/jobOffer"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection_service_proto.ConnectionService/InsertJobOffer", runtime.WithHTTPPathPattern("/connection/jobOffer"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1870,11 +1870,11 @@ var (
 
 	pattern_ConnectionService_RecommendUsersByConnection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"connection", "recommend", "users", "uuid"}, ""))
 
-	pattern_ConnectionService_InsertField_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"field"}, ""))
+	pattern_ConnectionService_InsertField_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"connection", "field"}, ""))
 
 	pattern_ConnectionService_InsertSkill_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"skill"}, ""))
 
-	pattern_ConnectionService_InsertJobOffer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"jobOffer"}, ""))
+	pattern_ConnectionService_InsertJobOffer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"connection", "jobOffer"}, ""))
 
 	pattern_ConnectionService_InsertSkillToUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"user", "uuid", "skill", "name"}, ""))
 

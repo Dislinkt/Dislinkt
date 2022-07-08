@@ -16,7 +16,6 @@ import (
 
 func mapPost(post *domain.Post) *pb.Post {
 	id := post.Id.Hex()
-
 	links := &pb.Links{
 		Comment: "/post/" + id + "/comment",
 		Like:    "/post/" + id + "/like",

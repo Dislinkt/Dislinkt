@@ -27,16 +27,21 @@ func NewServer(config *config.Config) *Server {
 }
 
 const (
-	QueueGroupRegister = "post_service_register"
-	QueueGroupUpdate   = "post_service_update"
+	QueueGroupRegister  = "post_service_register"
+	QueueGroupUpdate    = "post_service_update"
+	QueueGroupCreateJob = "post_service_create_job"
 )
 
 func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	postStore := server.initPostStore(mongoClient)
 
-	postService := server.initPostService(postStore)
-	postHandler := server.initPostHandler(postService)
+	fmt.Println(server.config.CreateJobOfferCommandSubject + "start post_service")
+	commandPublisher := server.initPublisher(server.config.CreateJobOfferCommandSubject)
+	replySubscriber := server.initSubscriber(server.config.CreateJobOfferReplySubject, QueueGroupCreateJob)
+	createJobOfferOrchestrator := server.initCreateJobOfferOrchestrator(commandPublisher, replySubscriber)
+
+	postService := server.initPostService(postStore, createJobOfferOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroupRegister)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
@@ -45,6 +50,12 @@ func (server *Server) Start() {
 	updateCommandSubscriber := server.initSubscriber(server.config.UpdateUserCommandSubject, QueueGroupUpdate)
 	updateReplyPublisher := server.initPublisher(server.config.UpdateUserReplySubject)
 	server.initUpdateUserHandler(postService, updateReplyPublisher, updateCommandSubscriber)
+
+	createJobOfferSubscriber := server.initSubscriber(server.config.CreateJobOfferCommandSubject, QueueGroupCreateJob)
+	createJobOfferPublisher := server.initPublisher(server.config.CreateJobOfferReplySubject)
+	server.initCreateJobOfferHandler(postService, createJobOfferPublisher, createJobOfferSubscriber)
+
+	postHandler := server.initPostHandler(postService)
 
 	server.startGrpcServer(postHandler)
 }
@@ -62,8 +73,8 @@ func (server *Server) initPostStore(client *mongo.Client) domain.PostStore {
 	return store
 }
 
-func (server *Server) initPostService(store domain.PostStore) *application.PostService {
-	return application.NewPostService(store)
+func (server *Server) initPostService(store domain.PostStore, createJobOfferOrchestrator *application.CreateJobOfferOrchestrator) *application.PostService {
+	return application.NewPostService(store, createJobOfferOrchestrator)
 }
 
 func (server *Server) initPostHandler(service *application.PostService) *api.PostHandler {
@@ -90,6 +101,15 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 	return subscriber
 }
 
+func (server *Server) initCreateJobOfferOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.CreateJobOfferOrchestrator {
+	orchestrator, err := application.NewCreateJobOfferOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
 func (server *Server) initRegisterUserHandler(service *application.PostService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
@@ -100,6 +120,13 @@ func (server *Server) initRegisterUserHandler(service *application.PostService, 
 
 func (server *Server) initUpdateUserHandler(service *application.PostService, publisher saga.Publisher, subscriber saga.Subscriber) {
 	_, err := api.NewUpdateUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initCreateJobOfferHandler(service *application.PostService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewJobOfferCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

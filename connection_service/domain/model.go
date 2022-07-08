@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"google.golang.org/genproto/googleapis/type/date"
+	"time"
 )
 
 type UserNode struct {
@@ -20,9 +20,10 @@ type JobOffer struct {
 	Id            string
 	Position      string
 	Preconditions string
-	DatePosted    date.Date
-	Duration      string
+	DatePosted    time.Time
+	Duration      int
 	Location      string
 	Title         string
 	Field         string
+	Description   string
 }

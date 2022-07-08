@@ -822,10 +822,8 @@ func (store *ConnectionDBStore) InsertSkill(name string) (string, error) {
 		}
 	}(session)
 
-	fmt.Println("usloo")
-
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
-
+		fmt.Println(name)
 		records, err := tx.Run("CREATE (n:Skill { name: $name  }) RETURN n.name", map[string]interface{}{
 			"name": name,
 		})
@@ -833,6 +831,8 @@ func (store *ConnectionDBStore) InsertSkill(name string) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		fmt.Println(records)
+
 		record, err := records.Single()
 		if err != nil {
 			return "", err
@@ -858,18 +858,22 @@ func (store *ConnectionDBStore) InsertJobOffer(jobOffer domain.JobOffer) (string
 		}
 	}(session)
 
+	fmt.Println("ConnectionDBStore: InsertJobOffer")
+	fmt.Println(jobOffer)
+
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
-		dateNow := time.Now().Local().Unix()
+
 		records, err := tx.Run("CREATE (n:JobOffer { Id: $id,Position: $position,DatePosted: $datePosted, Duration: $duration, "+
-			"Location: $location, Title: $title,Field: $field,Preconditions: $preconditions}) RETURN n.Id", map[string]interface{}{
+			"Location: $location, Title: $title,Field: $field,Preconditions: $preconditions, Description: $description}) RETURN n.Id", map[string]interface{}{
 			"id":            jobOffer.Id,
 			"position":      jobOffer.Position,
-			"datePosted":    dateNow,
+			"datePosted":    jobOffer.DatePosted,
 			"duration":      jobOffer.Duration,
 			"location":      jobOffer.Location,
 			"title":         jobOffer.Title,
 			"field":         jobOffer.Field,
 			"preconditions": jobOffer.Preconditions,
+			"description":   jobOffer.Description,
 		})
 
 		if err != nil {
@@ -908,7 +912,10 @@ func (store *ConnectionDBStore) InsertJobOffer(jobOffer domain.JobOffer) (string
 		return "", err
 	}
 
-	return result.(string), nil
+	fmt.Println("ConnectionDBStore: InsertJobOffer ", result.(string))
+	fmt.Println("prosloo svee")
+
+	return result.(string), err
 }
 
 func (store *ConnectionDBStore) InsertSkillToUser(name string, uuid string) (string, error) {
@@ -970,6 +977,7 @@ func (store *ConnectionDBStore) InsertFieldToUser(name string, uuid string) (str
 			return "", err
 		}
 		record, err := records.Single()
+		fmt.Println(record.Values[0].(string))
 		if err != nil {
 			return "", err
 		}
@@ -1004,23 +1012,28 @@ func (store *ConnectionDBStore) RecommendJobBySkill(userUid string) (jobs []*dom
 			"match (j:JobOffer) "+
 			"MATCH (u1)-[r1:SKILLS]->(s) "+
 			"MATCH (j)-[r2:SKILLS]->(s) "+
-			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field "+
+			"return DISTINCT j.Id, j.Position, j.DatePosted, j.Duration, j.Location, j.Title, j.Field, j.Preconditions, j.Description "+
 			"LIMIT 5", map[string]interface{}{
 			"uuid": userUid,
 		})
 
 		for records.Next() {
 
+			fmt.Println(records.Record().Values[0].(string))
+
 			node := domain.JobOffer{
 				Id:            records.Record().Values[0].(string),
 				Position:      records.Record().Values[1].(string),
-				Preconditions: records.Record().Values[2].(string),
-				Duration:      records.Record().Values[4].(string),
-				Location:      records.Record().Values[5].(string),
-				Title:         records.Record().Values[6].(string),
-				Field:         records.Record().Values[7].(string),
+				DatePosted:    records.Record().Values[2].(time.Time),
+				Duration:      int(records.Record().Values[3].(int64)),
+				Location:      records.Record().Values[4].(string),
+				Title:         records.Record().Values[5].(string),
+				Field:         records.Record().Values[6].(string),
+				Preconditions: records.Record().Values[7].(string),
+				Description:   records.Record().Values[8].(string),
 			}
 
+			fmt.Println()
 			jobs = append(jobs, &node)
 		}
 
@@ -1057,7 +1070,7 @@ func (store *ConnectionDBStore) RecommendJobByField(userUid string) (jobs []*dom
 			"match (j:JobOffer) "+
 			"MATCH (u1)-[r1:FIELDS]->(s) "+
 			"MATCH (j)-[r2:FIELDS]->(s) "+
-			"return DISTINCT j.Id , j.Position, j.Preconditions,j.DatePosted, j.Duration, j.Location, j.Title, j.Field "+
+			"return DISTINCT j.Id, j.Position, j.DatePosted, j.Duration, j.Location, j.Title, j.Field, j.Preconditions, j.Description "+
 			"LIMIT 5", map[string]interface{}{
 			"uuid": userUid,
 		})
@@ -1067,11 +1080,13 @@ func (store *ConnectionDBStore) RecommendJobByField(userUid string) (jobs []*dom
 			node := domain.JobOffer{
 				Id:            records.Record().Values[0].(string),
 				Position:      records.Record().Values[1].(string),
-				Preconditions: records.Record().Values[2].(string),
-				Duration:      records.Record().Values[4].(string),
-				Location:      records.Record().Values[5].(string),
-				Title:         records.Record().Values[6].(string),
-				Field:         records.Record().Values[7].(string),
+				DatePosted:    records.Record().Values[2].(time.Time),
+				Duration:      int(records.Record().Values[3].(int64)),
+				Location:      records.Record().Values[4].(string),
+				Title:         records.Record().Values[5].(string),
+				Field:         records.Record().Values[6].(string),
+				Preconditions: records.Record().Values[7].(string),
+				Description:   records.Record().Values[8].(string),
 			}
 
 			jobs = append(jobs, &node)
@@ -1099,15 +1114,23 @@ func (store *ConnectionDBStore) DeleteAllSkills() (res string, err error) {
 
 		}
 	}(session)
+	fmt.Println("Delete All Skills")
 	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		_, err := tx.Run("match (s:Skill) "+
 			"match (u1:UserNode) "+
-			"match (j:JobOffer) "+
 			"match (u1)-[r1:SKILLS]->(s) "+
-			"match (j)-[r2:SKILLS]->(s) "+
-			"delete r1,r2,s", map[string]interface{}{})
+			"delete r1", map[string]interface{}{})
 
+		_, err = tx.Run("match (s:Skill) "+
+			"match (j:JobOffer) "+
+			"match (j)-[r2:SKILLS]->(s) "+
+			"delete r2", map[string]interface{}{})
+
+		_, err = tx.Run("match (s:Skill) "+
+			"delete s", map[string]interface{}{})
+
+		fmt.Println("uslo obrisi")
 		if err != nil {
 			return nil, err
 		}
@@ -1134,10 +1157,16 @@ func (store *ConnectionDBStore) DeleteAllFields() (res string, err error) {
 
 		_, err := tx.Run("match (s:Field) "+
 			"match (u1:UserNode) "+
-			"match (j:JobOffer) "+
 			"match (u1)-[r1:FIELDS]->(s) "+
+			"delete r1", map[string]interface{}{})
+
+		_, err = tx.Run("match (s:Field) "+
+			"match (j:JobOffer) "+
 			"match (j)-[r2:FIELDS]->(s) "+
-			"delete r1,r2,s", map[string]interface{}{})
+			"delete r2", map[string]interface{}{})
+
+		_, err = tx.Run("match (s:Field) "+
+			"delete s", map[string]interface{}{})
 
 		if err != nil {
 			return nil, err
