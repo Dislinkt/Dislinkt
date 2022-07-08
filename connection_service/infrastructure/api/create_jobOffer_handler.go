@@ -34,7 +34,7 @@ func (handler *CreateJobOfferCommandHandler) handle(command *events.CreateJobOff
 	case events.CreateJobOfferInGraph:
 		fmt.Println("connectionHandler-createJobOffer")
 		jobOffer := mapConnectionCommandCreateJob(command)
-
+		fmt.Println(jobOffer)
 		_, err := handler.connectionService.InsertJobOffer(*jobOffer)
 		if err != nil {
 			fmt.Println("connectionHandler-error")

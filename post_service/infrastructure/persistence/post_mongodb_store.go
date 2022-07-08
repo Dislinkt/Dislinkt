@@ -204,8 +204,9 @@ func (store *PostMongoDBStore) InsertJobOffer(offer *domain.JobOffer) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(result)
 	offer.Id = result.InsertedID.(primitive.ObjectID)
-
+	fmt.Println(offer.Id)
 	return nil
 }
 

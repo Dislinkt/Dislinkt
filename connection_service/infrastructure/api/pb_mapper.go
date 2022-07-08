@@ -3,7 +3,8 @@ package api
 import (
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/domain"
-	"time"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"strconv"
 )
 
 func mapUserConn(userConn *domain.UserNode) *pb.User {
@@ -17,29 +18,35 @@ func mapUserConn(userConn *domain.UserNode) *pb.User {
 
 func mapJobOffer(jobOffer *domain.JobOffer) *pb.JobOffer {
 
+	duration := strconv.Itoa(jobOffer.Duration)
+
 	jobOfferPb := &pb.JobOffer{
 		Id:            jobOffer.Id,
 		Position:      jobOffer.Position,
 		Preconditions: jobOffer.Preconditions,
-		Duration:      jobOffer.Duration,
+		Duration:      duration,
 		Location:      jobOffer.Location,
 		Title:         jobOffer.Title,
 		Field:         jobOffer.Field,
+		Description:   jobOffer.Description,
+		DatePosted:    timestamppb.New(jobOffer.DatePosted),
 	}
 	return jobOfferPb
 }
 
 func mapJobOfferPb(jobOfferPb *pb.JobOffer) *domain.JobOffer {
+	dur, _ := strconv.Atoi(jobOfferPb.Duration)
 
 	jobOffer := &domain.JobOffer{
 		Id:            jobOfferPb.Id,
 		Position:      jobOfferPb.Position,
 		Preconditions: jobOfferPb.Preconditions,
-		DatePosted:    time.Time{},
-		Duration:      jobOfferPb.Duration,
+		DatePosted:    jobOfferPb.DatePosted.AsTime(),
+		Duration:      dur,
 		Location:      jobOfferPb.Location,
 		Title:         jobOfferPb.Title,
 		Field:         jobOfferPb.Field,
+		Description:   jobOfferPb.Description,
 	}
 
 	return jobOffer

@@ -59,8 +59,16 @@ func (service *PostService) GetAllJobOffers() ([]*domain.JobOffer, error) {
 	return service.store.GetAllJobOffers()
 }
 
-func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
+func (service *PostService) InsertJobOfferOrc(offer *domain.JobOffer) error {
 	err := service.createJobOfferOrchestrator.Start(offer)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
+	err := service.store.InsertJobOffer(offer)
 	if err != nil {
 		return err
 	}

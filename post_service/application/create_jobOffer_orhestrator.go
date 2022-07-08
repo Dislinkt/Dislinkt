@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"post_service/domain"
 )
 
@@ -29,7 +30,7 @@ func (o *CreateJobOfferOrchestrator) Start(jobOffer *domain.JobOffer) error {
 	event := &events.CreateJobOfferCommand{
 		Type: events.CreateJobOfferInPost,
 		JobOffer: events.JobOffer{
-			Id:            jobOffer.Id.String(),
+			Id:            primitive.NewObjectID(),
 			Position:      jobOffer.Position,
 			Description:   jobOffer.Description,
 			Preconditions: jobOffer.Preconditions,

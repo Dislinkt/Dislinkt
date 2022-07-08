@@ -142,14 +142,15 @@ service ConnectionService{
 }
 
 message JobOffer {
-  string  Id   = 1;
-  string  Position = 2;
-  string  Preconditions = 3;
-  string  Duration       = 4;
-  string  Location      = 5;
-  string  Title          = 6;
-  string  Field          = 7;
-
+  string Id = 1;
+  string Position = 2;
+  string Description = 3;
+  string Preconditions = 4;
+  google.protobuf.Timestamp DatePosted = 5;
+  string Duration = 6;
+  string Location = 7;
+  string Title = 8;
+  string Field= 9;
 }
 
 message JobOffers {

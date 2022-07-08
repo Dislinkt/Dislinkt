@@ -40,6 +40,7 @@ func (server *Server) Start() {
 
 	connectionStore := server.initConnectionStore(neo4jClient)
 
+	server.initData(connectionStore)
 	connectionService := server.initConnectionService(connectionStore)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
@@ -56,8 +57,6 @@ func (server *Server) Start() {
 	server.initCreateJobOfferHandler(connectionService, createJobOfferReplyPublisher, createJobOfferSubscriber)
 
 	connectionHandler := server.initConnectionHandler(connectionService)
-
-	server.initData(connectionStore)
 
 	server.startGrpcServer(connectionHandler)
 }
@@ -161,7 +160,6 @@ func (server *Server) initData(store domain.ConnectionStore) {
 	_, err = store.InsertSkill("Communication")
 	_, err = store.InsertSkill("Teamwork")
 	_, err = store.InsertSkill("Critical Thinking")
-	_, err = store.InsertSkill("Communication")
 	_, err = store.InsertSkill("Active Listening")
 	_, err = store.InsertSkill("Active Learning")
 	_, err = store.InsertSkill("Problem Solving")
@@ -177,6 +175,8 @@ func (server *Server) initData(store domain.ConnectionStore) {
 	_, err = store.InsertSkill("Troubleshooting")
 	_, err = store.InsertSkill("Operating System")
 	_, err = store.InsertSkill("Online Marketing")
+
+	fmt.Println("zavrsiloo")
 
 	if err != nil {
 		return

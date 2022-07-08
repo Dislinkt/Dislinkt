@@ -21,7 +21,7 @@ type JobOffer struct {
 	Position      string
 	Preconditions string
 	DatePosted    time.Time
-	Duration      string
+	Duration      int
 	Location      string
 	Title         string
 	Field         string

@@ -37,6 +37,7 @@ func (handler *CreateJobOfferCommandHandler) handle(command *events.CreateJobOff
 
 		err := handler.postService.InsertJobOffer(jobOffer)
 		if err != nil {
+			fmt.Println("posthandler-createJobOfferError")
 			reply.Type = events.PostServiceNotCreated
 			return
 		}

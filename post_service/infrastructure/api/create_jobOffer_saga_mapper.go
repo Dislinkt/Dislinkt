@@ -2,14 +2,13 @@ package api
 
 import (
 	"github.com/dislinkt/common/saga/events"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"post_service/domain"
 )
 
 func mapPostCommandCreateJob(command *events.CreateJobOfferCommand) *domain.JobOffer {
 
 	jobOfferD := &domain.JobOffer{
-		Id:            primitive.NewObjectID(),
+		Id:            command.JobOffer.Id,
 		Position:      command.JobOffer.Position,
 		Description:   command.JobOffer.Description,
 		Preconditions: command.JobOffer.Preconditions,

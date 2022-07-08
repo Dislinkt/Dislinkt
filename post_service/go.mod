@@ -7,7 +7,7 @@ replace github.com/dislinkt/common => ../common
 require (
 	github.com/dislinkt/common v0.0.0
 	github.com/go-playground/validator/v10 v10.11.0
-	go.mongodb.org/mongo-driver v1.9.0
+	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 )

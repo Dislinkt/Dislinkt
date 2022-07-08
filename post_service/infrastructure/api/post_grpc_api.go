@@ -188,7 +188,7 @@ func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Sea
 
 func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.CreateJobOfferRequest) (*pb.Empty, error) {
 	offer := mapNewJobOffer(request.JobOffer)
-	err := handler.service.InsertJobOffer(offer)
+	err := handler.service.InsertJobOfferOrc(offer)
 	if err != nil {
 		return nil, err
 	}

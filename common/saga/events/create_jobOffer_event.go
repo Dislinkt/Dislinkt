@@ -1,11 +1,12 @@
 package events
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
 type JobOffer struct {
-	Id            string
+	Id            primitive.ObjectID
 	Position      string
 	Description   string
 	Preconditions string
