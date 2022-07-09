@@ -57,6 +57,17 @@ service UserService{
       get: "/user/privacy-check"
     };
   }
+  rpc GetNotificationSettings(GetOneMessage) returns(NotificationSettings) {
+    option (google.api.http) = {
+      get: "/user/{id}/notification-settings"
+    };
+  }
+  rpc UpdateNotificationSettings(UpdateNotificationSettingsRequest) returns(EmptyMessage) {
+    option (google.api.http) = {
+      put: "/user/{id}/notification-settings"
+      body: "NotificationSettings"
+    };
+  }
 }
 
 message GetMeMessage{
@@ -173,4 +184,14 @@ message IsPrivateResponse {
   bool isPrivate = 1;
 }
 
+message UpdateNotificationSettingsRequest {
+  string id = 1;
+  NotificationSettings NotificationSettings = 2;
+}
+
+message NotificationSettings {
+  bool ConnectionNotifications = 1;
+  bool MessageNotifications = 2;
+  bool PostNotifications = 3;
+}
 

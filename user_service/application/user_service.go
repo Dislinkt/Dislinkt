@@ -212,3 +212,7 @@ func (service *UserService) GetPublicUsers() (*[]domain.User, error) {
 func (service *UserService) FindByID(uuid uuid.UUID) (*domain.User, error) {
 	return service.store.FindByID(uuid)
 }
+
+func (service *UserService) UpdateNotificationSettings(uuid uuid.UUID, ConnectionNotifications bool, MessageNotifications bool, PostNotifications bool) error {
+	return service.store.UpdateNotificationSettings(uuid, ConnectionNotifications, MessageNotifications, PostNotifications)
+}
