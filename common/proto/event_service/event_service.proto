@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option go_package = "github.com/Dislinkt/common/proto/event_service";
+
+package event_service_proto;
+
+import "google/api/annotations.proto";
+
+
+service EventService {
+    rpc getAllEvents(Empty) returns(GetMultipleResponse) {
+      option (google.api.http) = {
+        get: "/event"
+      };
+    }
+    rpc saveEvent(SaveEventRequest) returns(Empty) {
+      option (google.api.http) = {
+        post: "/event"
+        body: "Event"
+      };
+    }
+}
+
+message Empty {}
+
+message GetMultipleResponse {
+  repeated Event Events = 1;
+}
+
+message Event {
+  string UserId = 1;
+  string Description = 2;
+  string Date = 3;
+}
+
+message SaveEventRequest {
+  NewEvent Event = 1;
+}
+
+message NewEvent {
+  string UserId = 1;
+  string Description = 2;
+}
