@@ -19,6 +19,12 @@ type Config struct {
 	ConnectionPort     string
 	PostHost           string
 	PostPort           string
+	MessageHost        string
+	MessagePort        string
+	NotificationHost   string
+	NotificationPort   string
+	EventHost          string
+	EventPort          string
 }
 
 func NewConfig() *Config {
@@ -40,6 +46,12 @@ func NewConfig() *Config {
 		PostPort:           os.Getenv("POST_SERVICE_PORT"),
 		AdditionalUserHost: os.Getenv("ADDITIONAL_USER_SERVICE_HOST"),
 		AdditionalUserPort: os.Getenv("ADDITIONAL_USER_SERVICE_PORT"),
+		MessageHost:        os.Getenv("MESSAGE_SERVICE_HOST"),
+		MessagePort:        os.Getenv("MESSAGE_SERVICE_PORT"),
+		NotificationHost:   os.Getenv("NOTIFICATION_SERVICE_HOST"),
+		NotificationPort:   os.Getenv("NOTIFICATION_SERVICE_PORT"),
+		EventHost:          os.Getenv("EVENT_SERVICE_HOST"),
+		EventPort:          os.Getenv("EVENT_SERVICE_PORT"),
 	}
 
 }

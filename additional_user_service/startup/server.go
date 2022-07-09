@@ -45,11 +45,27 @@ func (server *Server) Start() {
 	mongoClient := server.initAdditionalUserClient()
 	additionalUserStore := server.initAdditionalUserStore(mongoClient)
 
-	additionalUserService := server.initAdditionalUserService(additionalUserStore)
+	commandPublisher := server.initPublisher(server.config.AddEducationCommandSubject)
+	replySubscriber := server.initSubscriber(server.config.AddEducationReplySubject, QueueGroup)
+	addEducationOrchestrator := server.initAddEducationOrchestrator(commandPublisher, replySubscriber)
+
+	commandSkillPublisher := server.initPublisher(server.config.AddSkillCommandSubject)
+	replySkillSubscriber := server.initSubscriber(server.config.AddSkillReplySubject, QueueGroup)
+	addSkillOrchestrator := server.initSkillOrchestrator(commandSkillPublisher, replySkillSubscriber)
+
+	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator, addSkillOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
 	server.initRegisterUserHandler(additionalUserService, replyPublisher, commandSubscriber)
+
+	commandAddEducationSubscriber := server.initSubscriber(server.config.AddEducationCommandSubject, QueueGroup)
+	replyAddEducationPublisher := server.initPublisher(server.config.AddEducationReplySubject)
+	server.initAddEducationHandler(additionalUserService, replyAddEducationPublisher, commandAddEducationSubscriber)
+
+	commandAddSkillSubscriber := server.initSubscriber(server.config.AddSkillCommandSubject, QueueGroup)
+	replyAddSkillPublisher := server.initPublisher(server.config.AddSkillReplySubject)
+	server.initAddSkillHandler(additionalUserService, replyAddSkillPublisher, commandAddSkillSubscriber)
 
 	additionalUserHandler := server.initAdditionalUserHandler(additionalUserService)
 
@@ -71,8 +87,9 @@ func (server *Server) initAdditionalUserStore(client *mongo.Client) domain.Addit
 	return store
 }
 
-func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore) *application.AdditionalUserService {
-	return application.NewAdditionalUserService(store)
+func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *application.AddEducationOrchestrator,
+	addSkillOrchestrator *application.AddSkillOrchestrator) *application.AdditionalUserService {
+	return application.NewAdditionalUserService(store, addEducationOrchestrator, addSkillOrchestrator)
 }
 
 func (server *Server) initPublisher(subject string) saga.Publisher {
@@ -98,6 +115,22 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 func (server *Server) initRegisterUserHandler(service *application.AdditionalUserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewRegisterUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initAddEducationHandler(service *application.AdditionalUserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewAddEducationCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initAddSkillHandler(service *application.AdditionalUserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewAddSkillCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -130,18 +163,6 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Political Science and Government"})
 	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Computer and Information Sciences and Support Services"})
 	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Communication and Media Studies"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Human Resources Management/Personnel Administration/General"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Architecture"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Electronic, Electronics and Communications Engineering"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Liberal Arts and Sciences/Liberal Studies"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(),
-		Name: "International Relations and Affairs"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Computer Systems networking and Telecommunications"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Criminal Justice and Corrections"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Business, Management, Marketing, and Related Support Services"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Art/Art Studies, General"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Advertising"})
-	fields = append(fields, &domain.FieldOfStudy{Id: primitive.NewObjectID(), Name: "Fine/Studio Arts, General"})
 	_, err := store.InsertFieldOfStudy(fields)
 	if err != nil {
 		return
@@ -218,4 +239,22 @@ func (server *Server) initData(service *application.AdditionalUserService, store
 		return
 	}
 
+}
+
+func (server *Server) initAddEducationOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.AddEducationOrchestrator {
+	orchestrator, err := application.NewAddEducationOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
+func (server *Server) initSkillOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.AddSkillOrchestrator {
+	orchestrator, err := application.NewAddSkillOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
 }

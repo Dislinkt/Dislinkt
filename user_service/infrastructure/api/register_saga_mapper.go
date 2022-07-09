@@ -6,7 +6,7 @@ import (
 
 	"github.com/dislinkt/common/saga/events"
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 )
 
 func mapCommandUser(command *events.RegisterUserCommand) *domain.User {

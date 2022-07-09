@@ -5,11 +5,14 @@ go 1.18
 replace github.com/dislinkt/common => ../common
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dislinkt/common v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/pquerna/otp v1.3.0
 	github.com/satori/go.uuid v1.2.0
+	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
+	github.com/go-playground/validator/v10 v10.11.0
+	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/pquerna/otp v1.3.0
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 	google.golang.org/grpc v1.46.0
 	gorm.io/driver/postgres v1.3.5
@@ -38,6 +41,7 @@ require (
 	github.com/nats-io/nats.go v1.15.0 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
+	go.mongodb.org/mongo-driver v1.9.1 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220111092808-5a964db01320 // indirect
 	golang.org/x/text v0.3.7 // indirect

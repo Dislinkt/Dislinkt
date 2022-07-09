@@ -8,11 +8,15 @@ import (
 )
 
 type PostService struct {
-	store domain.PostStore
+	store                      domain.PostStore
+	createJobOfferOrchestrator *CreateJobOfferOrchestrator
 }
 
-func NewPostService(store domain.PostStore) *PostService {
-	return &PostService{store: store}
+func NewPostService(store domain.PostStore, createJobOfferOrchestrator *CreateJobOfferOrchestrator) *PostService {
+	return &PostService{
+		store:                      store,
+		createJobOfferOrchestrator: createJobOfferOrchestrator,
+	}
 }
 
 func (service *PostService) Get(id primitive.ObjectID) (*domain.Post, error) {
@@ -55,8 +59,24 @@ func (service *PostService) GetAllJobOffers() ([]*domain.JobOffer, error) {
 	return service.store.GetAllJobOffers()
 }
 
+func (service *PostService) InsertJobOfferOrc(offer *domain.JobOffer) error {
+	err := service.createJobOfferOrchestrator.Start(offer)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
 func (service *PostService) InsertJobOffer(offer *domain.JobOffer) error {
-	return service.store.InsertJobOffer(offer)
+	err := service.store.InsertJobOffer(offer)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (service *PostService) DeleteJobOffer(jobOffer *domain.JobOffer) error {
+	return service.store.DeleteJobOffer(jobOffer)
 }
 
 func (service *PostService) InsertUser(user *domain.User) error {

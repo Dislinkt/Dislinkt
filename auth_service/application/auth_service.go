@@ -9,15 +9,21 @@ import (
 	"log"
 	"net/smtp"
 	"regexp"
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
 	//	"github.com/nats-io/jwt/v2"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/go-playground/validator/v10"
+	"github.com/pquerna/otp/totp"
+
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/auth_service/startup/config"
 	"github.com/dislinkt/common/interceptor"
 	pb "github.com/dislinkt/common/proto/auth_service"
+	"github.com/form3tech-oss/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -136,8 +142,13 @@ func getRoleString(role int) string {
 }
 
 func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFactoryRequest) (string, error) {
+<<<<<<< HEAD
 	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
 	//defer span.Finish()
+=======
+	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	// defer span.Finish()
+>>>>>>> develop
 
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 
@@ -161,8 +172,13 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 }
 
 func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLoginForCode) (string, error) {
+<<<<<<< HEAD
 	//span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
 	//defer span.Finish()
+=======
+	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	// defer span.Finish()
+>>>>>>> develop
 
 	user, err := auth.userService.GetByUsername(loginRequest.Username)
 
@@ -259,7 +275,7 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 }
 
 func passwordlessLoginMailMessage(token string, username string) []byte {
-	urlRedirection := "http://localhost:4200/passwordless-login-validation/" + token
+	urlRedirection := "https://localhost:4200/passwordless-login-validation/" + token
 
 	subject := "Subject: Passwordless login\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
@@ -386,7 +402,7 @@ func (auth *AuthService) SendActivationMail(username string) error {
 
 func verificationMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
-	urlRedirection := "http://localhost:4200/activate-account/" + token
+	urlRedirection := "https://localhost:4200/activate-account/" + token
 	fmt.Println("MAIL MESSAGE")
 
 	subject := "Subject: Account activation\n"
@@ -467,9 +483,9 @@ func (auth *AuthService) SendAccountRecoveryMail(ctx context.Context, request *p
 
 func recoverAccountMailMessage(token string, username string) []byte {
 	// TODO SD: port se moze izvuci iz env var - 4200
-	urlRedirection := "http://localhost:4200/recover-account/" + token
+	urlRedirection := "https://localhost:4200/recover-account/" + token
 
-	subject := "Subject: Account activation\n"
+	subject := "Subject: Account recovery\n"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body := "<html><body>\n" +
 		"Hello " + username + "! Recover your account with click on link: " + urlRedirection +

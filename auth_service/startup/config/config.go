@@ -51,10 +51,10 @@ func NewConfig() *Config {
 		RegisterUserReplySubject:   os.Getenv("REGISTER_USER_REPLY_SUBJECT"),
 		UpdateUserCommandSubject:   os.Getenv("UPDATE_USER_COMMAND_SUBJECT"),
 		UpdateUserReplySubject:     os.Getenv("UPDATE_USER_REPLY_SUBJECT"),
-		EmailSender:                "xmlbsep@gmail.com",
-		EmailHost:                  "smtp.gmail.com",
-		EmailPassword:              "sifra123",
-		EmailPort:                  "587",
+		EmailSender:                os.Getenv("EMAIL_SENDER"),
+		EmailHost:                  os.Getenv("EMAIL_HOST"),
+		EmailPassword:              os.Getenv("EMAIL_PASSWORD"),
+		EmailPort:                  os.Getenv("EMAIL_PORT"),
 		PublicKey:                  "Dislinkt",
 	}
 	// return &Config{

@@ -220,6 +220,8 @@ func (store *AdditionalUserMongoDBStore) InsertEducation(uuid string,
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("[AdditionalUserMongoDBStore InsertEducation]")
+	fmt.Println(education)
 	return education, nil
 }
 

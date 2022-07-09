@@ -78,6 +78,8 @@ services:
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
       UPDATE_USER_COMMAND_SUBJECT: ${UPDATE_USER_COMMAND_SUBJECT}
       UPDATE_USER_REPLY_SUBJECT: ${UPDATE_USER_REPLY_SUBJECT}
+      CREATE_JOB_COMMAND_SUBJECT: ${CREATE_JOB_COMMAND_SUBJECT}
+      CREATE_JOB_REPLY_SUBJECT: ${CREATE_JOB_REPLY_SUBJECT}
     depends_on:
       - post_db
     networks:
@@ -85,6 +87,54 @@ services:
       - monitoring
     ports:
       - "8082:8000"
+
+  message_service:
+    image: message_service
+    container_name: message_service
+    build:
+      context: .
+      dockerfile: ./message_service/Dockerfile
+    restart: on-failure
+    environment:
+      MESSAGE_DB_HOST: ${MESSAGE_DB_HOST}
+      MESSAGE_DB_PORT: ${MESSAGE_DB_PORT}
+      MESSAGE_SERVICE_PORT: ${MESSAGE_SERVICE_PORT}
+    depends_on:
+      - message_db
+    networks:
+      - network
+
+  notification_service:
+    image: notification_service
+    container_name: notification_service
+    build:
+      context: .
+      dockerfile: ./notification_service/Dockerfile
+    restart: on-failure
+    environment:
+      NOTIFICATION_DB_HOST: ${NOTIFICATION_DB_HOST}
+      NOTIFICATION_DB_PORT: ${NOTIFICATION_DB_PORT}
+      NOTIFICATION_SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
+    depends_on:
+      - notification_db
+    networks:
+      - network
+
+  event_service:
+    image: event_service
+    container_name: event_service
+    build:
+      context: .
+      dockerfile: ./event_service/Dockerfile
+    restart: on-failure
+    environment:
+      EVENT_DB_HOST: ${EVENT_DB_HOST}
+      EVENT_DB_PORT: ${EVENT_DB_PORT}
+      EVENT_SERVICE_PORT: ${EVENT_SERVICE_PORT}
+    depends_on:
+      - event_db
+    networks:
+      - network
 
   additional_user_service:
     image: additional_user_service
@@ -105,6 +155,10 @@ services:
       NATS_PASS: ${NATS_PASS}
       REGISTER_USER_COMMAND_SUBJECT: ${REGISTER_USER_COMMAND_SUBJECT}
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
+      ADD_EDUCATION_COMMAND_SUBJECT: ${ADD_EDUCATION_COMMAND_SUBJECT}
+      ADD_EDUCATION_REPLY_SUBJECT: ${ADD_EDUCATION_REPLY_SUBJECT}
+      ADD_SKILL_COMMAND_SUBJECT: ${ADD_SKILL_COMMAND_SUBJECT}
+      ADD_SKILL_REPLY_SUBJECT: ${ADD_SKILL_REPLY_SUBJECT}
     depends_on:
       - additional_user_db
     networks:
@@ -122,6 +176,7 @@ services:
     restart: on-failure
     logging:  *fluent-bit
     environment:
+<<<<<<< HEAD
       <<: *jaeger-env
       CONNECTION_DB_HOST: ${CONNECTION_DB_HOST}
       CONNECTION_DB_PORT: ${CONNECTION_DB_PORT}
@@ -136,6 +191,27 @@ services:
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
       PATCH_USER_COMMAND_SUBJECT: ${PATCH_USER_COMMAND_SUBJECT}
       PATCH_USER_REPLY_SUBJECT: ${PATCH_USER_REPLY_SUBJECT}
+=======
+      - CONNECTION_DB_HOST=${CONNECTION_DB_HOST}
+      - CONNECTION_DB_PORT=${CONNECTION_DB_PORT}
+      - CONNECTION_SERVICE_PORT=${CONNECTION_SERVICE_PORT}
+      - CONNECTION_DB_USER=${CONNECTION_DB_USER}
+      - CONNECTION_DB_PASS=${CONNECTION_DB_PASS}
+      - NATS_HOST=${NATS_HOST}
+      - NATS_PORT=${NATS_PORT}
+      - NATS_USER=${NATS_USER}
+      - NATS_PASS=${NATS_PASS}
+      - REGISTER_USER_COMMAND_SUBJECT=${REGISTER_USER_COMMAND_SUBJECT}
+      - REGISTER_USER_REPLY_SUBJECT=${REGISTER_USER_REPLY_SUBJECT}
+      - PATCH_USER_COMMAND_SUBJECT=${PATCH_USER_COMMAND_SUBJECT}
+      - PATCH_USER_REPLY_SUBJECT=${PATCH_USER_REPLY_SUBJECT}
+      - CREATE_JOB_COMMAND_SUBJECT=${CREATE_JOB_COMMAND_SUBJECT}
+      - CREATE_JOB_REPLY_SUBJECT=${CREATE_JOB_REPLY_SUBJECT}
+      - ADD_EDUCATION_COMMAND_SUBJECT=${ADD_EDUCATION_COMMAND_SUBJECT}
+      - ADD_EDUCATION_REPLY_SUBJECT=${ADD_EDUCATION_REPLY_SUBJECT}
+      - ADD_SKILL_COMMAND_SUBJECT=${ADD_SKILL_COMMAND_SUBJECT}
+      - ADD_SKILL_REPLY_SUBJECT=${ADD_SKILL_REPLY_SUBJECT}
+>>>>>>> develop
     depends_on:
       - neo4j
     networks:
@@ -168,6 +244,10 @@ services:
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
       UPDATE_USER_COMMAND_SUBJECT: ${UPDATE_USER_COMMAND_SUBJECT}
       UPDATE_USER_REPLY_SUBJECT: ${UPDATE_USER_REPLY_SUBJECT}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
     depends_on:
       - auth_db
     networks:
@@ -195,6 +275,12 @@ services:
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       POST_SERVICE_HOST: ${POST_SERVICE_HOST}
       POST_SERVICE_PORT: ${POST_SERVICE_PORT}
+      MESSAGE_SERVICE_HOST: ${MESSAGE_SERVICE_HOST}
+      MESSAGE_SERVICE_PORT: ${MESSAGE_SERVICE_PORT}
+      NOTIFICATION_SERVICE_HOST: ${NOTIFICATION_SERVICE_HOST}
+      NOTIFICATION_SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
+      EVENT_SERVICE_HOST: ${EVENT_SERVICE_HOST}
+      EVENT_SERVICE_PORT: ${EVENT_SERVICE_PORT}
       ADDITIONAL_USER_SERVICE_HOST: ${ADDITIONAL_USER_SERVICE_HOST}
       ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
       CONNECTION_SERVICE_HOST: ${CONNECTION_SERVICE_HOST}
@@ -239,7 +325,31 @@ services:
     logging:  *fluent-bit
     networks:
       - network
+<<<<<<< HEAD
       - monitoring
+=======
+
+  message_db:
+    image: mongo
+    container_name: message_db
+    restart: on-failure
+    networks:
+      - network
+
+  notification_db:
+    image: mongo
+    container_name: notification_db
+    restart: on-failure
+    networks:
+      - network
+
+  event_db:
+    image: mongo
+    container_name: event_db
+    restart: on-failure
+    networks:
+      - network
+>>>>>>> develop
 
   neo4j:
     image: neo4j:4.3.3-community #4.3.3-community  latest

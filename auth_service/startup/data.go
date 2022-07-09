@@ -143,4 +143,24 @@ var permissions = []*domain.Permission{
 		Role: 0,
 		Name: "createJobOffer",
 	},
+	{
+		Id:   29,
+		Role: 0,
+		Name: "sendMessage",
+	},
+	{
+		Id:   30,
+		Role: 0,
+		Name: "readNotifications",
+	},
+	{ // TODO: change role to admin
+		Id:   31,
+		Role: 1,
+		Name: "readEvents",
+	},
+	{
+		Id:   32,
+		Role: 1,
+		Name: "getMePermission",
+	},
 }

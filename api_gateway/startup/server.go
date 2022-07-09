@@ -23,6 +23,9 @@ import (
 	additionalUserGw "github.com/dislinkt/common/proto/additional_user_service"
 	authGw "github.com/dislinkt/common/proto/auth_service"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
+	eventGw "github.com/dislinkt/common/proto/event_service"
+	messageGw "github.com/dislinkt/common/proto/message_service"
+	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -74,18 +77,46 @@ func (server *Server) initHandlers() {
 		)}
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+
 	additionalUserEndpoint := fmt.Sprintf("%s:%s", server.config.AdditionalUserHost, server.config.AdditionalUserPort)
 	err = additionalUserGw.RegisterAdditionalUserServiceHandlerFromEndpoint(context.TODO(), server.mux, additionalUserEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}
+
 	postEndpoint := fmt.Sprintf("%s:%s", server.config.PostHost, server.config.PostPort)
 	err = postGw.RegisterPostServiceHandlerFromEndpoint(context.TODO(), server.mux, postEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	messageEndpoint := fmt.Sprintf("%s:%s", server.config.MessageHost, server.config.MessagePort)
+	err = messageGw.RegisterMessageServiceHandlerFromEndpoint(context.TODO(), server.mux, messageEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	notificationEndpoint := fmt.Sprintf("%s:%s", server.config.NotificationHost, server.config.NotificationPort)
+	err = notificationGw.RegisterNotificationServiceHandlerFromEndpoint(context.TODO(), server.mux, notificationEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	eventEndpoint := fmt.Sprintf("%s:%s", server.config.EventHost, server.config.EventPort)
+	err = eventGw.RegisterEventServiceHandlerFromEndpoint(context.TODO(), server.mux, eventEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+
 	connectionEndpoint := fmt.Sprintf("%s:%s", server.config.ConnectionHost, server.config.ConnectionPort)
 	err = connectionGw.RegisterConnectionServiceHandlerFromEndpoint(context.TODO(), server.mux, connectionEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}
+
 	authEndpoint := fmt.Sprintf("%s:%s", server.config.AuthHost, server.config.AuthPort)
 	err = authGw.RegisterAuthServiceHandlerFromEndpoint(context.TODO(), server.mux, authEndpoint, opts)
 	if err != nil {
@@ -100,6 +131,16 @@ func (server *Server) initCustomHandlers() {
 	userFeedHandler.Init(server.mux)
 	connectionRequestHandler := api.NewConnectionRequestHandler(server.config)
 	connectionRequestHandler.Init(server.mux)
+	connectionBlockHandler := api.NewConnectionBlockedUsersHandler(server.config)
+	connectionBlockHandler.Init(server.mux)
+	connectionAllHandler := api.NewConnectionAllHandler(server.config)
+	connectionAllHandler.Init(server.mux)
+	publicUserFeedHandler := api.NewPublicUserFeedHandler(server.config)
+	publicUserFeedHandler.Init(server.mux)
+	recommendationsHandler := api.NewConnectionRecommendationHandler(server.config)
+	recommendationsHandler.Init(server.mux)
+	searchUserHandler := api.NewConnectionSearchUserHandler(server.config)
+	searchUserHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {

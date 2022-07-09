@@ -48,15 +48,146 @@ service ConnectionService{
     };
   }
 
+  rpc BlockUser(BlockUserRequest) returns (BlockedUserStatus) {
+    option (google.api.http) = {
+      post: "/connection/user/{uuid}/block/{uuid1}"
+      body: ""
+    };
+  }
+
+
+  rpc UnblockConnection(BlockUserRequest) returns (BlockedUserStatus) {
+    option (google.api.http) = {
+      post: "/connection/user/{uuid}/unblock/{uuid1}"
+      body: ""
+    };
+  }
+
+  rpc GetAllBlockedForCurrentUser(BlockUserRequest) returns (GetAllResponse){
+    option (google.api.http) = {
+      get: "/connection/user/block/{uuid}"
+      body: ""
+    };
+  }
+
+  rpc GetAllUserBlockingCurrentUser(BlockUserRequest) returns (GetAllResponse){
+    option (google.api.http) = {
+      get: "/connection/user/blocked/{uuid}"
+      body: ""
+    };
+  }
+
+  rpc RecommendUsersByConnection(GetConnectionRequest) returns (GetAllResponse){
+    option (google.api.http) = {
+      get: "/connection/recommend/users/{uuid}"
+      body: ""
+    };
+  }
+
+  rpc InsertField(Field) returns (Response) {
+    option (google.api.http) = {
+      post: "/connection/field"
+      body: "*"
+    };
+  }
+
+  rpc InsertSkill(Skill) returns (Response) {
+    option (google.api.http) = {
+      post: "/skill"
+      body: "*"
+    };
+  }
+
+  rpc InsertJobOffer(JobOffer) returns (Response) {
+    option (google.api.http) = {
+      post: "/connection/jobOffer"
+      body: "*"
+    };
+  }
+
+  rpc InsertSkillToUser(UserInfoItem) returns (Response) {
+    option (google.api.http) = {
+      post: "/user/{uuid}/skill/{name}"
+      body: "*"
+    };
+  }
+
+  rpc InsertFieldToUser(UserInfoItem) returns (Response) {
+    option (google.api.http) = {
+      post: "/user/{uuid}/field/{name}"
+      body: "*"
+    };
+  }
+
+  rpc RecommendJobBySkill(GetConnectionRequest) returns (JobOffers) {
+    option (google.api.http) = {
+      get: "/user/recommend/skill/{uuid}"
+      body: ""
+    };
+  }
+
+  rpc RecommendJobByField(GetConnectionRequest) returns (JobOffers) {
+    option (google.api.http) = {
+      get: "/user/recommend/field/{uuid}"
+      body: ""
+    };
+  }
+
+  rpc CheckIfUsersConnected(CheckConnection) returns (CheckResult) {
+    option (google.api.http) = {
+      post: "/user/connection/check"
+      body: "*"
+    };
+  }
+
+  rpc CheckIfUsersBlocked(CheckConnection) returns (CheckResultBlock) {
+    option (google.api.http) = {
+      post: "/user/connection/block/check"
+      body: "*"
+    };
+  }
+}
+
+message JobOffer {
+  string Id = 1;
+  string Position = 2;
+  string Description = 3;
+  string Preconditions = 4;
+  google.protobuf.Timestamp DatePosted = 5;
+  string Duration = 6;
+  string Location = 7;
+  string Title = 8;
+  string Field= 9;
+}
+
+message JobOffers {
+  repeated JobOffer jobs = 1;
+}
+
+message UserInfoItem{
+  string uuid = 1;
+  string name = 2;
 }
 
 message RegisterRequest{
   User user = 1;
 }
 
+message Field{
+  string name = 1;
+}
+
+message Skill{
+  string name = 1;
+}
+
 message RegisterResponse{
   User user = 1;
   string message =2 ;
+}
+
+message Response{
+  string name = 1;
 }
 
 message  NewConnectionResponse {
@@ -65,8 +196,21 @@ message  NewConnectionResponse {
     string  ConnectionResponse = 3;
 }
 
+
+message  BlockedUserStatus {
+  string  CurrentUserUUID = 1;
+  string  BlockedUserUUID = 2;
+  string  ConnectionResponse = 3;
+}
+
+
 message GetConnectionRequest{
     string uuid = 1;
+}
+
+message BlockUserRequest {
+  string uuid = 1;
+  string uuid1 = 2;
 }
 
 message Connection {
@@ -92,7 +236,19 @@ message User {
   string status = 2;
 }
 
+message CheckConnection{
+ string uuid1 = 1;
+ string uuid2 = 2;
+}
+
 message GetAllResponse {
   repeated User users = 1;
 }
 
+message CheckResult{
+  bool isConnected = 1;
+}
+
+message CheckResultBlock{
+  bool isBlocked = 1;
+}

@@ -3,6 +3,8 @@ package api
 import (
 	b64 "encoding/base64"
 	"fmt"
+	pbEvent "github.com/dislinkt/common/proto/event_service"
+	pbNotification "github.com/dislinkt/common/proto/notification_service"
 	"strconv"
 	"time"
 
@@ -15,7 +17,6 @@ import (
 
 func mapPost(post *domain.Post) *pb.Post {
 	id := post.Id.Hex()
-
 	links := &pb.Links{
 		Comment: "/post/" + id + "/comment",
 		Like:    "/post/" + id + "/like",
@@ -157,4 +158,44 @@ func mapNewJobOffer(offerPb *pb.JobOffer) *domain.JobOffer {
 	}
 
 	return offer
+}
+
+func mapNotification(subjectUsername string) *pbNotification.NewNotification {
+	notificationPb := &pbNotification.NewNotification{
+		NotificationType: 3,
+		SubjectUsername:  subjectUsername,
+	}
+	return notificationPb
+}
+
+func mapEventForPostCreation(userId, postId string) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId:      userId,
+		Description: "Created a post (post: " + postId + ").",
+	}
+	return eventPb
+}
+
+func mapEventForPostComment(userId, postId string) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId:      userId,
+		Description: "Commented on post (post: " + postId + ").",
+	}
+	return eventPb
+}
+
+func mapEventForPostLike(userId, postId string) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId:      userId,
+		Description: "Liked post (post: " + postId + ").",
+	}
+	return eventPb
+}
+
+func mapEventForPostDislike(userId, postId string) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId:      userId,
+		Description: "Disliked post (post: " + postId + ").",
+	}
+	return eventPb
 }

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option go_package = "github.com/Dislinkt/common/proto/notification_service";
+
+package notification_service_proto;
+
+import "google/api/annotations.proto";
+
+
+service NotificationService{
+    rpc getNotificationsForUser(Empty) returns(GetMultipleResponse) {
+      option (google.api.http) = {
+        get: "/notification"
+      };
+    }
+    rpc saveNotification(SaveNotificationRequest) returns(Empty) {
+      option (google.api.http) = {
+        post: "/notification/{UserId}"
+        body: "Notification"
+      };
+    }
+}
+
+message Empty {}
+
+message GetMultipleResponse {
+  repeated Notification Notifications = 1;
+  int32 UnreadNotificationsNumber = 2;
+}
+
+message SaveNotificationRequest {
+  NewNotification Notification = 1;
+  string UserId = 2;
+}
+
+message NewNotification {
+  NotificationType notificationType = 1;
+  string SubjectUsername = 2;
+}
+
+message Notification {
+  string NotificationText = 1;
+  NotificationType NotificationType = 2;
+  string Date = 3;
+  bool IsRead = 4;
+}
+
+enum NotificationType {
+  Unknown = 0;
+  CONNECTION = 1;
+  MESSAGE = 2;
+  POST = 3;
+}
+
+

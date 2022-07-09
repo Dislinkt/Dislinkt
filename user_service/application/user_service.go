@@ -6,8 +6,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	"time"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -202,4 +203,12 @@ func (service *UserService) Delete(user *domain.User) interface{} {
 		return err
 	}
 	return service.store.Delete(user)
+}
+
+func (service *UserService) GetPublicUsers() (*[]domain.User, error) {
+	return service.store.GetPublicUsers()
+}
+
+func (service *UserService) FindByID(uuid uuid.UUID) (*domain.User, error) {
+	return service.store.FindByID(uuid)
 }

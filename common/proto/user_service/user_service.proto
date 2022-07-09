@@ -42,6 +42,21 @@ service UserService{
       body: "*"
     };
   }
+  rpc GetUserByUsername(GetOneByUsernameMessage) returns(UserResponse) {
+    option (google.api.http) = {
+      get: "/user/username/{username}"
+    };
+  }
+  rpc GetPublicUsers(GetMeMessage) returns(GetAllResponse) {
+    option (google.api.http) = {
+      get: "/user/public"
+    };
+  }
+  rpc CheckIfUserIsPrivate(GetOneMessage) returns(IsPrivateResponse) {
+    option (google.api.http) = {
+      get: "/user/privacy-check"
+    };
+  }
 }
 
 message GetMeMessage{
@@ -61,6 +76,10 @@ message SearchMessage{
 
 message GetOneMessage{
   string id = 1;
+}
+
+message GetOneByUsernameMessage{
+  string username = 1;
 }
 
 message PatchUserRequest{
@@ -148,6 +167,10 @@ message Links{
   string skills = 6;
   string interests = 7;
   string feed = 8;
+}
+
+message IsPrivateResponse {
+  bool isPrivate = 1;
 }
 
 

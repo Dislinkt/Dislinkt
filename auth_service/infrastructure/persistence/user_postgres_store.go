@@ -3,7 +3,7 @@ package persistence
 import (
 	"fmt"
 	"github.com/dislinkt/auth_service/domain"
-	uuid "github.com/satori/go.uuid"
+	uuid "github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 

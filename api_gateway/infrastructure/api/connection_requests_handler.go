@@ -53,7 +53,7 @@ func (handler *ConnectionRequestHandler) GetConnectionRequests(w http.ResponseWr
 		return
 	}
 
-	var requests []domain.ConnectionRequest
+	var requests []domain.ConnectionUser
 	for _, user := range connections.Users {
 		userResponse, err := userClient.GetOne(context.TODO(), &userGw.GetOneMessage{Id: user.UserID})
 		if err != nil {
@@ -78,8 +78,8 @@ func (handler *ConnectionRequestHandler) GetConnectionRequests(w http.ResponseWr
 	// ctx.JSON(http.StatusOK, &response)
 }
 
-func loadUserInfo(userPb *userGw.User) domain.ConnectionRequest {
-	var request domain.ConnectionRequest
+func loadUserInfo(userPb *userGw.User) domain.ConnectionUser {
+	var request domain.ConnectionUser
 
 	request.UserId = userPb.Id
 	request.Name = userPb.Name

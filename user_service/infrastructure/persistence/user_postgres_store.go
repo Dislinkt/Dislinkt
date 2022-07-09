@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/dislinkt/user_service/domain"
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 
@@ -56,7 +56,18 @@ func (store *UserPostgresStore) GetAll() (*[]domain.User, error) {
 	// span := tracer.StartSpanFromContext(ctx, "GetAll-DB")
 	// defer span.Finish()
 	var users []domain.User
-	result := store.db.Find(&users)
+	result := store.db.Where("user_role = 0").Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &users, nil
+}
+
+func (store *UserPostgresStore) GetPublicUsers() (*[]domain.User, error) {
+	// span := tracer.StartSpanFromContext(ctx, "GetAll-DB")
+	// defer span.Finish()
+	var users []domain.User
+	result := store.db.Where("private = false").Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -82,7 +93,8 @@ func (store *UserPostgresStore) FindByUsername(username string) (user *domain.Us
 func (store *UserPostgresStore) Search(searchText string) (*[]domain.User, error) {
 	var users []domain.User
 	arg := "%" + searchText + "%"
-	result := store.db.Where("name LIKE ? OR surname LIKE ? OR username LIKE ? LIMIT 5", arg, arg, arg).Find(&users)
+	result := store.db.Where("userRole = 0 and (name LIKE ? OR surname LIKE ? OR username LIKE ?) LIMIT 5", arg, arg,
+		arg).Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}
