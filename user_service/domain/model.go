@@ -25,21 +25,24 @@ const (
 )
 
 type User struct {
-	Id          uuid.UUID `gorm:"index:idx_name,unique"`
-	Name        string
-	Surname     string
-	Username    *string `gorm:"unique" `
-	Email       *string `gorm:"unique" `
-	Number      string
-	Gender      Gender
-	DateOfBirth string
-	Password    string `gorm:"-"`
-	UserRole    Role
-	Biography   string
-	Blocked     bool
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Private     bool
+	Id                      uuid.UUID `gorm:"index:idx_name,unique"`
+	Name                    string
+	Surname                 string
+	Username                *string `gorm:"unique" `
+	Email                   *string `gorm:"unique" `
+	Number                  string
+	Gender                  Gender
+	DateOfBirth             string
+	Password                string `gorm:"-"`
+	UserRole                Role
+	Biography               string
+	Blocked                 bool
+	CreatedAt               time.Time
+	UpdatedAt               time.Time
+	Private                 bool
+	ConnectionNotifications bool
+	MessageNotifications    bool
+	PostNotifications       bool
 }
 
 func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {

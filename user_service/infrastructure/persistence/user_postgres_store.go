@@ -108,3 +108,23 @@ func (store *UserPostgresStore) Delete(user *domain.User) error {
 	}
 	return nil
 }
+
+func (store *UserPostgresStore) UpdateNotificationSettings(uuid uuid.UUID, ConnectionNotifications bool, MessageNotifications bool, PostNotifications bool) error {
+	// span := tracer.StartSpanFromContext(ctx, "Update-DB")
+	// defer span.Finish()
+	var user domain.User
+	err := store.db.First(&user, "id = ?", uuid)
+	if user.ConnectionNotifications != ConnectionNotifications {
+		store.db.Model(&domain.User{}).Where("id = ?", uuid).Update("ConnectionNotifications", ConnectionNotifications)
+	}
+	if user.MessageNotifications != MessageNotifications {
+		store.db.Model(&domain.User{}).Where("id = ?", uuid).Update("MessageNotifications", MessageNotifications)
+	}
+	if user.PostNotifications != PostNotifications {
+		store.db.Model(&domain.User{}).Where("id = ?", uuid).Update("PostNotifications", PostNotifications)
+	}
+	if err != nil {
+		return err.Error
+	}
+	return nil
+}
