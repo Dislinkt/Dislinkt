@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 
@@ -44,7 +45,7 @@ func (handler *PatchUserCommandHandler) handle(command *events.PatchUserCommand)
 			reply.Type = events.PatchFailedInUser
 			return
 		}
-		dbUser, err := handler.userService.PatchUser(paths, user, command.User.Username)
+		dbUser, err := handler.userService.PatchUser(context.TODO(), paths, user, command.User.Username)
 		if err != nil {
 			fmt.Println(err)
 			reply.Type = events.PatchFailedInUser

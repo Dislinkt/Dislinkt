@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/dislinkt/additional_user_service/application"
@@ -34,7 +35,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 	switch command.Type {
 	case events.UpdateAdditional:
 		fmt.Println("additional handler-update")
-		err := handler.additionalService.CreateDocument(command.User.Id)
+		err := handler.additionalService.CreateDocument(context.TODO(), command.User.Id)
 		if err != nil {
 			reply.Type = events.AdditionalServiceNotUpdated
 			return
@@ -43,7 +44,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		// reply.Type = events.RegistrationApproved
 	case events.RollbackAdditional:
 		fmt.Println("additional handler-rollback")
-		err := handler.additionalService.DeleteDocument(command.User.Id)
+		err := handler.additionalService.DeleteDocument(context.TODO(), command.User.Id)
 		if err != nil {
 			return
 		}

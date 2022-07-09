@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	pb "github.com/dislinkt/common/proto/event_service"
+	"github.com/dislinkt/common/tracer"
 	"github.com/dislinkt/event_service/application"
 )
 
@@ -16,7 +17,11 @@ func NewEventHandler(service *application.EventService) *EventHandler {
 }
 
 func (handler *EventHandler) GetAllEvents(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
-	events, err := handler.service.GetAllEvents()
+	span := tracer.StartSpanFromContext(ctx, "GetAllEventsAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	events, err := handler.service.GetAllEvents(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +39,12 @@ func (handler *EventHandler) GetAllEvents(ctx context.Context, request *pb.Empty
 }
 
 func (handler *EventHandler) SaveEvent(ctx context.Context, request *pb.SaveEventRequest) (*pb.Empty, error) {
+	span := tracer.StartSpanFromContext(ctx, "SaveEventAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	event := mapNewEvent(request.Event)
-	err := handler.service.InsertEvent(event)
+	err := handler.service.InsertEvent(ctx, event)
 	if err != nil {
 		return nil, err
 	}

@@ -8,6 +8,7 @@ import (
 	eventGw "github.com/dislinkt/common/proto/event_service"
 	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
+	"github.com/dislinkt/common/tracer"
 	"post_service/infrastructure/persistence"
 	"time"
 
@@ -28,12 +29,16 @@ func NewPostHandler(service *application.PostService) *PostHandler {
 }
 
 func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
+	post, err := handler.service.Get(ctx, objectId)
 	if err != nil {
 		return nil, err
 	}
@@ -43,6 +48,10 @@ func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb
 }
 
 func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetRecentAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	id := request.Id
 
 	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
@@ -63,7 +72,7 @@ func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetReques
 	response := &pb.GetMultipleResponse{Posts: []*pb.Post{}}
 
 	if areUsersConnected || (!areUsersConnected && !isPrivate) || isUserTheSame {
-		posts, err = handler.service.GetRecent(id)
+		posts, err = handler.service.GetRecent(ctx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -77,8 +86,12 @@ func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetReques
 }
 
 func (handler *PostHandler) GetAllByUserId(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetAllByUserIdAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	id := request.Id
-	posts, err := handler.service.GetAllByUserId(id)
+	posts, err := handler.service.GetAllByUserId(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +120,11 @@ func (handler *PostHandler) GetAllByConnectionIds(ctx context.Context, request *
 */
 
 func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
-	posts, err := handler.service.GetAll()
+	span := tracer.StartSpanFromContext(ctx, "GetAllAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	posts, err := handler.service.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -120,11 +137,15 @@ func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.
 }
 
 func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePostRequest) (*pb.Empty, error) {
+	span := tracer.StartSpanFromContext(ctx, "CreatePostAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
-	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(ctx, &userGw.GetOneByUsernameMessage{Username: username})
 	post := mapNewPost(request.Post)
 	post.UserId = userResponse.User.Id
-	err := handler.service.Insert(post)
+	err := handler.service.Insert(ctx, post)
 	if err != nil {
 		return nil, err
 	}
@@ -138,23 +159,27 @@ func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePo
 }
 
 func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "CreateCommentAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	objectId, err := primitive.ObjectIDFromHex(request.PostId)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
+	post, err := handler.service.Get(ctx, objectId)
 	if err != nil {
 		return nil, err
 	}
 	comment := mapNewComment(request.Comment)
-	err = handler.service.CreateComment(post, comment)
+	err = handler.service.CreateComment(ctx, post, comment)
 	if err != nil {
 		return nil, err
 	}
 
 	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
-	_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+	_, _ = persistence.EventClient("event_service:8000").SaveEvent(ctx,
 		&eventGw.SaveEventRequest{Event: mapEventForPostComment(userResponse.User.Id, post.Id.Hex())})
 
 	return &pb.CreateCommentResponse{
@@ -163,44 +188,52 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 }
 
 func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRequest) (*pb.Empty, error) {
+	span := tracer.StartSpanFromContext(ctx, "LikePostAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	objectId, err := primitive.ObjectIDFromHex(request.PostId)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
+	post, err := handler.service.Get(ctx, objectId)
 	if err != nil {
 		return nil, err
 	}
-	err = handler.service.LikePost(post, request.UserId)
+	err = handler.service.LikePost(ctx, post, request.UserId)
 	if err != nil {
 		return nil, err
 	}
 
 	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
-	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
-	_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(ctx, &userGw.GetOneByUsernameMessage{Username: username})
+	_, _ = persistence.EventClient("event_service:8000").SaveEvent(ctx,
 		&eventGw.SaveEventRequest{Event: mapEventForPostLike(userResponse.User.Id, post.Id.Hex())})
 
 	return &pb.Empty{}, nil
 }
 
 func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.ReactionRequest) (*pb.Empty, error) {
+	span := tracer.StartSpanFromContext(ctx, "DislikePostAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	objectId, err := primitive.ObjectIDFromHex(request.PostId)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
+	post, err := handler.service.Get(ctx, objectId)
 	if err != nil {
 		return nil, err
 	}
-	err = handler.service.DislikePost(post, request.UserId)
+	err = handler.service.DislikePost(ctx, post, request.UserId)
 	if err != nil {
 		return nil, err
 	}
 
 	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
-	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
-	_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(ctx, &userGw.GetOneByUsernameMessage{Username: username})
+	_, _ = persistence.EventClient("event_service:8000").SaveEvent(ctx,
 		&eventGw.SaveEventRequest{Event: mapEventForPostDislike(userResponse.User.Id, post.Id.Hex())})
 
 	return &pb.Empty{}, nil
@@ -209,13 +242,17 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 /* JOB OFFERS */
 
 func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.SearchMessage) (*pb.GetAllJobOffers, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetAllJobOffersAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	var offers []*domain.JobOffer
 	var err error
 
 	if len(request.SearchText) == 0 {
-		offers, err = handler.service.GetAllJobOffers()
+		offers, err = handler.service.GetAllJobOffers(ctx)
 	} else {
-		offers, err = handler.service.SearchJobOffers(request.SearchText)
+		offers, err = handler.service.SearchJobOffers(ctx, request.SearchText)
 	}
 
 	if err != nil {
@@ -238,8 +275,12 @@ func (handler *PostHandler) GetAllJobOffers(ctx context.Context, request *pb.Sea
 /* REACTIONS I COMMENTS */
 
 func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.CreateJobOfferRequest) (*pb.Empty, error) {
+	span := tracer.StartSpanFromContext(ctx, "CreateJobOfferAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	offer := mapNewJobOffer(request.JobOffer)
-	err := handler.service.InsertJobOfferOrc(offer)
+	err := handler.service.InsertJobOfferOrc(ctx, offer)
 	if err != nil {
 		return nil, err
 	}
@@ -247,11 +288,15 @@ func (handler *PostHandler) CreateJobOffer(ctx context.Context, request *pb.Crea
 }
 
 func (handler *PostHandler) GetAllLikesForPost(ctx context.Context, request *pb.GetRequest) (*pb.GetReactionsResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetAllLikesForPostAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	objectId, err := primitive.ObjectIDFromHex(request.Id)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
+	post, err := handler.service.Get(ctx, objectId)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +304,7 @@ func (handler *PostHandler) GetAllLikesForPost(ctx context.Context, request *pb.
 	response := &pb.GetReactionsResponse{Users: []*pb.User{}}
 	for _, reaction := range post.Reactions {
 		if reaction.Reaction == domain.LIKED {
-			user, err := handler.service.GetUser(reaction.UserId)
+			user, err := handler.service.GetUser(ctx, reaction.UserId)
 			if err != nil {
 				return nil, err
 			}
@@ -275,11 +320,15 @@ func (handler *PostHandler) GetAllLikesForPost(ctx context.Context, request *pb.
 }
 
 func (handler *PostHandler) GetAllDislikesForPost(ctx context.Context, request *pb.GetRequest) (*pb.GetReactionsResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetAllDislikesForPostAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	objectId, err := primitive.ObjectIDFromHex(request.Id)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
+	post, err := handler.service.Get(ctx, objectId)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +336,7 @@ func (handler *PostHandler) GetAllDislikesForPost(ctx context.Context, request *
 	response := &pb.GetReactionsResponse{Users: []*pb.User{}}
 	for _, reaction := range post.Reactions {
 		if reaction.Reaction == domain.DISLIKED {
-			user, err := handler.service.GetUser(reaction.UserId)
+			user, err := handler.service.GetUser(ctx, reaction.UserId)
 			if err != nil {
 				return nil, err
 			}
@@ -303,18 +352,22 @@ func (handler *PostHandler) GetAllDislikesForPost(ctx context.Context, request *
 }
 
 func (handler *PostHandler) GetAllCommentsForPost(ctx context.Context, request *pb.GetRequest) (*pb.GetAllCommentsResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetAllCommentsForPostAPI")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	objectId, err := primitive.ObjectIDFromHex(request.Id)
 	if err != nil {
 		return nil, err
 	}
-	post, err := handler.service.Get(objectId)
+	post, err := handler.service.Get(ctx, objectId)
 	if err != nil {
 		return nil, err
 	}
 
 	response := &pb.GetAllCommentsResponse{Comments: []*pb.Comment{}}
 	for _, comment := range post.Comments {
-		user, err := handler.service.GetUser(comment.UserId)
+		user, err := handler.service.GetUser(ctx, comment.UserId)
 		if err != nil {
 			return nil, err
 		}

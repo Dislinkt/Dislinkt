@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 
@@ -42,7 +43,7 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 			reply.Type = events.UserNotUpdatedInUser
 			return
 		}
-		_, err := handler.userService.Update(user.Id, user)
+		_, err := handler.userService.Update(context.TODO(), user.Id, user)
 		if err != nil {
 			reply.Type = events.UserNotUpdatedInUser
 			return
@@ -51,7 +52,7 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 	case events.RollbackUpdateInUser:
 		fmt.Println("update user handler-rollback")
 		user := mapCommandUpdateUser(command)
-		_, err := handler.userService.Update(user.Id, user)
+		_, err := handler.userService.Update(context.TODO(), user.Id, user)
 		if err != nil {
 			return
 		}

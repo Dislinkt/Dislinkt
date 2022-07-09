@@ -2,6 +2,8 @@ package startup
 
 import (
 	"fmt"
+	"github.com/dislinkt/common/tracer"
+	otgo "github.com/opentracing/opentracing-go"
 	"log"
 	"net"
 
@@ -23,17 +25,11 @@ import (
 
 type Server struct {
 	config *config.Config
-	// tracer otgo.Tracer
-	// closer io.Closer
 }
 
 func NewServer(config *config.Config) *Server {
-	// newTracer, closer := tracer.Init(config.JaegerServiceName)
-	// otgo.SetGlobalTracer(newTracer)
 	return &Server{
 		config: config,
-		// tracer: newTracer,
-		// closer: closer,
 	}
 }
 
@@ -42,6 +38,8 @@ const (
 )
 
 func (server *Server) Start() {
+	tracer, _ := tracer.Init("additional_user_service")
+	otgo.SetGlobalTracer(tracer)
 	mongoClient := server.initAdditionalUserClient()
 	additionalUserStore := server.initAdditionalUserStore(mongoClient)
 

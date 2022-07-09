@@ -50,11 +50,6 @@ type JobOffer struct {
 type User struct {
 	Id       primitive.ObjectID `bson:"_id"`
 	UserUUID string             `bson:"userUUID"`
-<<<<<<< HEAD
-	Username string             `bson:"username" validate:"alphanum"`
-	Name     string             `bson:"name" validate:"alpha"`
-	Surname  string             `bson:"surname" validate:"alpha"`
-=======
 	Username string             `bson:"username"`
 	Name     string             `bson:"name" validate:"alpha"`
 	Surname  string             `bson:"surname" validate:"alpha"`
@@ -63,5 +58,4 @@ type User struct {
 type NewNotification struct {
 	NotificationType string
 	SubjectUsername  string
->>>>>>> develop
 }

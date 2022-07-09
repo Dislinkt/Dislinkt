@@ -103,6 +103,7 @@ services:
       - message_db
     networks:
       - network
+      - monitoring
 
   notification_service:
     image: notification_service
@@ -119,6 +120,7 @@ services:
       - notification_db
     networks:
       - network
+      - monitoring
 
   event_service:
     image: event_service
@@ -135,6 +137,7 @@ services:
       - event_db
     networks:
       - network
+      - monitoring
 
   additional_user_service:
     image: additional_user_service
@@ -176,7 +179,6 @@ services:
     restart: on-failure
     logging:  *fluent-bit
     environment:
-<<<<<<< HEAD
       <<: *jaeger-env
       CONNECTION_DB_HOST: ${CONNECTION_DB_HOST}
       CONNECTION_DB_PORT: ${CONNECTION_DB_PORT}
@@ -191,27 +193,12 @@ services:
       REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
       PATCH_USER_COMMAND_SUBJECT: ${PATCH_USER_COMMAND_SUBJECT}
       PATCH_USER_REPLY_SUBJECT: ${PATCH_USER_REPLY_SUBJECT}
-=======
-      - CONNECTION_DB_HOST=${CONNECTION_DB_HOST}
-      - CONNECTION_DB_PORT=${CONNECTION_DB_PORT}
-      - CONNECTION_SERVICE_PORT=${CONNECTION_SERVICE_PORT}
-      - CONNECTION_DB_USER=${CONNECTION_DB_USER}
-      - CONNECTION_DB_PASS=${CONNECTION_DB_PASS}
-      - NATS_HOST=${NATS_HOST}
-      - NATS_PORT=${NATS_PORT}
-      - NATS_USER=${NATS_USER}
-      - NATS_PASS=${NATS_PASS}
-      - REGISTER_USER_COMMAND_SUBJECT=${REGISTER_USER_COMMAND_SUBJECT}
-      - REGISTER_USER_REPLY_SUBJECT=${REGISTER_USER_REPLY_SUBJECT}
-      - PATCH_USER_COMMAND_SUBJECT=${PATCH_USER_COMMAND_SUBJECT}
-      - PATCH_USER_REPLY_SUBJECT=${PATCH_USER_REPLY_SUBJECT}
-      - CREATE_JOB_COMMAND_SUBJECT=${CREATE_JOB_COMMAND_SUBJECT}
-      - CREATE_JOB_REPLY_SUBJECT=${CREATE_JOB_REPLY_SUBJECT}
-      - ADD_EDUCATION_COMMAND_SUBJECT=${ADD_EDUCATION_COMMAND_SUBJECT}
-      - ADD_EDUCATION_REPLY_SUBJECT=${ADD_EDUCATION_REPLY_SUBJECT}
-      - ADD_SKILL_COMMAND_SUBJECT=${ADD_SKILL_COMMAND_SUBJECT}
-      - ADD_SKILL_REPLY_SUBJECT=${ADD_SKILL_REPLY_SUBJECT}
->>>>>>> develop
+      CREATE_JOB_COMMAND_SUBJECT: ${CREATE_JOB_COMMAND_SUBJECT}
+      CREATE_JOB_REPLY_SUBJECT: ${CREATE_JOB_REPLY_SUBJECT}
+      ADD_EDUCATION_COMMAND_SUBJECT: ${ADD_EDUCATION_COMMAND_SUBJECT}
+      ADD_EDUCATION_REPLY_SUBJECT: ${ADD_EDUCATION_REPLY_SUBJECT}
+      ADD_SKILL_COMMAND_SUBJECT: ${ADD_SKILL_COMMAND_SUBJECT}
+      ADD_SKILL_REPLY_SUBJECT: ${ADD_SKILL_REPLY_SUBJECT}
     depends_on:
       - neo4j
     networks:
@@ -325,9 +312,7 @@ services:
     logging:  *fluent-bit
     networks:
       - network
-<<<<<<< HEAD
       - monitoring
-=======
 
   message_db:
     image: mongo
@@ -335,6 +320,7 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   notification_db:
     image: mongo
@@ -342,6 +328,7 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   event_db:
     image: mongo
@@ -349,7 +336,7 @@ services:
     restart: on-failure
     networks:
       - network
->>>>>>> develop
+      - monitoring
 
   neo4j:
     image: neo4j:4.3.3-community #4.3.3-community  latest
