@@ -15,6 +15,10 @@ func mapNotification(notification *domain.Notification) *pb.Notification {
 		IsRead:           notification.IsRead,
 	}
 
+	if notificationPb.NotificationType == 0 {
+		notificationPb.NotificationType = 1
+	}
+
 	return notificationPb
 }
 
@@ -25,5 +29,6 @@ func mapNewNotification(notificationPb *pb.NewNotification) *domain.Notification
 		Date:             time.Now(),
 		IsRead:           false,
 	}
+
 	return notification
 }

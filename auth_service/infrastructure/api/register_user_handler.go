@@ -1,9 +1,12 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/auth_service/application"
+	"github.com/dislinkt/auth_service/infrastructure/persistence"
 	"github.com/dislinkt/auth_service/startup/config"
+	eventGw "github.com/dislinkt/common/proto/event_service"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/pquerna/otp/totp"
@@ -52,6 +55,9 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		uuid, err := handler.userService.Insert(user)
 
 		reply.User.Id = uuid.String()
+
+		_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+			&eventGw.SaveEventRequest{Event: mapEventForUserRegistration(uuid.String())})
 		if err != nil {
 			reply.Type = events.AuthNotUpdated
 			return
@@ -63,6 +69,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 			reply.Type = events.AuthNotUpdated
 			return
 		}
+
 		reply.Type = events.AuthUpdated
 	case events.RollbackAuth:
 		fmt.Println("RollbackAuth")

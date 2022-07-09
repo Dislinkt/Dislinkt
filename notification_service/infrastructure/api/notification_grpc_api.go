@@ -75,6 +75,7 @@ func generateNotificationText(notification *domain.Notification, subjectUsername
 		return subjectUsername + " sent you a message."
 	} else if notification.NotificationType == domain.POST {
 		return subjectUsername + " made a new post."
+	} else {
+		return subjectUsername + " sent you a connection request."
 	}
-	return ""
 }

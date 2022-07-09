@@ -3,6 +3,10 @@ package api
 import (
 	"context"
 	"fmt"
+	eventGw "github.com/dislinkt/common/proto/event_service"
+	notificationGw "github.com/dislinkt/common/proto/notification_service"
+	userGw "github.com/dislinkt/common/proto/user_service"
+	"github.com/dislinkt/connection_service/infrastructure/persistance"
 
 	pb "github.com/dislinkt/common/proto/connection_service"
 	"github.com/dislinkt/connection_service/application"
@@ -42,7 +46,20 @@ func (handler *ConnectionHandler) Register(ctx context.Context, request *pb.Regi
 
 func (handler *ConnectionHandler) CreateConnection(ctx context.Context, request *pb.NewConnectionRequest) (response *pb.NewConnectionResponse, err error) {
 	fmt.Println("[ConnectionHandler]:CreateConnection")
-	return handler.service.CreateConnection(request.Connection.BaseUserUUID, request.Connection.ConnectUserUUID)
+	response, err = handler.service.CreateConnection(request.Connection.BaseUserUUID, request.Connection.ConnectUserUUID)
+
+	userResponse, _ := persistance.UserClient("user_service:8000").GetOne(context.TODO(), &userGw.GetOneMessage{Id: request.Connection.ConnectUserUUID})
+	if response.ConnectionResponse == "CONNECTED" {
+		_, _ = persistance.EventClient("event_service:8000").SaveEvent(context.TODO(),
+			&eventGw.SaveEventRequest{Event: mapEventForConnection(request.Connection.ConnectUserUUID, request.Connection.BaseUserUUID)})
+	} else {
+		_, _ = persistance.EventClient("event_service:8000").SaveEvent(context.TODO(),
+			&eventGw.SaveEventRequest{Event: mapEventForConnectionRequest(request.Connection.ConnectUserUUID, request.Connection.BaseUserUUID)})
+	}
+	_, _ = persistance.NotificationClient("notification_service:8000").SaveNotification(context.TODO(),
+		&notificationGw.SaveNotificationRequest{Notification: mapNotification(userResponse.User.Username, response.ConnectionResponse), UserId: request.Connection.BaseUserUUID})
+
+	return response, err
 }
 
 func (handler *ConnectionHandler) AcceptConnection(ctx context.Context, request *pb.AcceptConnectionMessage) (response *pb.NewConnectionResponse, err error) {
@@ -89,6 +106,8 @@ func (handler *ConnectionHandler) GetAllConnectionRequestsForUser(ctx context.Co
 
 func (handler *ConnectionHandler) BlockUser(ctx context.Context, request *pb.BlockUserRequest) (response *pb.BlockedUserStatus, err error) {
 	fmt.Println("[ConnectionHandler]:BlockUser")
+	_, _ = persistance.EventClient("event_service:8000").SaveEvent(context.TODO(),
+		&eventGw.SaveEventRequest{Event: mapEventForUserBlocking(request.Uuid, request.Uuid1)})
 	return handler.service.BlockUser(request.Uuid, request.Uuid1)
 }
 

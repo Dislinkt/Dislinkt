@@ -3,6 +3,7 @@ package api
 import (
 	pb "github.com/dislinkt/common/proto/connection_service"
 	pbEvent "github.com/dislinkt/common/proto/event_service"
+	pbNotification "github.com/dislinkt/common/proto/notification_service"
 	"github.com/dislinkt/connection_service/domain"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
@@ -63,4 +64,41 @@ func mapEventForUserPrivacyChange(userId string, isPrivate bool) *pbEvent.NewEve
 		eventPb.Description = "Set account to public."
 	}
 	return eventPb
+}
+
+func mapEventForConnection(user1Id, user2Id string) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId:      user1Id,
+		Description: "Connected to user " + user2Id + ".",
+	}
+	return eventPb
+}
+
+func mapEventForConnectionRequest(user1Id, user2Id string) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId:      user1Id,
+		Description: "Sent connection request to user " + user2Id + ".",
+	}
+	return eventPb
+}
+
+func mapEventForUserBlocking(user1Id, user2Id string) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId:      user1Id,
+		Description: "Blocked user " + user2Id + ".",
+	}
+	return eventPb
+}
+
+func mapNotification(subjectUsername, status string) *pbNotification.NewNotification {
+	notificationPb := &pbNotification.NewNotification{
+		NotificationType: 2,
+		SubjectUsername:  subjectUsername,
+	}
+	if status == "CONNECTED" {
+		notificationPb.NotificationType = 1
+	} else {
+		notificationPb.NotificationType = 0
+	}
+	return notificationPb
 }
