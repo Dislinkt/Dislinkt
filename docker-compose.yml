@@ -99,6 +99,22 @@ services:
     networks:
       - network
 
+  event_service:
+    image: event_service
+    container_name: event_service
+    build:
+      context: .
+      dockerfile: ./event_service/Dockerfile
+    restart: on-failure
+    environment:
+      EVENT_DB_HOST: ${EVENT_DB_HOST}
+      EVENT_DB_PORT: ${EVENT_DB_PORT}
+      EVENT_SERVICE_PORT: ${EVENT_SERVICE_PORT}
+    depends_on:
+      - event_db
+    networks:
+      - network
+
   additional_user_service:
     image: additional_user_service
     container_name: additional_user_service
@@ -205,6 +221,8 @@ services:
       MESSAGE_SERVICE_PORT: ${MESSAGE_SERVICE_PORT}
       NOTIFICATION_SERVICE_HOST: ${NOTIFICATION_SERVICE_HOST}
       NOTIFICATION_SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
+      EVENT_SERVICE_HOST: ${EVENT_SERVICE_HOST}
+      EVENT_SERVICE_PORT: ${EVENT_SERVICE_PORT}
       ADDITIONAL_USER_SERVICE_HOST: ${ADDITIONAL_USER_SERVICE_HOST}
       ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
       CONNECTION_SERVICE_HOST: ${CONNECTION_SERVICE_HOST}
@@ -254,6 +272,13 @@ services:
   notification_db:
     image: mongo
     container_name: notification_db
+    restart: on-failure
+    networks:
+      - network
+
+  event_db:
+    image: mongo
+    container_name: event_db
     restart: on-failure
     networks:
       - network

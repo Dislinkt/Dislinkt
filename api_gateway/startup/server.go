@@ -17,6 +17,7 @@ import (
 	additionalUserGw "github.com/dislinkt/common/proto/additional_user_service"
 	authGw "github.com/dislinkt/common/proto/auth_service"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
+	eventGw "github.com/dislinkt/common/proto/event_service"
 	messageGw "github.com/dislinkt/common/proto/message_service"
 	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	postGw "github.com/dislinkt/common/proto/post_service"
@@ -84,6 +85,12 @@ func (server *Server) initHandlers() {
 
 	notificationEndpoint := fmt.Sprintf("%s:%s", server.config.NotificationHost, server.config.NotificationPort)
 	err = notificationGw.RegisterNotificationServiceHandlerFromEndpoint(context.TODO(), server.mux, notificationEndpoint, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	eventEndpoint := fmt.Sprintf("%s:%s", server.config.EventHost, server.config.EventPort)
+	err = eventGw.RegisterEventServiceHandlerFromEndpoint(context.TODO(), server.mux, eventEndpoint, opts)
 	if err != nil {
 		panic(err)
 	}
