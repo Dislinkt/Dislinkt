@@ -252,14 +252,14 @@ func (handler *AdditionalUserHandler) NewSkill(ctx context.Context, request *pb.
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
-	createdSkill, err := handler.service.CreateSkill(request.Id, skill)
+	err := handler.service.CreateSkillStart(request.Id, skill)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
 
 	return &pb.SkillResponse{
-		Skill: mapSkill(createdSkill),
+		Skill: mapSkill(skill),
 	}, nil
 }
 
