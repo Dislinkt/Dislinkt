@@ -1,11 +1,13 @@
 package api
 
 import (
+	"context"
 	"fmt"
-
+	eventGw "github.com/dislinkt/common/proto/event_service"
 	saga "github.com/dislinkt/common/saga/messaging"
 	events "github.com/dislinkt/common/saga/patch_user"
 	"github.com/dislinkt/connection_service/application"
+	"github.com/dislinkt/connection_service/infrastructure/persistance"
 )
 
 type PatchUserCommandHandler struct {
@@ -41,6 +43,10 @@ func (handler *PatchUserCommandHandler) handle(command *events.PatchUserCommand)
 			reply.Type = events.PatchFailedInConnection
 			return
 		}
+
+		_, _ = persistance.EventClient("event_service:8000").SaveEvent(context.TODO(),
+			&eventGw.SaveEventRequest{Event: mapEventForUserPrivacyChange(command.User.Id, command.User.Private)})
+
 		reply.Type = events.PatchedInConnection
 
 	default:

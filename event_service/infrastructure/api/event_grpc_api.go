@@ -25,6 +25,11 @@ func (handler *EventHandler) GetAllEvents(ctx context.Context, request *pb.Empty
 		current := mapEvent(event)
 		response.Events = append(response.Events, current)
 	}
+
+	for i, j := 0, len(response.Events)-1; i < j; i, j = i+1, j-1 {
+		response.Events[i], response.Events[j] = response.Events[j], response.Events[i]
+	}
+
 	return response, nil
 }
 

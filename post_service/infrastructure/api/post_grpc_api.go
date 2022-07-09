@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dislinkt/common/interceptor"
 	connectionGw "github.com/dislinkt/common/proto/connection_service"
+	eventGw "github.com/dislinkt/common/proto/event_service"
 	notificationGw "github.com/dislinkt/common/proto/notification_service"
 	userGw "github.com/dislinkt/common/proto/user_service"
 	"post_service/infrastructure/persistence"
@@ -129,6 +130,10 @@ func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePo
 	}
 	_, _ = persistence.NotificationClient("notification_service:8000").SaveNotification(context.TODO(),
 		&notificationGw.SaveNotificationRequest{Notification: mapNotification(username), UserId: userResponse.User.Id})
+
+	_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+		&eventGw.SaveEventRequest{Event: mapEventForPostCreation(userResponse.User.Id, post.Id.Hex())})
+
 	return &pb.Empty{}, nil
 }
 
@@ -146,6 +151,11 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 	if err != nil {
 		return nil, err
 	}
+
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
+	_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+		&eventGw.SaveEventRequest{Event: mapEventForPostComment(userResponse.User.Id, post.Id.Hex())})
 
 	return &pb.CreateCommentResponse{
 		Comment: request.Comment,
@@ -166,6 +176,11 @@ func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRe
 		return nil, err
 	}
 
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
+	_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+		&eventGw.SaveEventRequest{Event: mapEventForPostLike(userResponse.User.Id, post.Id.Hex())})
+
 	return &pb.Empty{}, nil
 }
 
@@ -182,6 +197,11 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 	if err != nil {
 		return nil, err
 	}
+
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
+	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
+	_, _ = persistence.EventClient("event_service:8000").SaveEvent(context.TODO(),
+		&eventGw.SaveEventRequest{Event: mapEventForPostDislike(userResponse.User.Id, post.Id.Hex())})
 
 	return &pb.Empty{}, nil
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	pb "github.com/dislinkt/common/proto/connection_service"
+	pbEvent "github.com/dislinkt/common/proto/event_service"
 	"github.com/dislinkt/connection_service/domain"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
@@ -50,4 +51,16 @@ func mapJobOfferPb(jobOfferPb *pb.JobOffer) *domain.JobOffer {
 	}
 
 	return jobOffer
+}
+
+func mapEventForUserPrivacyChange(userId string, isPrivate bool) *pbEvent.NewEvent {
+	eventPb := &pbEvent.NewEvent{
+		UserId: userId,
+	}
+	if isPrivate {
+		eventPb.Description = "Set account to private."
+	} else {
+		eventPb.Description = "Set account to public."
+	}
+	return eventPb
 }
