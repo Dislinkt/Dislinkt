@@ -19,6 +19,8 @@ type Config struct {
 	RegisterUserReplySubject   string
 	AddEducationCommandSubject string
 	AddEducationReplySubject   string
+	AddSkillCommandSubject     string
+	AddSkillReplySubject       string
 	PublicKey                  string
 }
 
@@ -42,6 +44,8 @@ func NewConfig() *Config {
 		RegisterUserReplySubject:   os.Getenv("REGISTER_USER_REPLY_SUBJECT"),
 		AddEducationCommandSubject: os.Getenv("ADD_EDUCATION_COMMAND_SUBJECT"),
 		AddEducationReplySubject:   os.Getenv("ADD_EDUCATION_REPLY_SUBJECT"),
+		AddSkillCommandSubject:     os.Getenv("ADD_SKILL_COMMAND_SUBJECT"),
+		AddSkillReplySubject:       os.Getenv("ADD_SKILL_REPLY_SUBJECT"),
 		PublicKey:                  "Dislinkt",
 	}
 }

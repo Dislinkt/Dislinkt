@@ -24,6 +24,8 @@ type Config struct {
 	CreateJobOfferReplySubject   string
 	AddEducationCommandSubject   string
 	AddEducationReplySubject     string
+	AddSkillCommandSubject       string
+	AddSkillReplySubject         string
 	PublicKey                    string
 }
 
@@ -61,6 +63,8 @@ func NewConfig() *Config {
 		CreateJobOfferReplySubject:   os.Getenv("CREATE_JOB_REPLY_SUBJECT"),
 		AddEducationCommandSubject:   os.Getenv("ADD_EDUCATION_COMMAND_SUBJECT"),
 		AddEducationReplySubject:     os.Getenv("ADD_EDUCATION_REPLY_SUBJECT"),
+		AddSkillCommandSubject:       os.Getenv("ADD_SKILL_COMMAND_SUBJECT"),
+		AddSkillReplySubject:         os.Getenv("ADD_SKILL_REPLY_SUBJECT"),
 		PublicKey:                    "Dislinkt",
 	}
 }

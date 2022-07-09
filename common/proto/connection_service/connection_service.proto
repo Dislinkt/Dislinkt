@@ -121,14 +121,14 @@ service ConnectionService{
 
   rpc RecommendJobBySkill(GetConnectionRequest) returns (JobOffers) {
     option (google.api.http) = {
-      get: "user/recommend/skill/{uuid}"
+      get: "/user/recommend/skill/{uuid}"
       body: ""
     };
   }
 
   rpc RecommendJobByField(GetConnectionRequest) returns (JobOffers) {
     option (google.api.http) = {
-      get: "user/recommend/field/{uuid}"
+      get: "/user/recommend/field/{uuid}"
       body: ""
     };
   }

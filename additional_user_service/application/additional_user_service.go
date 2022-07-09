@@ -10,6 +10,7 @@ import (
 type AdditionalUserService struct {
 	store                    domain.AdditionalUserStore
 	addEducationOrchestrator *AddEducationOrchestrator
+	addSkillOrchestrator     *AddSkillOrchestrator
 }
 
 func (service *AdditionalUserService) CreateDocument(uuid string) error {
@@ -39,10 +40,12 @@ func (service *AdditionalUserService) DeleteDocument(uuid string) error {
 
 // EDUCATION
 
-func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *AddEducationOrchestrator) *AdditionalUserService {
+func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *AddEducationOrchestrator,
+	addSkillOrchestrator *AddSkillOrchestrator) *AdditionalUserService {
 	return &AdditionalUserService{
 		store:                    store,
 		addEducationOrchestrator: addEducationOrchestrator,
+		addSkillOrchestrator:     addSkillOrchestrator,
 	}
 }
 
@@ -200,6 +203,14 @@ func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Ski
 	}
 
 	return insertSkill, nil
+}
+
+func (service *AdditionalUserService) CreateSkillStart(uuid string, skill *domain.Skill) error {
+	err := service.addSkillOrchestrator.Start(skill, uuid)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]domain.Skill, error) {

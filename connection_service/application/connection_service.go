@@ -106,6 +106,8 @@ func (servioe *ConnectionService) InsertJobOffer(jobOffer domain.JobOffer) (stri
 
 func (servioe *ConnectionService) InsertSkillToUser(name string, uuid string) (string, error) {
 	fmt.Println("[ConnectionService InsertSkillToUser")
+	fmt.Println(name)
+	fmt.Println(uuid)
 	return servioe.store.InsertSkillToUser(name, uuid)
 }
 
