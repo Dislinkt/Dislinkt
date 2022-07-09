@@ -123,6 +123,8 @@ func (server *Server) initCustomHandlers() {
 	publicUserFeedHandler.Init(server.mux)
 	recommendationsHandler := api.NewConnectionRecommendationHandler(server.config)
 	recommendationsHandler.Init(server.mux)
+	searchUserHandler := api.NewConnectionSearchUserHandler(server.config)
+	searchUserHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {
