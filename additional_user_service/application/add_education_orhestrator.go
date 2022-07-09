@@ -5,7 +5,6 @@ import (
 	"github.com/dislinkt/additional_user_service/domain"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AddEducationOrchestrator struct {
@@ -30,7 +29,7 @@ func (o *AddEducationOrchestrator) Start(education *domain.Education, userId str
 	event := &events.AddEducationCommand{
 		Type: events.AddEducationInAdditional,
 		Education: events.Education{
-			Id:           primitive.NewObjectID(),
+			Id:           education.Id,
 			School:       education.School,
 			Degree:       education.Degree,
 			FieldOfStudy: education.FieldOfStudy,

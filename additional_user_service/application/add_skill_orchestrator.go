@@ -5,7 +5,6 @@ import (
 	"github.com/dislinkt/additional_user_service/domain"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AddSkillOrchestrator struct {
@@ -30,7 +29,7 @@ func (o *AddSkillOrchestrator) Start(skill *domain.Skill, userId string) error {
 	event := &events.AddSkillCommand{
 		Type: events.AddSkillInAdditional,
 		Skill: events.Skill{
-			Id:   primitive.NewObjectID(),
+			Id:   skill.Id,
 			Name: skill.Name,
 		},
 		UserId: userId,

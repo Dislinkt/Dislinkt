@@ -213,7 +213,6 @@ func (store *AdditionalUserMongoDBStore) FindDocument(uuid string) (*domain.Addi
 
 func (store *AdditionalUserMongoDBStore) InsertEducation(uuid string,
 	education *domain.Education) (*domain.Education, error) {
-	education.Id = primitive.NewObjectID()
 	_, err := store.users.UpdateOne(context.TODO(), bson.M{"userUUID": uuid}, bson.D{
 		{"$set", bson.D{{"educations." + education.Id.Hex(), education}}},
 	})
@@ -353,7 +352,6 @@ func (store *AdditionalUserMongoDBStore) DeleteUserPosition(positionId string) e
 // SKILL
 
 func (store *AdditionalUserMongoDBStore) InsertSkill(uuid string, skill *domain.Skill) (*domain.Skill, error) {
-	skill.Id = primitive.NewObjectID()
 	_, err := store.users.UpdateOne(context.TODO(), bson.M{"userUUID": uuid}, bson.D{
 		{"$set", bson.D{{"skills." + skill.Id.Hex(), skill}}},
 	})

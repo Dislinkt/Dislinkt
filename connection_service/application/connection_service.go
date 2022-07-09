@@ -111,6 +111,13 @@ func (servioe *ConnectionService) InsertSkillToUser(name string, uuid string) (s
 	return servioe.store.InsertSkillToUser(name, uuid)
 }
 
+func (servioe *ConnectionService) DeleteSkillToUser(name string, uuid string) (string, error) {
+	fmt.Println("[ConnectionService DeleteSkillToUser")
+	fmt.Println(name)
+	fmt.Println(uuid)
+	return servioe.store.DeleteSkillForUser(uuid, name)
+}
+
 func (servioe *ConnectionService) InsertFieldToUser(name string, uuid string) (string, error) {
 	fmt.Println("[ConnectionService InsertFieldToUser")
 	fmt.Println(name, uuid)

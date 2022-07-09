@@ -11,6 +11,7 @@ type AdditionalUserService struct {
 	store                    domain.AdditionalUserStore
 	addEducationOrchestrator *AddEducationOrchestrator
 	addSkillOrchestrator     *AddSkillOrchestrator
+	deleteSkillOrchestrator  *DeleteSkillOrchestrator
 }
 
 func (service *AdditionalUserService) CreateDocument(uuid string) error {
@@ -41,11 +42,12 @@ func (service *AdditionalUserService) DeleteDocument(uuid string) error {
 // EDUCATION
 
 func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *AddEducationOrchestrator,
-	addSkillOrchestrator *AddSkillOrchestrator) *AdditionalUserService {
+	addSkillOrchestrator *AddSkillOrchestrator, deleteSkillOrchestrator *DeleteSkillOrchestrator) *AdditionalUserService {
 	return &AdditionalUserService{
 		store:                    store,
 		addEducationOrchestrator: addEducationOrchestrator,
 		addSkillOrchestrator:     addSkillOrchestrator,
+		deleteSkillOrchestrator:  deleteSkillOrchestrator,
 	}
 }
 
@@ -225,6 +227,18 @@ func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]d
 	return document.Skills, nil
 }
 
+func (service *AdditionalUserService) FindUserSkill(skillId string, uuid string) (*domain.Skill, error) {
+	skills, err := service.FindUserSkills(uuid)
+	mapSkill := *skills
+	skill := mapSkill[skillId]
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("[AdditionalUserService: FindUserSkill]")
+	fmt.Println("skill")
+	return &skill, nil
+}
+
 func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId string,
 	skill *domain.Skill) (*map[string]domain.Skill, error) {
 	if !IsValidUUID(uuid) {
@@ -249,6 +263,23 @@ func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID st
 	}
 
 	err := service.store.DeleteUserSkill(additionID)
+	userSkill, err := service.store.FindUserDocument(uuid)
+	if err != nil {
+		return nil, err
+	}
+	return userSkill.Skills, nil
+}
+
+func (service *AdditionalUserService) DeleteUserSkillStart(uuid string, additionID string) (*map[string]domain.Skill,
+	error) {
+	if !IsValidUUID(uuid) {
+		return nil, errors.New("Invalid uuid")
+	}
+
+	err := service.deleteSkillOrchestrator.Start(uuid, additionID)
+	if err != nil {
+		return nil, err
+	}
 	userSkill, err := service.store.FindUserDocument(uuid)
 	if err != nil {
 		return nil, err

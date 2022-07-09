@@ -306,7 +306,7 @@ func (handler *AdditionalUserHandler) DeleteSkill(ctx context.Context, request *
 
 	// ctx = tracer.ContextWithSpan(context.Background(), span)
 	// err := handler.service.Register( ctx, user)
-	skills, err := handler.service.DeleteUserSkill(request.UserId, request.AdditionId)
+	skills, err := handler.service.DeleteUserSkillStart(request.UserId, request.AdditionId)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err

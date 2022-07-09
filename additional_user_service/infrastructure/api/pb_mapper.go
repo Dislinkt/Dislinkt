@@ -22,6 +22,7 @@ func mapNewEducation(educationPb *pb.NewEducation) *domain.Education {
 		FieldOfStudy: educationPb.FieldOfStudy,
 		StartDate:    primitive.NewDateTimeFromTime(startDate),
 		EndDate:      primitive.NewDateTimeFromTime(endDate),
+		Id:           primitive.NewObjectID(),
 	}
 	return educationD
 }
@@ -111,6 +112,7 @@ func mapPositions(positions *map[string]domain.Position) []*pb.Position {
 func mapNewSkill(skillPb *pb.NewSkill) *domain.Skill {
 	skillD := &domain.Skill{
 		Name: skillPb.Name,
+		Id:   primitive.NewObjectID(),
 	}
 	return skillD
 }

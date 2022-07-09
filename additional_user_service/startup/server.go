@@ -53,7 +53,11 @@ func (server *Server) Start() {
 	replySkillSubscriber := server.initSubscriber(server.config.AddSkillReplySubject, QueueGroup)
 	addSkillOrchestrator := server.initSkillOrchestrator(commandSkillPublisher, replySkillSubscriber)
 
-	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator, addSkillOrchestrator)
+	commandDeleteSkillPublisher := server.initPublisher(server.config.DeleteSkillCommandSubject)
+	replyDeleteSkillSubscriber := server.initSubscriber(server.config.DeleteSkillReplySubject, QueueGroup)
+	deleteSkillOrchestrator := server.initDeleteSkillOrchestrator(commandDeleteSkillPublisher, replyDeleteSkillSubscriber)
+
+	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
@@ -66,6 +70,10 @@ func (server *Server) Start() {
 	commandAddSkillSubscriber := server.initSubscriber(server.config.AddSkillCommandSubject, QueueGroup)
 	replyAddSkillPublisher := server.initPublisher(server.config.AddSkillReplySubject)
 	server.initAddSkillHandler(additionalUserService, replyAddSkillPublisher, commandAddSkillSubscriber)
+
+	commandeleteSkillSubscriber := server.initSubscriber(server.config.DeleteSkillCommandSubject, QueueGroup)
+	replyDeleteSkillPublisher := server.initPublisher(server.config.DeleteSkillReplySubject)
+	server.initDeleteSkillHandler(additionalUserService, replyDeleteSkillPublisher, commandeleteSkillSubscriber)
 
 	additionalUserHandler := server.initAdditionalUserHandler(additionalUserService)
 
@@ -88,8 +96,8 @@ func (server *Server) initAdditionalUserStore(client *mongo.Client) domain.Addit
 }
 
 func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *application.AddEducationOrchestrator,
-	addSkillOrchestrator *application.AddSkillOrchestrator) *application.AdditionalUserService {
-	return application.NewAdditionalUserService(store, addEducationOrchestrator, addSkillOrchestrator)
+	addSkillOrchestrator *application.AddSkillOrchestrator, deleteSkillOrchestrator *application.DeleteSkillOrchestrator) *application.AdditionalUserService {
+	return application.NewAdditionalUserService(store, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator)
 }
 
 func (server *Server) initPublisher(subject string) saga.Publisher {
@@ -131,6 +139,14 @@ func (server *Server) initAddEducationHandler(service *application.AdditionalUse
 func (server *Server) initAddSkillHandler(service *application.AdditionalUserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewAddSkillCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initDeleteSkillHandler(service *application.AdditionalUserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewDeleteSkillCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -253,6 +269,15 @@ func (server *Server) initAddEducationOrchestrator(publisher saga.Publisher,
 func (server *Server) initSkillOrchestrator(publisher saga.Publisher,
 	subscriber saga.Subscriber) *application.AddSkillOrchestrator {
 	orchestrator, err := application.NewAddSkillOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
+func (server *Server) initDeleteSkillOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.DeleteSkillOrchestrator {
+	orchestrator, err := application.NewDeleteSkillOrchestrator(publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
