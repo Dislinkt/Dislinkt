@@ -205,3 +205,34 @@ func (handler *UserHandler) PatchUser(ctx context.Context, request *pb.PatchUser
 		User: mapUser(user),
 	}, nil
 }
+
+func (handler *UserHandler) GetNotificationSettings(ctx context.Context, request *pb.GetOneMessage) (*pb.NotificationSettings, error) {
+	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
+	// defer span.Finish()
+
+	id, _ := uuid.FromString(request.Id)
+	user, err := handler.service.FindByID(id)
+	if err != nil || user == nil {
+		return nil, err
+	}
+	response := &pb.NotificationSettings{
+		ConnectionNotifications: user.ConnectionNotifications,
+		MessageNotifications:    user.MessageNotifications,
+		PostNotifications:       user.PostNotifications,
+	}
+	return response, nil
+}
+
+func (handler *UserHandler) UpdateNotificationSettings(ctx context.Context, request *pb.UpdateNotificationSettingsRequest) (*pb.EmptyMessage, error) {
+	// span := tracer.StartSpanFromContextMetadata(ctx, "GetAllAPI")
+	// defer span.Finish()
+
+	id, _ := uuid.FromString(request.Id)
+	err := handler.service.UpdateNotificationSettings(id, request.NotificationSettings.ConnectionNotifications,
+		request.NotificationSettings.MessageNotifications, request.NotificationSettings.PostNotifications)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return &pb.EmptyMessage{}, nil
+}

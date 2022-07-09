@@ -56,11 +56,14 @@ func (handler *NotificationHandler) SaveNotification(ctx context.Context, reques
 	if notification.NotificationType == domain.POST {
 		handler.saveNotificationsForNewPost(ctx, notification, request.UserId, request.Notification.SubjectUsername)
 	} else {
-		notification.UserId = request.UserId
-		notification.NotificationText = generateNotificationText(notification, request.Notification.SubjectUsername)
-		err := handler.service.InsertNotification(ctx, notification)
-		if err != nil {
-			return nil, err
+		userNotificationSettings, _ := persistence.UserClient("user_service:8000").GetNotificationSettings(ctx, &userGw.GetOneMessage{Id: request.UserId})
+		if (notification.NotificationType == domain.CONNECTION && userNotificationSettings.ConnectionNotifications) || (notification.NotificationType == domain.MESSAGE && userNotificationSettings.MessageNotifications) {
+			notification.UserId = request.UserId
+			notification.NotificationText = generateNotificationText(notification, request.Notification.SubjectUsername)
+			err := handler.service.InsertNotification(ctx, notification)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return &pb.Empty{}, nil
@@ -71,13 +74,16 @@ func (handler *NotificationHandler) saveNotificationsForNewPost(ctx context.Cont
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	connections, _ := persistence.ConnectionClient("connection_service:8000").GetAllConnectionForUser(context.TODO(), &connectionGw.GetConnectionRequest{Uuid: userId})
+	connections, _ := persistence.ConnectionClient("connection_service:8000").GetAllConnectionForUser(ctx, &connectionGw.GetConnectionRequest{Uuid: userId})
 	notification.NotificationText = generateNotificationText(notification, username)
 
 	for _, user := range connections.Users {
-		notification.Id = primitive.NewObjectID()
-		notification.UserId = user.UserID
-		_ = handler.service.InsertNotification(ctx, notification)
+		userNotificationSettings, _ := persistence.UserClient("user_service:8000").GetNotificationSettings(ctx, &userGw.GetOneMessage{Id: user.UserID})
+		if notification.NotificationType == domain.POST && userNotificationSettings.PostNotifications {
+			notification.Id = primitive.NewObjectID()
+			notification.UserId = user.UserID
+			_ = handler.service.InsertNotification(ctx, notification)
+		}
 	}
 }
 
