@@ -1,13 +1,17 @@
 package startup
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
+	"regexp"
 
 	"github.com/dislinkt/common/interceptor"
 	saga "github.com/dislinkt/common/saga/messaging"
 	"github.com/dislinkt/common/saga/messaging/nats"
+	"github.com/gofrs/uuid"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/dislinkt/auth_service/application"
 	"github.com/dislinkt/auth_service/domain"
@@ -38,6 +42,7 @@ func (server *Server) Start() {
 	postgresClient := server.initUserClient()
 	userStore := server.initUserStore(postgresClient)
 	permissionStore := server.initPermissionStore(postgresClient)
+	server.addAdmin(userStore)
 
 	userService := server.initUserService(userStore)
 
@@ -54,6 +59,7 @@ func (server *Server) Start() {
 	authHandler := server.initAuthHandler(authService)
 
 	server.startGrpcServer(authHandler)
+
 }
 
 func (server *Server) initUserClient() *gorm.DB {
@@ -165,4 +171,39 @@ func (server *Server) initUpdateUserHandler(service *application.UserService, pu
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (server *Server) addAdmin(store domain.UserStore) {
+	id, _ := uuid.FromString("13c4dc91-410c-4370-a964-17c64566f740")
+	hashAndSalt, err := HashAndSaltPasswordIfStrongAndMatching("Lozinka123")
+	user := domain.User{
+		Id:        id,
+		Username:  "admin",
+		Email:     "admin@gmail.com",
+		Password:  hashAndSalt,
+		UserRole:  1,
+		Active:    true,
+		ApiToken:  nil,
+		TotpToken: "",
+	}
+	err = store.Insert(&user)
+	if err != nil {
+		log.Println("Error creating admin!")
+		return
+	}
+	log.Println("Admin successfully added!")
+}
+
+func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
+	isStrong, _ := regexp.MatchString("[0-9A-Za-z!?#$@.*+_\\-]+", password)
+
+	if !isStrong {
+		return "", errors.New("Password not strong enough!")
+	}
+	pwd := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash), err
 }

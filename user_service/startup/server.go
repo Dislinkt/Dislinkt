@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"github.com/dislinkt/common/interceptor"
+	"github.com/gofrs/uuid"
 
 	userProto "github.com/dislinkt/common/proto/user_service"
 	saga "github.com/dislinkt/common/saga/messaging"
@@ -44,6 +46,7 @@ const (
 func (server *Server) Start() {
 	postgresClient := server.initUserClient()
 	userStore := server.initUserStore(postgresClient)
+	server.addAdmin(userStore)
 
 	commandPublisher := server.initPublisher(server.config.RegisterUserCommandSubject)
 	replySubscriber := server.initSubscriber(server.config.RegisterUserReplySubject, QueueGroupRegister)
@@ -75,6 +78,35 @@ func (server *Server) Start() {
 
 	server.startGrpcServer(userHandler)
 
+}
+
+func (server *Server) addAdmin(store domain.UserStore) {
+	id, _ := uuid.FromString("13c4dc91-410c-4370-a964-17c64566f740")
+	username := "admin"
+	email := "admin@gmail.com"
+	user := domain.User{
+		Id:          id,
+		Name:        "Admin",
+		Surname:     "Admin",
+		Username:    &username,
+		Email:       &email,
+		Number:      "",
+		Gender:      0,
+		DateOfBirth: "",
+		Password:    "",
+		UserRole:    1,
+		Biography:   "",
+		Blocked:     false,
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+		Private:     false,
+	}
+	err := store.Insert(&user)
+	if err != nil {
+		log.Println("Error creating admin!")
+		return
+	}
+	log.Println("Admin successfully added!")
 }
 
 func (server *Server) initUserClient() *gorm.DB {

@@ -1,7 +1,7 @@
 package domain
 
 import (
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type User struct {
@@ -23,5 +23,5 @@ type LoginRequest struct {
 type Permission struct {
 	Id   uint `gorm:"primaryKey;auto_increment:true"`
 	Role int
-	Name string `gorm:"unique"`
+	Name string
 }

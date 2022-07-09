@@ -153,9 +153,14 @@ var permissions = []*domain.Permission{
 		Role: 0,
 		Name: "readNotifications",
 	},
-	{ //TODO: change role to admin
+	{ // TODO: change role to admin
 		Id:   31,
-		Role: 0,
+		Role: 1,
 		Name: "readEvents",
+	},
+	{
+		Id:   32,
+		Role: 1,
+		Name: "getMePermission",
 	},
 }
