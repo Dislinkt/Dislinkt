@@ -1,8 +1,10 @@
 package application
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/dislinkt/common/tracer"
 	"github.com/go-playground/validator/v10"
 	"regexp"
 
@@ -20,7 +22,11 @@ func NewUserService(store domain.UserStore) *UserService {
 	}
 }
 
-func (service *UserService) GetByUsername(username string) (*domain.User, error) {
+func (service *UserService) GetByUsername(ctx context.Context, username string) (*domain.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetByUsername-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !isUsernameValid(username) {
 		return nil, errors.New("unallowed characters in username")
 	}
@@ -34,7 +40,11 @@ func (service *UserService) GetByUsername(username string) (*domain.User, error)
 	return user, err
 }
 
-func (service *UserService) GetByEmail(email string) (*domain.User, error) {
+func (service *UserService) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetByEmail-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !isEmailValid(email) {
 		return nil, errors.New("unallowed characters in email")
 	}
@@ -47,11 +57,11 @@ func (service *UserService) GetByEmail(email string) (*domain.User, error) {
 	return user, err
 }
 
-func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
-	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+func (service *UserService) Insert(ctx context.Context, user *domain.User) (uuid.UUID, error) {
+	span := tracer.StartSpanFromContext(ctx, "Insert-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 
 	// TODO: obrisala jer mi treba da imaju isti id da mogu da menjam username
 	// newUUID := uuid.NewV4()
@@ -64,7 +74,12 @@ func (service *UserService) Insert(user *domain.User) (uuid.UUID, error) {
 	return user.Id, err
 }
 
-func (service *UserService) Delete(user *domain.User) error {
+func (service *UserService) Delete(ctx context.Context, user *domain.User) error {
+	span := tracer.StartSpanFromContext(ctx, "Delete-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	if err := validator.New().Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
@@ -72,11 +87,11 @@ func (service *UserService) Delete(user *domain.User) error {
 	return service.store.Delete(user)
 }
 
-func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
-	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+func (service *UserService) Update(ctx context.Context, uuid uuid.UUID, user *domain.User) error {
+	span := tracer.StartSpanFromContext(ctx, "Update-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	_, err := service.store.FindByID(uuid)
 	if err != nil {
 		return err
@@ -86,7 +101,12 @@ func (service *UserService) Update(uuid uuid.UUID, user *domain.User) error {
 	return service.store.Update(user)
 }
 
-func (service *UserService) GetById(uuid uuid.UUID) (*domain.User, error) {
+func (service *UserService) GetById(ctx context.Context, uuid uuid.UUID) (*domain.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetById-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	user, err := service.store.FindByID(uuid)
 	if err != nil {
 		return nil, err
@@ -94,18 +114,23 @@ func (service *UserService) GetById(uuid uuid.UUID) (*domain.User, error) {
 	return user, err
 }
 
-func (service *UserService) ChangeUsername(stringId string, username string) error {
+func (service *UserService) ChangeUsername(ctx context.Context, stringId string, username string) error {
+	span := tracer.StartSpanFromContext(ctx, "ChangeUsername-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	if !isUsernameValid(username) {
 		return errors.New("unallowed characters in username")
 	}
 
 	id, err := uuid.FromString(stringId)
-	user, err := service.GetById(id)
+	user, err := service.GetById(ctx, id)
 	if err != nil {
 		return err
 	}
 	user.Username = username
-	err = service.Update(id, user)
+	err = service.Update(ctx, id, user)
 	if err != nil {
 		return err
 	}

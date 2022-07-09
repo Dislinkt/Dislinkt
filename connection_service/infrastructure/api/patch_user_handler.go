@@ -38,7 +38,7 @@ func (handler *PatchUserCommandHandler) handle(command *events.PatchUserCommand)
 		fmt.Println("connections handler-patch")
 		fmt.Println(command.User)
 		// id, _ := uuid.FromString(command.User.Id)
-		err := handler.connectionService.UpdateUser(command.User.Id, command.User.Private)
+		err := handler.connectionService.UpdateUser(context.TODO(), command.User.Id, command.User.Private)
 		if err != nil {
 			reply.Type = events.PatchFailedInConnection
 			return

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/additional_user_service/application"
 	"github.com/dislinkt/common/saga/events"
@@ -37,7 +38,7 @@ func (handler *AddEducationCommandHandler) handle(command *events.AddEducationCo
 	case events.AddEducationInAdditional:
 		fmt.Println("additional handler add education")
 		edu := mapAdditionalCommandAddEducation(command)
-		_, err := handler.additionalService.CreateEducation(command.UserId, edu)
+		_, err := handler.additionalService.CreateEducation(context.TODO(), command.UserId, edu)
 		if err != nil {
 			fmt.Println("additional handler error not added")
 			reply.Type = events.AdditionalServiceNotAdded
@@ -50,7 +51,7 @@ func (handler *AddEducationCommandHandler) handle(command *events.AddEducationCo
 	case events.RollbackEducationInAdditional:
 		fmt.Println("additional handler-rollback education")
 		edu := mapAdditionalCommandAddEducation(command)
-		err, _ := handler.additionalService.DeleteUserEducation(command.UserId, edu.Id.Hex())
+		err, _ := handler.additionalService.DeleteUserEducation(context.TODO(), command.UserId, edu.Id.Hex())
 		if err != nil {
 			return
 		}

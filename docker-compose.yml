@@ -1,4 +1,15 @@
 version: "3.8"
+x-logging: &fluent-bit
+  driver: fluentd
+  options:
+    fluentd-address: ${FLUENT_BIT_ADDRESS}:24224
+
+x-tracing: &jaeger-env
+  JAEGER_AGENT_HOST: ${JAEGER_HOST}
+  JAEGER_AGENT_PORT: 6831
+  JAEGER_SAMPLER_MANAGER_HOST_PORT: ${JAEGER_HOST}:5778
+  JAEGER_SAMPLER_TYPE: const
+  JAEGER_SAMPLER_PARAM: 1
 
 services:
   user_service:
@@ -9,6 +20,7 @@ services:
       dockerfile: ./user_service/Dockerfile
     restart: on-failure
     environment:
+      <<: *jaeger-env
       USER_DB_HOST: ${USER_DB_HOST}
       USER_DB_PORT: ${USER_DB_PORT}
       USER_DB_USER: ${USER_DB_USER}
@@ -38,8 +50,12 @@ services:
     depends_on:
       - user_db
     #      - tracing
+    logging:  *fluent-bit
     networks:
       - network
+      - monitoring
+    ports:
+      - "8081:8000"
 
   post_service:
     image: post_service
@@ -48,7 +64,9 @@ services:
       context: .
       dockerfile: ./post_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
+      <<: *jaeger-env
       POST_DB_HOST: ${POST_DB_HOST}
       POST_DB_PORT: ${POST_DB_PORT}
       POST_SERVICE_PORT: ${POST_SERVICE_PORT}
@@ -66,6 +84,9 @@ services:
       - post_db
     networks:
       - network
+      - monitoring
+    ports:
+      - "8082:8000"
 
   message_service:
     image: message_service
@@ -82,6 +103,7 @@ services:
       - message_db
     networks:
       - network
+      - monitoring
 
   notification_service:
     image: notification_service
@@ -98,6 +120,7 @@ services:
       - notification_db
     networks:
       - network
+      - monitoring
 
   event_service:
     image: event_service
@@ -114,6 +137,7 @@ services:
       - event_db
     networks:
       - network
+      - monitoring
 
   additional_user_service:
     image: additional_user_service
@@ -122,7 +146,9 @@ services:
       context: .
       dockerfile: ./additional_user_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
+      <<: *jaeger-env
       ADDITIONAL_USER_DB_HOST: ${ADDITIONAL_USER_DB_HOST}
       ADDITIONAL_USER_DB_PORT: ${ADDITIONAL_USER_DB_PORT}
       ADDITIONAL_USER_SERVICE_PORT: ${ADDITIONAL_USER_SERVICE_PORT}
@@ -140,6 +166,9 @@ services:
       - additional_user_db
     networks:
       - network
+      - monitoring
+    ports:
+      - "8083:8000"
 
   connection_service:
     image: connection_service
@@ -148,30 +177,35 @@ services:
       context: .
       dockerfile: ./connection_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
-      - CONNECTION_DB_HOST=${CONNECTION_DB_HOST}
-      - CONNECTION_DB_PORT=${CONNECTION_DB_PORT}
-      - CONNECTION_SERVICE_PORT=${CONNECTION_SERVICE_PORT}
-      - CONNECTION_DB_USER=${CONNECTION_DB_USER}
-      - CONNECTION_DB_PASS=${CONNECTION_DB_PASS}
-      - NATS_HOST=${NATS_HOST}
-      - NATS_PORT=${NATS_PORT}
-      - NATS_USER=${NATS_USER}
-      - NATS_PASS=${NATS_PASS}
-      - REGISTER_USER_COMMAND_SUBJECT=${REGISTER_USER_COMMAND_SUBJECT}
-      - REGISTER_USER_REPLY_SUBJECT=${REGISTER_USER_REPLY_SUBJECT}
-      - PATCH_USER_COMMAND_SUBJECT=${PATCH_USER_COMMAND_SUBJECT}
-      - PATCH_USER_REPLY_SUBJECT=${PATCH_USER_REPLY_SUBJECT}
-      - CREATE_JOB_COMMAND_SUBJECT=${CREATE_JOB_COMMAND_SUBJECT}
-      - CREATE_JOB_REPLY_SUBJECT=${CREATE_JOB_REPLY_SUBJECT}
-      - ADD_EDUCATION_COMMAND_SUBJECT=${ADD_EDUCATION_COMMAND_SUBJECT}
-      - ADD_EDUCATION_REPLY_SUBJECT=${ADD_EDUCATION_REPLY_SUBJECT}
-      - ADD_SKILL_COMMAND_SUBJECT=${ADD_SKILL_COMMAND_SUBJECT}
-      - ADD_SKILL_REPLY_SUBJECT=${ADD_SKILL_REPLY_SUBJECT}
+      <<: *jaeger-env
+      CONNECTION_DB_HOST: ${CONNECTION_DB_HOST}
+      CONNECTION_DB_PORT: ${CONNECTION_DB_PORT}
+      CONNECTION_SERVICE_PORT: ${CONNECTION_SERVICE_PORT}
+      CONNECTION_DB_USER: ${CONNECTION_DB_USER}
+      CONNECTION_DB_PASS: ${CONNECTION_DB_PASS}
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: ${NATS_PORT}
+      NATS_USER: ${NATS_USER}
+      NATS_PASS: ${NATS_PASS}
+      REGISTER_USER_COMMAND_SUBJECT: ${REGISTER_USER_COMMAND_SUBJECT}
+      REGISTER_USER_REPLY_SUBJECT: ${REGISTER_USER_REPLY_SUBJECT}
+      PATCH_USER_COMMAND_SUBJECT: ${PATCH_USER_COMMAND_SUBJECT}
+      PATCH_USER_REPLY_SUBJECT: ${PATCH_USER_REPLY_SUBJECT}
+      CREATE_JOB_COMMAND_SUBJECT: ${CREATE_JOB_COMMAND_SUBJECT}
+      CREATE_JOB_REPLY_SUBJECT: ${CREATE_JOB_REPLY_SUBJECT}
+      ADD_EDUCATION_COMMAND_SUBJECT: ${ADD_EDUCATION_COMMAND_SUBJECT}
+      ADD_EDUCATION_REPLY_SUBJECT: ${ADD_EDUCATION_REPLY_SUBJECT}
+      ADD_SKILL_COMMAND_SUBJECT: ${ADD_SKILL_COMMAND_SUBJECT}
+      ADD_SKILL_REPLY_SUBJECT: ${ADD_SKILL_REPLY_SUBJECT}
     depends_on:
       - neo4j
     networks:
       - network
+      - monitoring
+    ports:
+      - "8084:8000"
 
   auth_service:
     image: auth_service
@@ -180,7 +214,9 @@ services:
       context: .
       dockerfile: ./auth_service/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     environment:
+      <<: *jaeger-env
       AUTH_DB_HOST: ${AUTH_DB_HOST}
       AUTH_DB_PORT: ${AUTH_DB_PORT}
       AUTH_DB_USER: ${AUTH_DB_USER}
@@ -203,6 +239,9 @@ services:
       - auth_db
     networks:
       - network
+      - monitoring
+    ports:
+      - "8085:8000"
 
   api_gateway:
     image: api_gateway
@@ -211,9 +250,11 @@ services:
       context: .
       dockerfile: ./api_gateway/Dockerfile
     restart: on-failure
+    logging:  *fluent-bit
     ports:
       - ${GATEWAY_PORT}:${GATEWAY_PORT}
     environment:
+      <<: *jaeger-env
       GATEWAY_PORT: ${GATEWAY_PORT}
       USER_SERVICE_HOST: ${USER_SERVICE_HOST}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
@@ -233,6 +274,7 @@ services:
       CONNECTION_SERVICE_PORT: ${CONNECTION_SERVICE_PORT}
     networks:
       - network
+      - monitoring
   #      - jaeger-demo
   #    depends_on:
   #      - tracing
@@ -241,30 +283,36 @@ services:
     image: postgres
     container_name: user_db
     restart: on-failure
+    logging:  *fluent-bit
     environment:
       POSTGRES_USER: ${USER_DB_USER}
       POSTGRES_PASSWORD: ${USER_DB_PASS}
       POSTGRES_DB: ${USER_DB_NAME}
     networks:
       - network
+      - monitoring
 
   auth_db:
     image: postgres
     container_name: auth_db
     restart: on-failure
+    logging:  *fluent-bit
     environment:
       POSTGRES_USER: ${AUTH_DB_USER}
       POSTGRES_PASSWORD: ${AUTH_DB_PASS}
       POSTGRES_DB: ${AUTH_DB_NAME}
     networks:
       - network
+      - monitoring
 
   post_db:
     image: mongo
     container_name: post_db
     restart: on-failure
+    logging:  *fluent-bit
     networks:
       - network
+      - monitoring
 
   message_db:
     image: mongo
@@ -272,6 +320,7 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   notification_db:
     image: mongo
@@ -279,6 +328,7 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   event_db:
     image: mongo
@@ -286,25 +336,30 @@ services:
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   neo4j:
     image: neo4j:4.3.3-community #4.3.3-community  latest
     container_name: neo4j
+    logging:  *fluent-bit
     ports:
       - "7474:7474"
       - "7687:7687"
     networks:
       - network
+      - monitoring
     environment:
-      - NEO4J_AUTH=neo4j/password
-      - NEO4J_dbms_memory_pagecache_size=512M
+      NEO4J_AUTH: neo4j/password
+      NEO4J_dbms_memory_pagecache_size: 512M
 
   additional_user_db:
     image: mongo
+    logging:  *fluent-bit
     container_name: additional_user_db
     restart: on-failure
     networks:
       - network
+      - monitoring
 
   #  tracing:
   #    image: jaegertracing/all-in-one
@@ -322,8 +377,10 @@ services:
     image: nats
     container_name: nats
     restart: on-failure
+    logging:  *fluent-bit
     networks:
       - network
+      - monitoring
     ports:
       - 8222:8222
       - 4222:4222
@@ -352,8 +409,14 @@ services:
 #    networks:
 #      - network
 
+volumes:
+  prometheus-data:
+  grafana-data:
+
 networks:
   network:
     driver: bridge
+  monitoring:
+    external: true
 
 #  jaeger-demo:

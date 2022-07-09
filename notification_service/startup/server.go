@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/dislinkt/common/interceptor"
 	notificationProto "github.com/dislinkt/common/proto/notification_service"
+	"github.com/dislinkt/common/tracer"
 	"github.com/dislinkt/notification_service/application"
 	"github.com/dislinkt/notification_service/domain"
 	"github.com/dislinkt/notification_service/infrastructure/api"
 	"github.com/dislinkt/notification_service/infrastructure/persistence"
 	"github.com/dislinkt/notification_service/startup/config"
+	otgo "github.com/opentracing/opentracing-go"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"log"
@@ -24,6 +26,8 @@ func NewServer(config *config.Config) *Server {
 }
 
 func (server *Server) Start() {
+	tracer, _ := tracer.Init("user_service")
+	otgo.SetGlobalTracer(tracer)
 	mongoClient := server.initMongoClient()
 	notificationStore := server.initNotificationStore(mongoClient)
 

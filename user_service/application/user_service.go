@@ -1,11 +1,13 @@
 package application
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/dislinkt/common/tracer"
+	"github.com/go-playground/validator/v10"
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofrs/uuid"
 
 	"github.com/dislinkt/user_service/domain"
@@ -31,11 +33,11 @@ func NewUserService(store domain.UserStore, registerUserOrchestrator *RegisterUs
 	}
 }
 
-func (service *UserService) Register(user *domain.User) error {
-	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+func (service *UserService) Register(ctx context.Context, user *domain.User) error {
+	span := tracer.StartSpanFromContext(ctx, "Register-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if err := validator.New().Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
@@ -47,11 +49,11 @@ func (service *UserService) Register(user *domain.User) error {
 
 	return err
 }
-func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error) {
-	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+func (service *UserService) StartUpdate(ctx context.Context, user *domain.User) (*domain.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "StartUpdate-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if err := validator.New().Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return nil, errors.New("Invalid user data")
@@ -69,11 +71,11 @@ func (service *UserService) StartUpdate(user *domain.User) (*domain.User, error)
 	return dbUser, err
 }
 
-func (service *UserService) Insert(user *domain.User) error {
-	// span := tracer.StartSpanFromContext(ctx, "Register-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+func (service *UserService) Insert(ctx context.Context, user *domain.User) error {
+	span := tracer.StartSpanFromContext(ctx, "Insert-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if err := validator.New().Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return errors.New("Invalid user data")
@@ -81,11 +83,11 @@ func (service *UserService) Insert(user *domain.User) error {
 	err := service.store.Insert(user)
 	return err
 }
-func (service *UserService) Update(uuid uuid.UUID, user *domain.User) (*domain.User, error) {
-	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+func (service *UserService) Update(ctx context.Context, uuid uuid.UUID, user *domain.User) (*domain.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "Update-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	dbUser, err := service.store.FindByID(uuid)
 	if err != nil {
 		return nil, err
@@ -100,7 +102,12 @@ func (service *UserService) Update(uuid uuid.UUID, user *domain.User) (*domain.U
 	return updatedUser, err
 }
 
-func (service *UserService) PatchUserStart(requestUser *domain.User) error {
+func (service *UserService) PatchUserStart(ctx context.Context, requestUser *domain.User) error {
+	span := tracer.StartSpanFromContext(ctx, "PatchUser-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	err := service.patchOrchestrator.Start(requestUser)
 	if err != nil {
 		return err
@@ -109,12 +116,12 @@ func (service *UserService) PatchUserStart(requestUser *domain.User) error {
 	return err
 }
 
-func (service *UserService) PatchUser(updatePaths []string, requestUser *domain.User,
+func (service *UserService) PatchUser(ctx context.Context, updatePaths []string, requestUser *domain.User,
 	username string) (*domain.User, error) {
-	// span := tracer.StartSpanFromContext(ctx, "Update-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+	span := tracer.StartSpanFromContext(ctx, "PatchUser-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	foundUser, err := service.store.FindByUsername(username)
 	if err != nil {
 		fmt.Println(err)
@@ -177,11 +184,11 @@ func updateField(paths []string, user *domain.User, requestUser *domain.User) (*
 	return user, nil
 }
 
-func (service *UserService) GetAll() (*[]domain.User, error) {
-	// span := tracer.StartSpanFromContext(ctx, "GetAll-Service")
-	// defer span.Finish()
-	//
-	// newCtx := tracer.ContextWithSpan(context.Background(), span)
+func (service *UserService) GetAll(ctx context.Context) (*[]domain.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetAll-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	return service.store.GetAll()
 }
 

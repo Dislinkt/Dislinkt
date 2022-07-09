@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
@@ -41,7 +42,7 @@ func (handler *AddSkillCommandHandler) handle(command *events.AddSkillCommand) {
 		fmt.Println(command.Skill.Name)
 		fmt.Println(command.UserId)
 		fmt.Println("podaci")
-		_, err := handler.connectionService.InsertSkillToUser(command.Skill.Name, command.UserId)
+		_, err := handler.connectionService.InsertSkillToUser(context.TODO(), command.Skill.Name, command.UserId)
 		if err != nil {
 			fmt.Println("connectionHandler-error add skill")
 			reply.Type = events.GraphDatabaseSkillNotAdded

@@ -9,7 +9,13 @@ import (
 	"path/filepath"
 
 	"github.com/dislinkt/api_gateway/infrastructure/api"
+	"github.com/dislinkt/common/tracer"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	"github.com/opentracing/opentracing-go"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	muxprom "gitlab.com/msvechla/mux-prometheus/pkg/middleware"
 
 	// "github.com/dislinkt/api_gateway/infrastructure/api"
 
@@ -57,8 +63,18 @@ func customMatcher(key string) (string, bool) {
 }
 
 func (server *Server) initHandlers() {
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials()),
+		// tracer
+		grpc.WithUnaryInterceptor(
+			grpc_opentracing.UnaryClientInterceptor(
+				grpc_opentracing.WithTracer(opentracing.GlobalTracer()),
+			),
+		),
+		grpc.WithStreamInterceptor(
+			grpc_opentracing.StreamClientInterceptor(
+				grpc_opentracing.WithTracer(opentracing.GlobalTracer()),
+			),
+		)}
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
 	if err != nil {
@@ -128,18 +144,26 @@ func (server *Server) initCustomHandlers() {
 }
 
 func (server *Server) Start() {
+	// tracing
+	tracer, _ := tracer.Init("api_gateway")
+	opentracing.SetGlobalTracer(tracer)
 	crtPath, _ := filepath.Abs("./cert.crt")
 	keyPath, _ := filepath.Abs("./cert.key")
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"https://localhost:4200", "https://localhost:4200/**",
 			"http://localhost:4200", "http://localhost:4200/**", "http://localhost:8080/**",
-			"http://localhost:3000/**", "http://localhost:3000"}),
+			"http://localhost:3000/**", "http://localhost:3000", "http://localhost:9090"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}),
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin", "Authorization", "Access-Control-Allow-Origin", "*"}),
 		handlers.AllowCredentials(),
 	)
+	r := mux.NewRouter()
+	instrumentation := muxprom.NewDefaultInstrumentation()
+	r.Use(instrumentation.Middleware)
+	r.Path("/metrics").Handler(promhttp.Handler())
+	r.PathPrefix("/").Handler(cors(muxMiddleware(server)))
 	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), cors(muxMiddleware(server))))
-	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, cors(muxMiddleware(server))))
+	log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%s", server.config.Port), crtPath, keyPath, r))
 	// log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
 }
 
