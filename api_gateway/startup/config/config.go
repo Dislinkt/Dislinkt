@@ -23,6 +23,8 @@ type Config struct {
 	MessagePort        string
 	NotificationHost   string
 	NotificationPort   string
+	EventHost          string
+	EventPort          string
 }
 
 func NewConfig() *Config {
@@ -48,6 +50,8 @@ func NewConfig() *Config {
 		MessagePort:        os.Getenv("MESSAGE_SERVICE_PORT"),
 		NotificationHost:   os.Getenv("NOTIFICATION_SERVICE_HOST"),
 		NotificationPort:   os.Getenv("NOTIFICATION_SERVICE_PORT"),
+		EventHost:          os.Getenv("EVENT_SERVICE_HOST"),
+		EventPort:          os.Getenv("EVENT_SERVICE_PORT"),
 	}
 
 }
