@@ -464,28 +464,82 @@ func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string
 			if err != nil {
 				return nil, err
 			}
-			record, err := records.Single()
-			if err != nil {
-				return nil, err
-			}
+			if records.Next() {
+				record, err := records.Single()
+				if err != nil {
+					return nil, err
+				}
 
-			status := record.Values[0].(string)
-			dateNow := time.Now().Local().Unix()
-			fmt.Println(status)
-			if status == "CONNECTED" {
-				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $currentUser "+
-					"Match (u2:UserNode) WHERE u2.uid = $blocked_user "+
-					"MATCH (u1)-[r1:CONNECTION {status: 'CONNECTED'}]->(u2) "+
-					"MATCH (u2)-[r2:CONNECTION {status: 'CONNECTED'}]->(u1) "+
-					"SET r1.status = $status "+
-					"SET r2.status = $status1", map[string]interface{}{
-					"currentUser":  currentUser,
-					"blocked_user": blockedUser,
-					"status":       "BLOCK",
-					"status1":      "BLOCKED",
-					"date":         dateNow,
+				status := record.Values[0].(string)
+				dateNow := time.Now().Local().Unix()
+				fmt.Println(status)
+				if status == "CONNECTED" {
+					_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $currentUser "+
+						"Match (u2:UserNode) WHERE u2.uid = $blocked_user "+
+						"MATCH (u1)-[r1:CONNECTION {status: 'CONNECTED'}]->(u2) "+
+						"MATCH (u2)-[r2:CONNECTION {status: 'CONNECTED'}]->(u1) "+
+						"SET r1.status = $status "+
+						"SET r2.status = $status1", map[string]interface{}{
+						"currentUser":  currentUser,
+						"blocked_user": blockedUser,
+						"status":       "BLOCK",
+						"status1":      "BLOCKED",
+						"date":         dateNow,
+					})
+					fmt.Println("Korisnici izblokirani")
+
+					if err != nil {
+						return nil, err
+					} else {
+						return &pb.BlockedUserStatus{
+							CurrentUserUUID:    currentUser,
+							BlockedUserUUID:    blockedUser,
+							ConnectionResponse: "BLOCK",
+						}, nil
+					}
+				} else if status == "BLOCKED" {
+					fmt.Println("uslo")
+					_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $currentUser "+
+						"Match (u2:UserNode) WHERE u2.uid = $blocked_user "+
+						"MATCH (u1)-[r1:CONNECTION {status: 'BLOCKED'}]->(u2) "+
+						"SET r1.status = $status ", map[string]interface{}{
+						"currentUser":  currentUser,
+						"blocked_user": blockedUser,
+						"status":       "BLOCK",
+						"date":         dateNow,
+					})
+					if err != nil {
+						return nil, err
+					} else {
+						return &pb.BlockedUserStatus{
+							CurrentUserUUID:    currentUser,
+							BlockedUserUUID:    blockedUser,
+							ConnectionResponse: "BLOCK",
+						}, nil
+					}
+				} else if status == "BLOCK" {
+					return &pb.BlockedUserStatus{
+						CurrentUserUUID:    currentUser,
+						BlockedUserUUID:    blockedUser,
+						ConnectionResponse: "Action refused: user blocked",
+					}, nil
+				} else {
+					return &pb.BlockedUserStatus{
+						CurrentUserUUID:    currentUser,
+						BlockedUserUUID:    blockedUser,
+						ConnectionResponse: "Action refused: users not connected",
+					}, nil
+				}
+
+			} else { ///ukoliko nisu konektovani
+				dateNow := time.Now().Local().Unix()
+				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $connect_user_uuid  MATCH (u2:UserNode) WHERE u2.uid = $base_user_uuid CREATE (u1)-[r2:CONNECTION {status: $status1, date: $date}]->(u2) CREATE (u2)-[r1:CONNECTION {status: $status2, date: $date}]->(u1)", map[string]interface{}{
+					"connect_user_uuid": currentUser,
+					"base_user_uuid":    blockedUser,
+					"status1":           "BLOCK",
+					"status2":           "BLOCKED",
+					"date":              dateNow,
 				})
-				fmt.Println("Korisnici izblokirani")
 
 				if err != nil {
 					return nil, err
@@ -496,38 +550,6 @@ func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string
 						ConnectionResponse: "BLOCK",
 					}, nil
 				}
-			} else if status == "BLOCKED" {
-				fmt.Println("uslo")
-				_, err := tx.Run("MATCH (u1:UserNode) WHERE u1.uid = $currentUser "+
-					"Match (u2:UserNode) WHERE u2.uid = $blocked_user "+
-					"MATCH (u1)-[r1:CONNECTION {status: 'BLOCKED'}]->(u2) "+
-					"SET r1.status = $status ", map[string]interface{}{
-					"currentUser":  currentUser,
-					"blocked_user": blockedUser,
-					"status":       "BLOCK",
-					"date":         dateNow,
-				})
-				if err != nil {
-					return nil, err
-				} else {
-					return &pb.BlockedUserStatus{
-						CurrentUserUUID:    currentUser,
-						BlockedUserUUID:    blockedUser,
-						ConnectionResponse: "BLOCK",
-					}, nil
-				}
-			} else if status == "BLOCK" {
-				return &pb.BlockedUserStatus{
-					CurrentUserUUID:    currentUser,
-					BlockedUserUUID:    blockedUser,
-					ConnectionResponse: "Action refused: user blocked",
-				}, nil
-			} else {
-				return &pb.BlockedUserStatus{
-					CurrentUserUUID:    currentUser,
-					BlockedUserUUID:    blockedUser,
-					ConnectionResponse: "Action refused: users not connected",
-				}, nil
 			}
 
 		} else {

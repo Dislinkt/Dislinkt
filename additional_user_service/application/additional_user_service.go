@@ -16,6 +16,7 @@ type AdditionalUserService struct {
 	deleteSkillOrchestrator     *DeleteSkillOrchestrator
 	updateSkillOrchestrator     *UpdateSkillOrchestrator
 	deleteEducationOrchestrator *DeleteEducationOrchestrator
+	updateEducationOrchestrator *UpdateEducationOrchestrator
 }
 
 func (service *AdditionalUserService) CreateDocument(ctx context.Context, uuid string) error {
@@ -55,7 +56,8 @@ func (service *AdditionalUserService) DeleteDocument(ctx context.Context, uuid s
 
 func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *AddEducationOrchestrator,
 	addSkillOrchestrator *AddSkillOrchestrator, deleteSkillOrchestrator *DeleteSkillOrchestrator,
-	updateSkillOrchestrator *UpdateSkillOrchestrator, deleteEducationOrchestrator *DeleteEducationOrchestrator) *AdditionalUserService {
+	updateSkillOrchestrator *UpdateSkillOrchestrator, deleteEducationOrchestrator *DeleteEducationOrchestrator,
+	updateEducationOrchestrator *UpdateEducationOrchestrator) *AdditionalUserService {
 	return &AdditionalUserService{
 		store:                       store,
 		addEducationOrchestrator:    addEducationOrchestrator,
@@ -63,6 +65,7 @@ func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrch
 		deleteSkillOrchestrator:     deleteSkillOrchestrator,
 		updateSkillOrchestrator:     updateSkillOrchestrator,
 		deleteEducationOrchestrator: deleteEducationOrchestrator,
+		updateEducationOrchestrator: updateEducationOrchestrator,
 	}
 }
 
@@ -130,6 +133,27 @@ func (service *AdditionalUserService) UpdateUserEducation(ctx context.Context, u
 	}
 
 	err := service.store.UpdateUserEducation(educationId, education)
+	if err != nil {
+		return nil, err
+	}
+	userEducation, err := service.store.FindUserDocument(uuid)
+	if err != nil {
+		return nil, err
+	}
+	return userEducation.Educations, nil
+}
+
+func (service *AdditionalUserService) UpdateUserEducationStart(ctx context.Context, uuid string, educationId string,
+	education *domain.Education) (*map[string]domain.Education, error) {
+	span := tracer.StartSpanFromContext(ctx, "UpdateUserEducationStart")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	if !IsValidUUID(uuid) {
+		return nil, errors.New("Invalid uuid")
+	}
+
+	err := service.updateEducationOrchestrator.Start(uuid, educationId, education)
 	if err != nil {
 		return nil, err
 	}

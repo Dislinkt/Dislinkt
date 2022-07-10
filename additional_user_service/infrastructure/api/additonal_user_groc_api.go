@@ -130,7 +130,7 @@ func (handler *AdditionalUserHandler) UpdateEducation(ctx context.Context, reque
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	educations, err := handler.service.UpdateUserEducation(ctx, request.UserId, request.EducationId,
+	educations, err := handler.service.UpdateUserEducationStart(ctx, request.UserId, request.EducationId,
 		mapNewEducation(request.Education))
 	if err != nil {
 		fmt.Println(err.Error())

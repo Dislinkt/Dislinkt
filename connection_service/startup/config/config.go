@@ -26,6 +26,8 @@ type Config struct {
 	AddEducationReplySubject      string
 	DeleteEducationCommandSubject string
 	DeleteEducationReplySubject   string
+	UpdateEducationCommandSubject string
+	UpdateEducationReplySubject   string
 	AddSkillCommandSubject        string
 	AddSkillReplySubject          string
 	DeleteSkillCommandSubject     string
@@ -71,6 +73,8 @@ func NewConfig() *Config {
 		AddEducationReplySubject:      os.Getenv("ADD_EDUCATION_REPLY_SUBJECT"),
 		DeleteEducationCommandSubject: os.Getenv("DELETE_EDUCATION_COMMAND_SUBJECT"),
 		DeleteEducationReplySubject:   os.Getenv("DELETE_EDUCATION_REPLY_SUBJECT"),
+		UpdateEducationCommandSubject: os.Getenv("UPDATE_EDUCATION_COMMAND_SUBJECT"),
+		UpdateEducationReplySubject:   os.Getenv("UPDATE_EDUCATION_REPLY_SUBJECT"),
 		AddSkillCommandSubject:        os.Getenv("ADD_SKILL_COMMAND_SUBJECT"),
 		AddSkillReplySubject:          os.Getenv("ADD_SKILL_REPLY_SUBJECT"),
 		DeleteSkillCommandSubject:     os.Getenv("DELETE_SKILL_COMMAND_SUBJECT"),
