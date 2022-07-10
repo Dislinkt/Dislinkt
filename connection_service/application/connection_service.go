@@ -194,6 +194,17 @@ func (servioe *ConnectionService) DeleteSkillToUser(ctx context.Context, name st
 	return servioe.store.DeleteSkillForUser(uuid, name)
 }
 
+func (servioe *ConnectionService) DeleteFieldToUser(ctx context.Context, name string, uuid string) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "DeleteFieldToUser-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	fmt.Println("[ConnectionService DeleteFieldToUser")
+	fmt.Println(name)
+	fmt.Println(uuid)
+	return servioe.store.DeleteFieldForUser(uuid, name)
+}
+
 func (servioe *ConnectionService) InsertFieldToUser(ctx context.Context, name string, uuid string) (string, error) {
 	span := tracer.StartSpanFromContext(ctx, "InsertFieldToUser-Service")
 	defer span.Finish()

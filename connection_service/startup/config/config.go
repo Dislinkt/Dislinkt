@@ -7,30 +7,32 @@ import (
 )
 
 type Config struct {
-	Port                         string
-	Host                         string
-	Neo4jUri                     string
-	Neo4jUsername                string
-	Neo4jPassword                string
-	NatsHost                     string
-	NatsPort                     string
-	NatsUser                     string
-	NatsPass                     string
-	RegisterUserCommandSubject   string
-	RegisterUserReplySubject     string
-	PatchUserCommandSubject      string
-	PatchUserReplySubject        string
-	CreateJobOfferCommandSubject string
-	CreateJobOfferReplySubject   string
-	AddEducationCommandSubject   string
-	AddEducationReplySubject     string
-	AddSkillCommandSubject       string
-	AddSkillReplySubject         string
-	DeleteSkillCommandSubject    string
-	DeleteSkillReplySubject      string
-	UpdateSkillCommandSubject    string
-	UpdateSkillReplySubject      string
-	PublicKey                    string
+	Port                          string
+	Host                          string
+	Neo4jUri                      string
+	Neo4jUsername                 string
+	Neo4jPassword                 string
+	NatsHost                      string
+	NatsPort                      string
+	NatsUser                      string
+	NatsPass                      string
+	RegisterUserCommandSubject    string
+	RegisterUserReplySubject      string
+	PatchUserCommandSubject       string
+	PatchUserReplySubject         string
+	CreateJobOfferCommandSubject  string
+	CreateJobOfferReplySubject    string
+	AddEducationCommandSubject    string
+	AddEducationReplySubject      string
+	DeleteEducationCommandSubject string
+	DeleteEducationReplySubject   string
+	AddSkillCommandSubject        string
+	AddSkillReplySubject          string
+	DeleteSkillCommandSubject     string
+	DeleteSkillReplySubject       string
+	UpdateSkillCommandSubject     string
+	UpdateSkillReplySubject       string
+	PublicKey                     string
 }
 
 func NewConfig() *Config {
@@ -63,16 +65,18 @@ func NewConfig() *Config {
 		PatchUserReplySubject:      os.Getenv("PATCH_USER_REPLY_SUBJECT"),
 		//CreateJobOfferCommandSubject: "job.create.command",
 		//CreateJobOfferReplySubject:   "job.create.reply",
-		CreateJobOfferCommandSubject: os.Getenv("CREATE_JOB_COMMAND_SUBJECT"),
-		CreateJobOfferReplySubject:   os.Getenv("CREATE_JOB_REPLY_SUBJECT"),
-		AddEducationCommandSubject:   os.Getenv("ADD_EDUCATION_COMMAND_SUBJECT"),
-		AddEducationReplySubject:     os.Getenv("ADD_EDUCATION_REPLY_SUBJECT"),
-		AddSkillCommandSubject:       os.Getenv("ADD_SKILL_COMMAND_SUBJECT"),
-		AddSkillReplySubject:         os.Getenv("ADD_SKILL_REPLY_SUBJECT"),
-		DeleteSkillCommandSubject:    os.Getenv("DELETE_SKILL_COMMAND_SUBJECT"),
-		DeleteSkillReplySubject:      os.Getenv("DELETE_SKILL_REPLY_SUBJECT"),
-		UpdateSkillCommandSubject:    os.Getenv("UPDATE_SKILL_COMMAND_SUBJECT"),
-		UpdateSkillReplySubject:      os.Getenv("UPDATE_SKILL_REPLY_SUBJECT"),
-		PublicKey:                    "Dislinkt",
+		CreateJobOfferCommandSubject:  os.Getenv("CREATE_JOB_COMMAND_SUBJECT"),
+		CreateJobOfferReplySubject:    os.Getenv("CREATE_JOB_REPLY_SUBJECT"),
+		AddEducationCommandSubject:    os.Getenv("ADD_EDUCATION_COMMAND_SUBJECT"),
+		AddEducationReplySubject:      os.Getenv("ADD_EDUCATION_REPLY_SUBJECT"),
+		DeleteEducationCommandSubject: os.Getenv("DELETE_EDUCATION_COMMAND_SUBJECT"),
+		DeleteEducationReplySubject:   os.Getenv("DELETE_EDUCATION_REPLY_SUBJECT"),
+		AddSkillCommandSubject:        os.Getenv("ADD_SKILL_COMMAND_SUBJECT"),
+		AddSkillReplySubject:          os.Getenv("ADD_SKILL_REPLY_SUBJECT"),
+		DeleteSkillCommandSubject:     os.Getenv("DELETE_SKILL_COMMAND_SUBJECT"),
+		DeleteSkillReplySubject:       os.Getenv("DELETE_SKILL_REPLY_SUBJECT"),
+		UpdateSkillCommandSubject:     os.Getenv("UPDATE_SKILL_COMMAND_SUBJECT"),
+		UpdateSkillReplySubject:       os.Getenv("UPDATE_SKILL_REPLY_SUBJECT"),
+		PublicKey:                     "Dislinkt",
 	}
 }
