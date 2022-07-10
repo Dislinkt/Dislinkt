@@ -966,6 +966,7 @@ func (store *ConnectionDBStore) InsertSkillToUser(name string, uuid string) (str
 		}
 	}(session)
 
+	fmt.Println("[ConnectionDBStore: InsertSkillToUser]")
 	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 
 		records, err := tx.Run("match (u1:UserNode) where u1.uid = $uuid "+
@@ -975,10 +976,14 @@ func (store *ConnectionDBStore) InsertSkillToUser(name string, uuid string) (str
 			"uuid": uuid,
 		})
 
+		fmt.Println("[ConnectionDBStore1: InsertSkillToUser]")
+		fmt.Println(err)
+
 		if err != nil {
 			return "", err
 		}
 		record, err := records.Single()
+		fmt.Println(err)
 		if err != nil {
 			return "", err
 		}
@@ -1282,10 +1287,16 @@ func (store *ConnectionDBStore) DeleteFieldForUser(userUUID string, fieldName st
 
 func (store *ConnectionDBStore) UpdateSkillForUser(userUUID string, skillNameOld string, skillNameNew string) (res string, err error) {
 
+	fmt.Println("[ConnectionDBStore: UpdateSkillForUser]")
+	fmt.Println(skillNameOld)
 	res, err = store.DeleteSkillForUser(userUUID, skillNameOld)
+	fmt.Println(res)
 	if res == "done" {
-		res, err = store.InsertSkillToUser(userUUID, skillNameNew)
-		if res != "done" {
+		fmt.Println("[ConnectionDBStore: UpdateSkillForUser]")
+		fmt.Println(skillNameNew)
+		res, err = store.InsertSkillToUser(skillNameNew, userUUID)
+		fmt.Println(res)
+		if err != nil {
 			return "error", err
 		}
 	}
@@ -1297,11 +1308,42 @@ func (store *ConnectionDBStore) UpdateFieldForUser(userUUID string, fieldNameOld
 
 	res, err = store.DeleteFieldForUser(userUUID, fieldNameOld)
 	if res == "done" {
-		res, err = store.InsertFieldToUser(userUUID, fieldNameNew)
-		if res != "done" {
+		res, err = store.InsertFieldToUser(fieldNameNew, userUUID)
+		if err != nil {
 			return "error", err
 		}
 	}
 
 	return "done", err
+}
+
+func (store *ConnectionDBStore) CheckIfDatabaseFilled() (isFilled bool, err error) {
+	session := (*store.connectionDB).NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer func(session neo4j.Session) {
+		err := session.Close()
+		if err != nil {
+
+		}
+	}(session)
+	result, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		res, err := tx.Run("match (s:Field) "+
+			"return s", map[string]interface{}{})
+
+		if err != nil {
+			return false, err
+		}
+
+		if res.Next() {
+			return true, nil
+		} else {
+			return false, nil
+		}
+
+	})
+
+	if err != nil {
+		return false, err
+	}
+
+	return result.(bool), err
 }
