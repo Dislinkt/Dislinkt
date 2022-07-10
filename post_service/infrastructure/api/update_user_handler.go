@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/dislinkt/common/saga/events"
@@ -35,7 +36,7 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 	case events.UpdateInPost:
 		fmt.Println("post handler-update")
 
-		err := handler.postService.UpdateUser(mapPostCommandUpdateUser(command))
+		err := handler.postService.UpdateUser(context.TODO(), mapPostCommandUpdateUser(command))
 		if err != nil {
 			//reply.User =
 			reply.Type = events.UserNotUpdatedInPost

@@ -3,6 +3,8 @@ package startup
 import (
 	"errors"
 	"fmt"
+	"github.com/dislinkt/common/tracer"
+	otgo "github.com/opentracing/opentracing-go"
 	"log"
 	"net"
 	"regexp"
@@ -39,6 +41,10 @@ const (
 )
 
 func (server *Server) Start() {
+
+	tracer, _ := tracer.Init("auth_service")
+	otgo.SetGlobalTracer(tracer)
+
 	postgresClient := server.initUserClient()
 	userStore := server.initUserStore(postgresClient)
 	permissionStore := server.initPermissionStore(postgresClient)

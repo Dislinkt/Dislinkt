@@ -2,6 +2,8 @@ package startup
 
 import (
 	"fmt"
+	"github.com/dislinkt/common/tracer"
+	otgo "github.com/opentracing/opentracing-go"
 	"log"
 	"net"
 
@@ -33,6 +35,9 @@ const (
 )
 
 func (server *Server) Start() {
+	tracer, _ := tracer.Init("post_service")
+	otgo.SetGlobalTracer(tracer)
+
 	mongoClient := server.initMongoClient()
 	postStore := server.initPostStore(mongoClient)
 

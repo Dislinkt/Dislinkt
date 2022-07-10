@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
@@ -41,7 +42,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 			reply.Type = events.UserServiceNotUpdated
 			return
 		}
-		err := handler.userService.Insert(user)
+		err := handler.userService.Insert(context.TODO(), user)
 		if err != nil {
 			reply.Type = events.UserServiceNotUpdated
 			return

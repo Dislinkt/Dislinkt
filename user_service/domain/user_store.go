@@ -13,4 +13,5 @@ type UserStore interface {
 	Search(searchText string) (*[]User, error)
 	Delete(user *User) error
 	GetPublicUsers() (*[]User, error)
+	UpdateNotificationSettings(uuid uuid.UUID, ConnectionNotifications bool, MessageNotifications bool, PostNotifications bool) error
 }

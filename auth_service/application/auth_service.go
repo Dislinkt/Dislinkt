@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/dislinkt/common/tracer"
+	"github.com/go-playground/validator/v10"
+	"github.com/pquerna/otp/totp"
 	"log"
 	"net/smtp"
 	"regexp"
 	//	"github.com/nats-io/jwt/v2"
 	"time"
-
-	"github.com/go-playground/validator/v10"
-	"github.com/pquerna/otp/totp"
 
 	"github.com/dislinkt/auth_service/domain"
 	"github.com/dislinkt/auth_service/startup/config"
@@ -48,8 +48,13 @@ func NewAuthService(userService *UserService, permissionStore domain.PermissionS
 	}
 }
 
-func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (string, error) {
-	user, err := auth.userService.GetByUsername(loginRequest.Username)
+func (auth *AuthService) AuthenticateUser(ctx context.Context, loginRequest *domain.LoginRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthenticateUser-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	user, err := auth.userService.GetByUsername(ctx, loginRequest.Username)
 	if err != nil || user == nil {
 		return "", errors.New("invalid username")
 	}
@@ -63,7 +68,7 @@ func (auth *AuthService) AuthenticateUser(loginRequest *domain.LoginRequest) (st
 	}
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := auth.generateToken(user, expireTime)
+	token, err := auth.generateToken(ctx, user, expireTime)
 	if err != nil {
 		return "", errors.New("invalid password")
 	}
@@ -84,7 +89,12 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 	return true
 }
 
-func (auth *AuthService) generateToken(user *domain.User, expireTime int64) (string, error) {
+func (auth *AuthService) generateToken(ctx context.Context, user *domain.User, expireTime int64) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "GenerateToken-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	//	rolesString, _ := json.Marshal(user.Roles)
 	if err := validator.New().Struct(user); err != nil {
 		//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
@@ -135,11 +145,13 @@ func getRoleString(role int) string {
 	}
 }
 
-func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFactoryRequest) (string, error) {
-	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
-	// defer span.Finish()
+func (auth *AuthService) AuthenticateTwoFactoryUser(ctx context.Context, loginRequest *pb.LoginTwoFactoryRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthenticateTwoFactoryUser-Service")
+	defer span.Finish()
 
-	user, err := auth.userService.GetByUsername(loginRequest.Username)
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	user, err := auth.userService.GetByUsername(ctx, loginRequest.Username)
 
 	if !user.Active {
 		return "", errors.New("user account not activated!")
@@ -152,7 +164,7 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 	}
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := auth.generateToken(user, expireTime)
+	token, err := auth.generateToken(ctx, user, expireTime)
 	if err != nil {
 		return "", errors.New("invalid password")
 	}
@@ -160,11 +172,13 @@ func (auth *AuthService) AuthenticateTwoFactoryUser(loginRequest *pb.LoginTwoFac
 	return token, err
 }
 
-func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLoginForCode) (string, error) {
-	// span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
-	// defer span.Finish()
+func (auth *AuthService) GenerateTwoFactoryCode(ctx context.Context, loginRequest *pb.TwoFactoryLoginForCode) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "GenerateTwoFactoryCode-Service")
+	defer span.Finish()
 
-	user, err := auth.userService.GetByUsername(loginRequest.Username)
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	user, err := auth.userService.GetByUsername(ctx, loginRequest.Username)
 
 	if !user.Active {
 		return "", errors.New("user account not activated!")
@@ -183,7 +197,11 @@ func (auth *AuthService) GenerateTwoFactoryCode(loginRequest *pb.TwoFactoryLogin
 	return code, err
 }
 
-func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims, err error) {
+func (auth *AuthService) ValidateToken(ctx context.Context, signedToken string) (claims jwt.MapClaims, err error) {
+	span := tracer.StartSpanFromContext(ctx, "ValidateToken-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	token, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
 		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -211,8 +229,11 @@ func (auth *AuthService) ValidateToken(signedToken string) (claims jwt.MapClaims
 }
 
 func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.PasswordlessLoginRequest) (*pb.PasswordlessLoginResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PasswordlessLogin-Service")
+	defer span.Finish()
 
-	user, err := auth.userService.GetByEmail(request.Email)
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	user, err := auth.userService.GetByEmail(ctx, request.Email)
 	if err != nil || user == nil {
 		return nil, errors.New("invalid username")
 	}
@@ -236,7 +257,7 @@ func (auth *AuthService) PasswordlessLogin(ctx context.Context, request *pb.Pass
 	smtpPort := config.NewConfig().EmailPort
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := auth.generateToken(user, expireTime)
+	token, err := auth.generateToken(ctx, user, expireTime)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not generate JWT token")
 	}
@@ -273,7 +294,10 @@ func passwordlessLoginMailMessage(token string, username string) []byte {
 }
 
 func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.ConfirmEmailLoginRequest) (*pb.ConfirmEmailLoginResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "ConfirmEmailLogin-Service")
+	defer span.Finish()
 
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -302,8 +326,12 @@ func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.Conf
 }
 
 func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "ChangePassword-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	username := ctx.Value(interceptor.LoggedInUserKey{}).(string)
-	user, err := auth.userService.GetByUsername(username)
+	user, err := auth.userService.GetByUsername(ctx, username)
 	if err != nil {
 		return &pb.ChangePasswordResponse{
 			StatusCode: "500",
@@ -335,7 +363,7 @@ func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangeP
 	}
 
 	user.Password = hashedNewPassword
-	auth.userService.Update(user.Id, user)
+	auth.userService.Update(ctx, user.Id, user)
 
 	return &pb.ChangePasswordResponse{
 		StatusCode: "200",
@@ -357,14 +385,18 @@ func HashAndSaltPasswordIfStrongAndMatching(password string) (string, error) {
 	return string(hash), err
 }
 
-func (auth *AuthService) SendActivationMail(username string) error {
-	user, err := auth.userService.GetByUsername(username)
+func (auth *AuthService) SendActivationMail(ctx context.Context, username string) error {
+	span := tracer.StartSpanFromContext(ctx, "SendActivationMail-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	user, err := auth.userService.GetByUsername(ctx, username)
 	if err != nil || user == nil {
 		return errors.New("invalid username")
 	}
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := auth.generateToken(user, expireTime)
+	token, err := auth.generateToken(ctx, user, expireTime)
 
 	message := verificationMailMessage(token, username)
 
@@ -401,6 +433,10 @@ func verificationMailMessage(token string, username string) []byte {
 }
 
 func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.ActivationRequest) (*pb.ActivationResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "ActivateAccount-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -423,13 +459,13 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 		return nil, fmt.Errorf("JWT is expired")
 	}
 
-	user, err := auth.userService.GetByUsername(claims.Username)
+	user, err := auth.userService.GetByUsername(ctx, claims.Username)
 	if err != nil || user == nil {
 		return nil, errors.New("invalid username")
 	}
 
 	user.Active = true
-	auth.userService.Update(user.Id, user)
+	auth.userService.Update(ctx, user.Id, user)
 
 	return &pb.ActivationResponse{
 		Token: request.Token,
@@ -437,13 +473,17 @@ func (auth *AuthService) ActivateAccount(ctx context.Context, request *pb.Activa
 }
 
 func (auth *AuthService) SendAccountRecoveryMail(ctx context.Context, request *pb.AccountRecoveryMailRequest) (*pb.AccountRecoveryMailResponse, error) {
-	user, err := auth.userService.GetByEmail(request.Email)
+	span := tracer.StartSpanFromContext(ctx, "SendAccountRecoveryMail-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	user, err := auth.userService.GetByEmail(ctx, request.Email)
 	if err != nil || user == nil {
 		return nil, errors.New("invalid email")
 	}
 
 	expireTime := time.Now().Add(time.Hour).Unix()
-	token, err := auth.generateToken(user, expireTime)
+	token, err := auth.generateToken(ctx, user, expireTime)
 
 	message := recoverAccountMailMessage(token, user.Username)
 
@@ -481,6 +521,10 @@ func recoverAccountMailMessage(token string, username string) []byte {
 }
 
 func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.RecoverAccountRequest) (*pb.RecoverAccountResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "RecoverAccount-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	token, err := jwt.ParseWithClaims(request.Token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -503,7 +547,7 @@ func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.Recover
 		return nil, fmt.Errorf("JWT is expired")
 	}
 
-	user, err := auth.userService.GetByUsername(claims.Username)
+	user, err := auth.userService.GetByUsername(ctx, claims.Username)
 	if err != nil {
 		return &pb.RecoverAccountResponse{
 			StatusCode: "500",
@@ -527,7 +571,7 @@ func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.Recover
 	}
 
 	user.Password = hashedNewPassword
-	auth.userService.Update(user.Id, user)
+	auth.userService.Update(ctx, user.Id, user)
 
 	return &pb.RecoverAccountResponse{
 		StatusCode: "200",
@@ -536,10 +580,14 @@ func (auth *AuthService) RecoverAccount(ctx context.Context, request *pb.Recover
 }
 
 func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITokenRequest) (*pb.NewAPITokenResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "GenerateAPIToken-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	fmt.Println("Auth Service GenerateAPIToken")
 	var permissions []string
 	permissions = append(permissions, "createJobOffer")
-	user, err := auth.userService.GetByUsername(request.Username)
+	user, err := auth.userService.GetByUsername(ctx, request.Username)
 	fmt.Println(user)
 	expireTime := time.Now().Add(time.Hour * 4).Unix()
 	claims := ApiTokenClaims{
@@ -562,7 +610,7 @@ func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITo
 	salted, err := HashAndSaltApiToken(jwtToken)
 	user.ApiToken = &salted
 
-	err = auth.userService.Update(user.Id, user)
+	err = auth.userService.Update(ctx, user.Id, user)
 
 	if err != nil {
 		return nil, err
@@ -574,12 +622,16 @@ func (auth *AuthService) GenerateAPIToken(ctx context.Context, request *pb.APITo
 }
 
 func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
-	claims, err := auth.VerifyApiToken(request.ApiToken)
+	span := tracer.StartSpanFromContext(ctx, "ValidateApiTokenFunc-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	claims, err := auth.VerifyApiToken(ctx, request.ApiToken)
 	if err != nil {
 		return nil, nil
 	}
 
-	user, err := auth.userService.GetByUsername(claims.Username)
+	user, err := auth.userService.GetByUsername(ctx, claims.Username)
 	if user == nil {
 		fmt.Println("nema usera")
 		return nil, nil
@@ -605,7 +657,11 @@ func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.J
 	}, nil
 }
 
-func (auth *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims, err error) {
+func (auth *AuthService) VerifyApiToken(ctx context.Context, apiToken string) (claims *ApiTokenClaims, err error) {
+	span := tracer.StartSpanFromContext(ctx, "VerifyApiToken-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	token, err := jwt.ParseWithClaims(apiToken, &ApiTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -630,10 +686,6 @@ func (auth *AuthService) VerifyApiToken(apiToken string) (claims *ApiTokenClaims
 
 	return claims, nil
 }
-
-// func (auth *AuthService) ValidateApiTokenFunc(ctx context.Context, request *pb.JobPostingDtoRequest) (*pb.JobPostingDtoResponse, error) {
-//
-// }
 
 func HashAndSaltApiToken(apiToken string) (string, error) {
 

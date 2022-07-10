@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/dislinkt/common/saga/events"
@@ -35,7 +36,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 	case events.UpdatePost:
 		fmt.Println("posthandler-update")
 
-		err := handler.postService.InsertUser(mapPostCommandUser(command))
+		err := handler.postService.InsertUser(context.TODO(), mapPostCommandUser(command))
 		if err != nil {
 			fmt.Println(err)
 			reply.Type = events.PostNotUpdated
@@ -44,7 +45,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		reply.Type = events.PostUpdated
 	case events.RollbackPost:
 		fmt.Println("posthandler-rollback")
-		err := handler.postService.DeleteUser(mapPostCommandUser(command))
+		err := handler.postService.DeleteUser(context.TODO(), mapPostCommandUser(command))
 		if err != nil {
 			return
 		}

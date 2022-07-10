@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/dislinkt/auth_service/application"
@@ -35,7 +36,7 @@ func (handler *UpdateUserCommandHandler) handle(command *events.UpdateUserComman
 	case events.UpdateInAuth:
 		fmt.Println("auth handler-update")
 
-		err := handler.userService.ChangeUsername(command.User.Id, command.User.Username)
+		err := handler.userService.ChangeUsername(context.TODO(), command.User.Id, command.User.Username)
 		if err != nil {
 			// reply.User =
 			reply.Type = events.UserNotUpdatedInAuth

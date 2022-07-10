@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
@@ -35,7 +36,7 @@ func (handler *CreateJobOfferCommandHandler) handle(command *events.CreateJobOff
 		fmt.Println("posthandler-createJobOffer")
 		jobOffer := mapPostCommandCreateJob(command)
 
-		err := handler.postService.InsertJobOffer(jobOffer)
+		err := handler.postService.InsertJobOffer(context.TODO(), jobOffer)
 		if err != nil {
 			fmt.Println("posthandler-createJobOfferError")
 			reply.Type = events.PostServiceNotCreated
@@ -44,7 +45,7 @@ func (handler *CreateJobOfferCommandHandler) handle(command *events.CreateJobOff
 		reply.Type = events.PostServiceCreated
 	case events.RollbackJobOfferInPost:
 		fmt.Println("posthandler-rollbackJobOffer")
-		err := handler.postService.DeleteJobOffer(mapPostCommandCreateJob(command))
+		err := handler.postService.DeleteJobOffer(context.TODO(), mapPostCommandCreateJob(command))
 		if err != nil {
 			return
 		}

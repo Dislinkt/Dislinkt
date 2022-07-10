@@ -52,7 +52,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 
 		user.TotpToken = key.Secret()
 		user.Active = true
-		uuid, err := handler.userService.Insert(user)
+		uuid, err := handler.userService.Insert(context.TODO(), user)
 
 		reply.User.Id = uuid.String()
 
@@ -63,7 +63,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 			return
 		}
 
-		errSendingMail := handler.authService.SendActivationMail(user.Username)
+		errSendingMail := handler.authService.SendActivationMail(context.TODO(), user.Username)
 		if errSendingMail != nil {
 			fmt.Println("ERROR SENDING MAIL")
 			reply.Type = events.AuthNotUpdated
@@ -73,7 +73,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 		reply.Type = events.AuthUpdated
 	case events.RollbackAuth:
 		fmt.Println("RollbackAuth")
-		err := handler.userService.Delete(mapCommandUser(command))
+		err := handler.userService.Delete(context.TODO(), mapCommandUser(command))
 		if err != nil {
 			return
 		}

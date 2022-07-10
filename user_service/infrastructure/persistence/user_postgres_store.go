@@ -93,7 +93,7 @@ func (store *UserPostgresStore) FindByUsername(username string) (user *domain.Us
 func (store *UserPostgresStore) Search(searchText string) (*[]domain.User, error) {
 	var users []domain.User
 	arg := "%" + searchText + "%"
-	result := store.db.Where("userRole = 0 and (name LIKE ? OR surname LIKE ? OR username LIKE ?) LIMIT 5", arg, arg,
+	result := store.db.Where("user_role = 0 and (name LIKE ? OR surname LIKE ? OR username LIKE ?) LIMIT 5", arg, arg,
 		arg).Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
@@ -105,6 +105,26 @@ func (store *UserPostgresStore) Delete(user *domain.User) error {
 	result := store.db.Delete(user)
 	if result.Error != nil {
 		return result.Error
+	}
+	return nil
+}
+
+func (store *UserPostgresStore) UpdateNotificationSettings(uuid uuid.UUID, ConnectionNotifications bool, MessageNotifications bool, PostNotifications bool) error {
+	// span := tracer.StartSpanFromContext(ctx, "Update-DB")
+	// defer span.Finish()
+	var user domain.User
+	err := store.db.First(&user, "id = ?", uuid)
+	if user.ConnectionNotifications != ConnectionNotifications {
+		store.db.Model(&domain.User{}).Where("id = ?", uuid).Update("ConnectionNotifications", ConnectionNotifications)
+	}
+	if user.MessageNotifications != MessageNotifications {
+		store.db.Model(&domain.User{}).Where("id = ?", uuid).Update("MessageNotifications", MessageNotifications)
+	}
+	if user.PostNotifications != PostNotifications {
+		store.db.Model(&domain.User{}).Where("id = ?", uuid).Update("PostNotifications", PostNotifications)
+	}
+	if err != nil {
+		return err.Error
 	}
 	return nil
 }

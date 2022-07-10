@@ -1,9 +1,11 @@
 package application
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/dislinkt/additional_user_service/domain"
+	"github.com/dislinkt/common/tracer"
 	uuid "github.com/gofrs/uuid"
 )
 
@@ -14,7 +16,11 @@ type AdditionalUserService struct {
 	deleteSkillOrchestrator  *DeleteSkillOrchestrator
 }
 
-func (service *AdditionalUserService) CreateDocument(uuid string) error {
+func (service *AdditionalUserService) CreateDocument(ctx context.Context, uuid string) error {
+	span := tracer.StartSpanFromContext(ctx, "CreateDocument-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return errors.New("Invalid uuid")
 	}
@@ -26,7 +32,11 @@ func (service *AdditionalUserService) CreateDocument(uuid string) error {
 	return nil
 }
 
-func (service *AdditionalUserService) DeleteDocument(uuid string) error {
+func (service *AdditionalUserService) DeleteDocument(ctx context.Context, uuid string) error {
+	span := tracer.StartSpanFromContext(ctx, "DeleteDocument-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return errors.New("Invalid uuid")
 	}
@@ -51,8 +61,12 @@ func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrch
 	}
 }
 
-func (service *AdditionalUserService) CreateEducation(uuid string, education *domain.Education) (*domain.Education,
+func (service *AdditionalUserService) CreateEducation(ctx context.Context, uuid string, education *domain.Education) (*domain.Education,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "CreateEducation-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		fmt.Println("invalid uuid")
 		return nil, errors.New("Invalid uuid")
@@ -71,7 +85,11 @@ func (service *AdditionalUserService) CreateEducation(uuid string, education *do
 	return insertEducation, nil
 }
 
-func (service *AdditionalUserService) CreateEducationStart(uuid string, education *domain.Education) error {
+func (service *AdditionalUserService) CreateEducationStart(ctx context.Context, uuid string, education *domain.Education) error {
+	span := tracer.StartSpanFromContext(ctx, "CreateEducationStart-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	err := service.addEducationOrchestrator.Start(education, uuid)
 	if err != nil {
 		return err
@@ -79,8 +97,12 @@ func (service *AdditionalUserService) CreateEducationStart(uuid string, educatio
 	return err
 }
 
-func (service *AdditionalUserService) FindUserEducations(uuid string) (*map[string]domain.Education,
+func (service *AdditionalUserService) FindUserEducations(ctx context.Context, uuid string) (*map[string]domain.Education,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "FindUSerEducations-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -92,8 +114,12 @@ func (service *AdditionalUserService) FindUserEducations(uuid string) (*map[stri
 	return document.Educations, nil
 }
 
-func (service *AdditionalUserService) UpdateUserEducation(uuid string, educationId string,
+func (service *AdditionalUserService) UpdateUserEducation(ctx context.Context, uuid string, educationId string,
 	education *domain.Education) (*map[string]domain.Education, error) {
+	span := tracer.StartSpanFromContext(ctx, "UpdateUserEducation")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -109,7 +135,11 @@ func (service *AdditionalUserService) UpdateUserEducation(uuid string, education
 	return userEducation.Educations, nil
 }
 
-func (service *AdditionalUserService) DeleteUserEducation(uuid string, additionID string) (*map[string]domain.Education, error) {
+func (service *AdditionalUserService) DeleteUserEducation(ctx context.Context, uuid string, additionID string) (*map[string]domain.Education, error) {
+	span := tracer.StartSpanFromContext(ctx, "DeleteUserEducation")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -124,8 +154,12 @@ func (service *AdditionalUserService) DeleteUserEducation(uuid string, additionI
 
 // POSITION
 
-func (service *AdditionalUserService) CreatePosition(uuid string, position *domain.Position) (*domain.Position,
+func (service *AdditionalUserService) CreatePosition(ctx context.Context, uuid string, position *domain.Position) (*domain.Position,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "CreatePosition-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -143,7 +177,11 @@ func (service *AdditionalUserService) CreatePosition(uuid string, position *doma
 	return insertPosition, nil
 }
 
-func (service *AdditionalUserService) FindUserPositions(uuid string) (*map[string]domain.Position, error) {
+func (service *AdditionalUserService) FindUserPositions(ctx context.Context, uuid string) (*map[string]domain.Position, error) {
+	span := tracer.StartSpanFromContext(ctx, "FindUSerPositions-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -155,8 +193,12 @@ func (service *AdditionalUserService) FindUserPositions(uuid string) (*map[strin
 	return document.Positions, nil
 }
 
-func (service *AdditionalUserService) UpdateUserPosition(uuid string, positionId string,
+func (service *AdditionalUserService) UpdateUserPosition(ctx context.Context, uuid string, positionId string,
 	position *domain.Position) (*map[string]domain.Position, error) {
+	span := tracer.StartSpanFromContext(ctx, "UpdateUserPosition-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -172,8 +214,12 @@ func (service *AdditionalUserService) UpdateUserPosition(uuid string, positionId
 	return userPosition.Positions, nil
 }
 
-func (service *AdditionalUserService) DeleteUserPosition(uuid string, additionID string) (*map[string]domain.Position,
+func (service *AdditionalUserService) DeleteUserPosition(ctx context.Context, uuid string, additionID string) (*map[string]domain.Position,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "DeleteUserPosition-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -188,8 +234,12 @@ func (service *AdditionalUserService) DeleteUserPosition(uuid string, additionID
 
 // SKILL
 
-func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Skill) (*domain.Skill,
+func (service *AdditionalUserService) CreateSkill(ctx context.Context, uuid string, skill *domain.Skill) (*domain.Skill,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "CreateSkill-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -207,7 +257,11 @@ func (service *AdditionalUserService) CreateSkill(uuid string, skill *domain.Ski
 	return insertSkill, nil
 }
 
-func (service *AdditionalUserService) CreateSkillStart(uuid string, skill *domain.Skill) error {
+func (service *AdditionalUserService) CreateSkillStart(ctx context.Context, uuid string, skill *domain.Skill) error {
+	span := tracer.StartSpanFromContext(ctx, "CreateSkillStart")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	err := service.addSkillOrchestrator.Start(skill, uuid)
 	if err != nil {
 		return err
@@ -215,7 +269,11 @@ func (service *AdditionalUserService) CreateSkillStart(uuid string, skill *domai
 	return err
 }
 
-func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]domain.Skill, error) {
+func (service *AdditionalUserService) FindUserSkills(ctx context.Context, uuid string) (*map[string]domain.Skill, error) {
+	span := tracer.StartSpanFromContext(ctx, "FindUserSkills-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -227,8 +285,12 @@ func (service *AdditionalUserService) FindUserSkills(uuid string) (*map[string]d
 	return document.Skills, nil
 }
 
-func (service *AdditionalUserService) FindUserSkill(skillId string, uuid string) (*domain.Skill, error) {
-	skills, err := service.FindUserSkills(uuid)
+func (service *AdditionalUserService) FindUserSkill(ctx context.Context, skillId string, uuid string) (*domain.Skill, error) {
+	span := tracer.StartSpanFromContext(ctx, "FindUserSkill-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	skills, err := service.FindUserSkills(ctx, uuid)
 	mapSkill := *skills
 	skill := mapSkill[skillId]
 	if err != nil {
@@ -240,8 +302,12 @@ func (service *AdditionalUserService) FindUserSkill(skillId string, uuid string)
 	return &skill, nil
 }
 
-func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId string,
+func (service *AdditionalUserService) UpdateUserSkill(ctx context.Context, uuid string, skillId string,
 	skill *domain.Skill) (*map[string]domain.Skill, error) {
+	span := tracer.StartSpanFromContext(ctx, "UpdateUserSkill-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -257,8 +323,12 @@ func (service *AdditionalUserService) UpdateUserSkill(uuid string, skillId strin
 	return userSkill.Skills, nil
 }
 
-func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID string) (*map[string]domain.Skill,
+func (service *AdditionalUserService) DeleteUserSkill(ctx context.Context, uuid string, additionID string) (*map[string]domain.Skill,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "DeleteUSerSkill-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -274,8 +344,14 @@ func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID st
 	return userSkill.Skills, nil
 }
 
-func (service *AdditionalUserService) DeleteUserSkillStart(uuid string, additionID string) (*map[string]domain.Skill,
+func (service *AdditionalUserService) DeleteUserSkillStart(ctx context.Context, uuid string, additionID string) (*map[string]domain.Skill,
 	error) {
+
+	span := tracer.StartSpanFromContext(ctx, "DeleteUserSkillStart")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -293,8 +369,12 @@ func (service *AdditionalUserService) DeleteUserSkillStart(uuid string, addition
 
 // INTEREST
 
-func (service *AdditionalUserService) CreateInterest(uuid string, interest *domain.Interest) (*domain.Interest,
+func (service *AdditionalUserService) CreateInterest(ctx context.Context, uuid string, interest *domain.Interest) (*domain.Interest,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "CreateInterest")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -312,7 +392,11 @@ func (service *AdditionalUserService) CreateInterest(uuid string, interest *doma
 	return insertInterest, nil
 }
 
-func (service *AdditionalUserService) FindUserInterests(uuid string) (*map[string]domain.Interest, error) {
+func (service *AdditionalUserService) FindUserInterests(ctx context.Context, uuid string) (*map[string]domain.Interest, error) {
+	span := tracer.StartSpanFromContext(ctx, "FindUserInterests")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -324,8 +408,12 @@ func (service *AdditionalUserService) FindUserInterests(uuid string) (*map[strin
 	return document.Interests, nil
 }
 
-func (service *AdditionalUserService) UpdateUserInterest(uuid string, interestId string,
+func (service *AdditionalUserService) UpdateUserInterest(ctx context.Context, uuid string, interestId string,
 	interest *domain.Interest) (*map[string]domain.Interest, error) {
+	span := tracer.StartSpanFromContext(ctx, "UpdateUserInterest")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -341,8 +429,12 @@ func (service *AdditionalUserService) UpdateUserInterest(uuid string, interestId
 	return userInterest.Interests, nil
 }
 
-func (service *AdditionalUserService) DeleteUserInterest(uuid string, additionID string) (*map[string]domain.Interest,
+func (service *AdditionalUserService) DeleteUserInterest(ctx context.Context, uuid string, additionID string) (*map[string]domain.Interest,
 	error) {
+	span := tracer.StartSpanFromContext(ctx, "DeleteUserInterest-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	if !IsValidUUID(uuid) {
 		return nil, errors.New("Invalid uuid")
 	}
@@ -355,7 +447,11 @@ func (service *AdditionalUserService) DeleteUserInterest(uuid string, additionID
 	return userInterest.Interests, nil
 }
 
-func (service *AdditionalUserService) GetFieldOfStudies() ([]*domain.FieldOfStudy, error) {
+func (service *AdditionalUserService) GetFieldOfStudies(ctx context.Context) ([]*domain.FieldOfStudy, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetFieldOfStudies-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	study, err := service.store.GetAllFieldOfStudy()
 	if err != nil {
 		return nil, nil
@@ -363,7 +459,11 @@ func (service *AdditionalUserService) GetFieldOfStudies() ([]*domain.FieldOfStud
 	return study, nil
 }
 
-func (service *AdditionalUserService) GetSkills() ([]*domain.Skill, error) {
+func (service *AdditionalUserService) GetSkills(ctx context.Context) ([]*domain.Skill, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetSkills-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	skills, err := service.store.GetSkills()
 	if err != nil {
 		return nil, nil
@@ -371,7 +471,11 @@ func (service *AdditionalUserService) GetSkills() ([]*domain.Skill, error) {
 	return skills, nil
 }
 
-func (service *AdditionalUserService) GetIndustries() ([]*domain.Industry, error) {
+func (service *AdditionalUserService) GetIndustries(ctx context.Context) ([]*domain.Industry, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetIndustries-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	industries, err := service.store.GetIndustries()
 	if err != nil {
 		return nil, nil
@@ -379,7 +483,11 @@ func (service *AdditionalUserService) GetIndustries() ([]*domain.Industry, error
 	return industries, nil
 }
 
-func (service *AdditionalUserService) GetDegrees() ([]*domain.Degree, error) {
+func (service *AdditionalUserService) GetDegrees(ctx context.Context) ([]*domain.Degree, error) {
+	span := tracer.StartSpanFromContext(ctx, "GetDegrees-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
 	degrees, err := service.store.GetDegrees()
 	if err != nil {
 		return nil, nil

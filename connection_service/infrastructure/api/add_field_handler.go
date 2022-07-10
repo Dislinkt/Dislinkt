@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/common/saga/events"
 	saga "github.com/dislinkt/common/saga/messaging"
@@ -41,7 +42,7 @@ func (handler *AddEducationCommandHandler) handle(command *events.AddEducationCo
 		fmt.Println(command.Education.FieldOfStudy)
 		fmt.Println(command.UserId)
 		fmt.Println("podaci")
-		_, err := handler.connectionService.InsertFieldToUser(command.Education.FieldOfStudy, command.UserId)
+		_, err := handler.connectionService.InsertFieldToUser(context.TODO(), command.Education.FieldOfStudy, command.UserId)
 		if err != nil {
 			fmt.Println("connectionHandler-error addEducation")
 			reply.Type = events.GraphDatabaseNotAdded

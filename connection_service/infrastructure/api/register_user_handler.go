@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/dislinkt/common/saga/events"
@@ -41,7 +42,7 @@ func (handler *CreateUserCommandHandler) handle(command *events.RegisterUserComm
 	switch command.Type {
 	case events.UpdateConnectionNode:
 		fmt.Println("connection handler-update")
-		_, err := handler.connectionService.Register(command.User.Id, status)
+		_, err := handler.connectionService.Register(context.TODO(), command.User.Id, status)
 		if err != nil {
 			reply.Type = events.ConnectionsNotUpdated
 			return
