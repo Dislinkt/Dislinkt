@@ -49,12 +49,11 @@ func (handler *UserHandler) GetAll(ctx context.Context, request *pb.SearchMessag
 }
 
 func (handler *UserHandler) GetMe(ctx context.Context, request *pb.GetMeMessage) (*pb.GetMeResponse, error) {
+	userName := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContextMetadata(ctx, "GetMe")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-
-	userName := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	fmt.Println("Get me: " + userName)
 	user, err := handler.service.FindByUsername(userName)
 	if err != nil || user == nil {
@@ -162,8 +161,6 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	fmt.Println("*************************************************")
-	fmt.Println(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	user := mapUpdateUser(request.User)
 
 	parsedUUID, err := uuid.FromString(request.Id)
@@ -187,11 +184,11 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 
 func (handler *UserHandler) PatchUser(ctx context.Context, request *pb.PatchUserRequest) (*pb.
 	UserResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContextMetadata(ctx, "PatchUser")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	fmt.Println("Patch : " + username)
 	user := mapNewUser(request.User)
 	user.Username = &username

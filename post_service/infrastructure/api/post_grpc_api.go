@@ -48,13 +48,12 @@ func (handler PostHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb
 }
 
 func (handler *PostHandler) GetRecent(ctx context.Context, request *pb.GetRequest) (*pb.GetMultipleResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "GetRecentAPI")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 	id := request.Id
-
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	privacyResponse, _ := persistence.UserClient("user_service:8000").CheckIfUserIsPrivate(context.TODO(), &userGw.GetOneMessage{Id: id})
 	isPrivate := privacyResponse.IsPrivate
 	areUsersConnected := false
@@ -137,11 +136,11 @@ func (handler *PostHandler) GetAll(ctx context.Context, request *pb.Empty) (*pb.
 }
 
 func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePostRequest) (*pb.Empty, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "CreatePostAPI")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(ctx, &userGw.GetOneByUsernameMessage{Username: username})
 	post := mapNewPost(request.Post)
 	post.UserId = userResponse.User.Id
@@ -159,6 +158,7 @@ func (handler *PostHandler) CreatePost(ctx context.Context, request *pb.CreatePo
 }
 
 func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "CreateCommentAPI")
 	defer span.Finish()
 
@@ -177,7 +177,6 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 		return nil, err
 	}
 
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
 	_, _ = persistence.EventClient("event_service:8000").SaveEvent(ctx,
 		&eventGw.SaveEventRequest{Event: mapEventForPostComment(userResponse.User.Id, post.Id.Hex())})
@@ -188,6 +187,7 @@ func (handler *PostHandler) CreateComment(ctx context.Context, request *pb.Creat
 }
 
 func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRequest) (*pb.Empty, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "LikePostAPI")
 	defer span.Finish()
 
@@ -205,7 +205,6 @@ func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRe
 		return nil, err
 	}
 
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(ctx, &userGw.GetOneByUsernameMessage{Username: username})
 	_, _ = persistence.EventClient("event_service:8000").SaveEvent(ctx,
 		&eventGw.SaveEventRequest{Event: mapEventForPostLike(userResponse.User.Id, post.Id.Hex())})
@@ -214,6 +213,7 @@ func (handler *PostHandler) LikePost(ctx context.Context, request *pb.ReactionRe
 }
 
 func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.ReactionRequest) (*pb.Empty, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "DislikePostAPI")
 	defer span.Finish()
 
@@ -231,7 +231,6 @@ func (handler *PostHandler) DislikePost(ctx context.Context, request *pb.Reactio
 		return nil, err
 	}
 
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(ctx, &userGw.GetOneByUsernameMessage{Username: username})
 	_, _ = persistence.EventClient("event_service:8000").SaveEvent(ctx,
 		&eventGw.SaveEventRequest{Event: mapEventForPostDislike(userResponse.User.Id, post.Id.Hex())})

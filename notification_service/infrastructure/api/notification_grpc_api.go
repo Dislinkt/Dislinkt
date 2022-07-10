@@ -24,11 +24,11 @@ func NewNotificationHandler(service *application.NotificationService) *Notificat
 }
 
 func (handler *NotificationHandler) GetNotificationsForUser(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "GetNotificationsForUserAPI")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
 	notifications, err := handler.service.GetNotificationsForUser(ctx, userResponse.User.Id)
 	if err != nil {

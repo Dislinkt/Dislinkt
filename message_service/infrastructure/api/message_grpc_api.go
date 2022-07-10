@@ -22,11 +22,11 @@ func NewMessageHandler(service *application.MessageService) *MessageHandler {
 }
 
 func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, request *pb.Empty) (*pb.GetMultipleResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "GetMessageHistoriesByUserAPI")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
 	messageHistories, err := handler.service.GetMessageHistoriesByUser(ctx, userResponse.User.Id)
 	if err != nil {
@@ -41,11 +41,11 @@ func (handler *MessageHandler) GetMessageHistoriesByUser(ctx context.Context, re
 }
 
 func (handler *MessageHandler) GetMessageHistory(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "GetMessageHistoryAPI")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	userResponse, _ := persistence.UserClient("user_service:8000").GetUserByUsername(context.TODO(), &userGw.GetOneByUsernameMessage{Username: username})
 	messageHistory, err := handler.service.GetMessageHistory(ctx, userResponse.User.Id, request.ReceiverId)
 	if err != nil {
@@ -57,6 +57,7 @@ func (handler *MessageHandler) GetMessageHistory(ctx context.Context, request *p
 }
 
 func (handler *MessageHandler) SendMessage(ctx context.Context, request *pb.SendMessageRequest) (*pb.GetResponse, error) {
+	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	span := tracer.StartSpanFromContext(ctx, "SendMessageAPI")
 	defer span.Finish()
 
@@ -66,7 +67,6 @@ func (handler *MessageHandler) SendMessage(ctx context.Context, request *pb.Send
 	if err != nil {
 		return nil, err
 	}
-	username := fmt.Sprintf(ctx.Value(interceptor.LoggedInUserKey{}).(string))
 	_, _ = persistence.NotificationClient("notification_service:8000").SaveNotification(context.TODO(),
 		&notificationGw.SaveNotificationRequest{Notification: mapNotification(username), UserId: message.ReceiverId})
 	return &pb.GetResponse{MessageHistory: mapMessageHistory(messageHistory)}, nil

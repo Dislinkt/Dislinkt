@@ -326,11 +326,11 @@ func (auth *AuthService) ConfirmEmailLogin(ctx context.Context, request *pb.Conf
 }
 
 func (auth *AuthService) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+	username := ctx.Value(interceptor.LoggedInUserKey{}).(string)
 	span := tracer.StartSpanFromContext(ctx, "ChangePassword-Service")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	username := ctx.Value(interceptor.LoggedInUserKey{}).(string)
 	user, err := auth.userService.GetByUsername(ctx, username)
 	if err != nil {
 		return &pb.ChangePasswordResponse{
