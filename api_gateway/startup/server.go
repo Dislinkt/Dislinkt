@@ -3,6 +3,8 @@ package startup
 import (
 	"context"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"io"
 	"log"
 	"net/http"
@@ -40,6 +42,15 @@ type Server struct {
 	tracer otgo.Tracer
 	closer io.Closer
 }
+
+var (
+	RequestCounter = promauto.NewCounter(prometheus.CounterOpts{
+		Namespace: "go_app",
+		Subsystem: "api",
+		Name:      "request_counter",
+		Help:      "Total HTTP requests count for specific endpoint.",
+	})
+)
 
 func NewServer(config *cfg.Config) *Server {
 	server := &Server{
@@ -171,5 +182,6 @@ func muxMiddleware(server *Server) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println(server.config.AuthHost + ":" + server.config.AuthPort)
 		server.mux.ServeHTTP(w, r)
+		RequestCounter.Inc()
 	})
 }
