@@ -72,7 +72,6 @@ func (interceptor *AuthInterceptor) Authorize(ctx context.Context, method string
 		return ctx, status.Errorf(codes.Unauthenticated, "Unauthorized")
 	}
 
-	fmt.Println("PEEEEEEEEEEEERMISSIOOOONS")
 	for _, role := range claims.Permissions {
 		if role == accessiblePermission {
 			fmt.Println(role)
