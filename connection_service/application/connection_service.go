@@ -173,6 +173,16 @@ func (servioe *ConnectionService) InsertSkillToUser(ctx context.Context, name st
 	return servioe.store.InsertSkillToUser(name, uuid)
 }
 
+func (servioe *ConnectionService) UpdateSkillForUser(ctx context.Context, userUUID string, skillNameOld string, skillNameNew string) (res string, err error) {
+	span := tracer.StartSpanFromContext(ctx, "UpdateUserSkill-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	fmt.Println("[ConnectionService UpdateUserSkill")
+
+	return servioe.store.UpdateSkillForUser(userUUID, skillNameOld, skillNameNew)
+}
+
 func (servioe *ConnectionService) DeleteSkillToUser(ctx context.Context, name string, uuid string) (string, error) {
 	span := tracer.StartSpanFromContext(ctx, "DeleteSkillToUser-Service")
 	defer span.Finish()

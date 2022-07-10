@@ -14,6 +14,7 @@ type AdditionalUserService struct {
 	addEducationOrchestrator *AddEducationOrchestrator
 	addSkillOrchestrator     *AddSkillOrchestrator
 	deleteSkillOrchestrator  *DeleteSkillOrchestrator
+	updateSkillOrchestrator  *UpdateSkillOrchestrator
 }
 
 func (service *AdditionalUserService) CreateDocument(ctx context.Context, uuid string) error {
@@ -52,12 +53,14 @@ func (service *AdditionalUserService) DeleteDocument(ctx context.Context, uuid s
 // EDUCATION
 
 func NewAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *AddEducationOrchestrator,
-	addSkillOrchestrator *AddSkillOrchestrator, deleteSkillOrchestrator *DeleteSkillOrchestrator) *AdditionalUserService {
+	addSkillOrchestrator *AddSkillOrchestrator, deleteSkillOrchestrator *DeleteSkillOrchestrator,
+	updateSkillOrchestrator *UpdateSkillOrchestrator) *AdditionalUserService {
 	return &AdditionalUserService{
 		store:                    store,
 		addEducationOrchestrator: addEducationOrchestrator,
 		addSkillOrchestrator:     addSkillOrchestrator,
 		deleteSkillOrchestrator:  deleteSkillOrchestrator,
+		updateSkillOrchestrator:  updateSkillOrchestrator,
 	}
 }
 
@@ -313,6 +316,27 @@ func (service *AdditionalUserService) UpdateUserSkill(ctx context.Context, uuid 
 	}
 
 	err := service.store.UpdateUserSkill(skillId, skill)
+	if err != nil {
+		return nil, err
+	}
+	userSkill, err := service.store.FindUserDocument(uuid)
+	if err != nil {
+		return nil, err
+	}
+	return userSkill.Skills, nil
+}
+
+func (service *AdditionalUserService) UpdateUserSkillStart(ctx context.Context, uuid string, skillId string,
+	skill *domain.Skill) (*map[string]domain.Skill, error) {
+	span := tracer.StartSpanFromContext(ctx, "UpdateUserSkillStart-Service")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	if !IsValidUUID(uuid) {
+		return nil, errors.New("Invalid uuid")
+	}
+
+	err := service.updateSkillOrchestrator.Start(uuid, skillId, skill)
 	if err != nil {
 		return nil, err
 	}

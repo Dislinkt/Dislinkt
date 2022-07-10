@@ -28,6 +28,8 @@ type Config struct {
 	AddSkillReplySubject         string
 	DeleteSkillCommandSubject    string
 	DeleteSkillReplySubject      string
+	UpdateSkillCommandSubject    string
+	UpdateSkillReplySubject      string
 	PublicKey                    string
 }
 
@@ -69,6 +71,8 @@ func NewConfig() *Config {
 		AddSkillReplySubject:         os.Getenv("ADD_SKILL_REPLY_SUBJECT"),
 		DeleteSkillCommandSubject:    os.Getenv("DELETE_SKILL_COMMAND_SUBJECT"),
 		DeleteSkillReplySubject:      os.Getenv("DELETE_SKILL_REPLY_SUBJECT"),
+		UpdateSkillCommandSubject:    os.Getenv("UPDATE_SKILL_COMMAND_SUBJECT"),
+		UpdateSkillReplySubject:      os.Getenv("UPDATE_SKILL_REPLY_SUBJECT"),
 		PublicKey:                    "Dislinkt",
 	}
 }

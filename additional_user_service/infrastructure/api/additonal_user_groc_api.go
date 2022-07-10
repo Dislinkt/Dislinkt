@@ -272,7 +272,7 @@ func (handler *AdditionalUserHandler) UpdateSkill(ctx context.Context, request *
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	skills, err := handler.service.UpdateUserSkill(ctx, request.UserId, request.SkillId,
+	skills, err := handler.service.UpdateUserSkillStart(ctx, request.UserId, request.SkillId,
 		mapNewSkill(request.Skill))
 	if err != nil {
 		fmt.Println(err.Error())

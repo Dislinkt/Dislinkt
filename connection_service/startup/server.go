@@ -72,6 +72,10 @@ func (server *Server) Start() {
 	replyDeleteSkillPublisher := server.initPublisher(server.config.DeleteSkillReplySubject)
 	server.initDeleteSkillHandler(connectionService, replyDeleteSkillPublisher, commandDeleteSkillSubscriber)
 
+	commandUpdateSkillSubscriber := server.initSubscriber(server.config.UpdateSkillCommandSubject, QueueGroup)
+	replyUpdateSkillPublisher := server.initPublisher(server.config.UpdateSkillReplySubject)
+	server.initUpdateSkillHandler(connectionService, replyUpdateSkillPublisher, commandUpdateSkillSubscriber)
+
 	connectionHandler := server.initConnectionHandler(connectionService)
 
 	server.startGrpcServer(connectionHandler)
@@ -139,58 +143,63 @@ func (server *Server) initConnectionHandler(service *application.ConnectionServi
 }
 
 func (server *Server) initData(store domain.ConnectionStore) {
-	_, err := store.DeleteAllFields()
-	if err != nil {
-		return
-	}
-	_, err = store.InsertField("Business Administration and Management, General")
-	if err != nil {
-		return
-	}
-	_, err = store.InsertField("Electrical and Electronics Engineering")
-	if err != nil {
-		return
-	}
-	_, err = store.InsertField("Accounting")
-	if err != nil {
-		return
-	}
-	_, err = store.InsertField("English Language and Literature/Letters")
-	if err != nil {
-		return
-	}
-	_, err = store.InsertField("Political Science and Government")
-	if err != nil {
-		return
-	}
-	_, err = store.InsertField("Computer and Information Sciences and Support Services")
-	if err != nil {
-		return
-	}
-	_, err = store.InsertField("Communication and Media Studies")
-	if err != nil {
-		return
-	}
+	isFilled, err := store.CheckIfDatabaseFilled()
+	fmt.Println(isFilled)
+	if !isFilled {
 
-	_, err = store.DeleteAllSkills()
-	_, err = store.InsertSkill("Communication")
-	_, err = store.InsertSkill("Teamwork")
-	_, err = store.InsertSkill("Critical Thinking")
-	_, err = store.InsertSkill("Active Listening")
-	_, err = store.InsertSkill("Active Learning")
-	_, err = store.InsertSkill("Problem Solving")
-	_, err = store.InsertSkill("Management")
-	_, err = store.InsertSkill("Training")
-	_, err = store.InsertSkill("Design")
-	_, err = store.InsertSkill("Presentations")
-	_, err = store.InsertSkill("Data Analysis")
-	_, err = store.InsertSkill("Blogging")
-	_, err = store.InsertSkill("Business")
-	_, err = store.InsertSkill("Leadership")
-	_, err = store.InsertSkill("Time Management")
-	_, err = store.InsertSkill("Troubleshooting")
-	_, err = store.InsertSkill("Operating System")
-	_, err = store.InsertSkill("Online Marketing")
+		_, err := store.DeleteAllFields()
+		if err != nil {
+			return
+		}
+		_, err = store.InsertField("Business Administration and Management, General")
+		if err != nil {
+			return
+		}
+		_, err = store.InsertField("Electrical and Electronics Engineering")
+		if err != nil {
+			return
+		}
+		_, err = store.InsertField("Accounting")
+		if err != nil {
+			return
+		}
+		_, err = store.InsertField("English Language and Literature/Letters")
+		if err != nil {
+			return
+		}
+		_, err = store.InsertField("Political Science and Government")
+		if err != nil {
+			return
+		}
+		_, err = store.InsertField("Computer and Information Sciences and Support Services")
+		if err != nil {
+			return
+		}
+		_, err = store.InsertField("Communication and Media Studies")
+		if err != nil {
+			return
+		}
+
+		_, err = store.DeleteAllSkills()
+		_, err = store.InsertSkill("Communication")
+		_, err = store.InsertSkill("Teamwork")
+		_, err = store.InsertSkill("Critical Thinking")
+		_, err = store.InsertSkill("Active Listening")
+		_, err = store.InsertSkill("Active Learning")
+		_, err = store.InsertSkill("Problem Solving")
+		_, err = store.InsertSkill("Management")
+		_, err = store.InsertSkill("Training")
+		_, err = store.InsertSkill("Design")
+		_, err = store.InsertSkill("Presentations")
+		_, err = store.InsertSkill("Data Analysis")
+		_, err = store.InsertSkill("Blogging")
+		_, err = store.InsertSkill("Business")
+		_, err = store.InsertSkill("Leadership")
+		_, err = store.InsertSkill("Time Management")
+		_, err = store.InsertSkill("Troubleshooting")
+		_, err = store.InsertSkill("Operating System")
+		_, err = store.InsertSkill("Online Marketing")
+	}
 
 	fmt.Println("zavrsiloo")
 
@@ -230,6 +239,13 @@ func (server *Server) initAddSkillHandler(service *application.ConnectionService
 
 func (server *Server) initDeleteSkillHandler(service *application.ConnectionService, publisher saga.Publisher, subscriber saga.Subscriber) {
 	_, err := api.NewDeleteSkillCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initUpdateSkillHandler(service *application.ConnectionService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewUpdateSkillCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

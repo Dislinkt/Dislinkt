@@ -55,7 +55,11 @@ func (server *Server) Start() {
 	replyDeleteSkillSubscriber := server.initSubscriber(server.config.DeleteSkillReplySubject, QueueGroup)
 	deleteSkillOrchestrator := server.initDeleteSkillOrchestrator(commandDeleteSkillPublisher, replyDeleteSkillSubscriber)
 
-	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator)
+	commandUpdateSkillPublisher := server.initPublisher(server.config.UpdateSkillCommandSubject)
+	replyUpdateSkillSubscriber := server.initSubscriber(server.config.UpdateSkillReplySubject, QueueGroup)
+	updateSkillOrchestrator := server.initUpdateSkillOrchestrator(commandUpdateSkillPublisher, replyUpdateSkillSubscriber)
+
+	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator, updateSkillOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
@@ -72,6 +76,10 @@ func (server *Server) Start() {
 	commandeleteSkillSubscriber := server.initSubscriber(server.config.DeleteSkillCommandSubject, QueueGroup)
 	replyDeleteSkillPublisher := server.initPublisher(server.config.DeleteSkillReplySubject)
 	server.initDeleteSkillHandler(additionalUserService, replyDeleteSkillPublisher, commandeleteSkillSubscriber)
+
+	commandUpdateSkillSubscriber := server.initSubscriber(server.config.UpdateSkillCommandSubject, QueueGroup)
+	replyUpdateSkillPublisher := server.initPublisher(server.config.UpdateSkillReplySubject)
+	server.initUpdateSkillHandler(additionalUserService, replyUpdateSkillPublisher, commandUpdateSkillSubscriber)
 
 	additionalUserHandler := server.initAdditionalUserHandler(additionalUserService)
 
@@ -94,8 +102,9 @@ func (server *Server) initAdditionalUserStore(client *mongo.Client) domain.Addit
 }
 
 func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *application.AddEducationOrchestrator,
-	addSkillOrchestrator *application.AddSkillOrchestrator, deleteSkillOrchestrator *application.DeleteSkillOrchestrator) *application.AdditionalUserService {
-	return application.NewAdditionalUserService(store, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator)
+	addSkillOrchestrator *application.AddSkillOrchestrator, deleteSkillOrchestrator *application.DeleteSkillOrchestrator,
+	updateSkillOrchestrator *application.UpdateSkillOrchestrator) *application.AdditionalUserService {
+	return application.NewAdditionalUserService(store, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator, updateSkillOrchestrator)
 }
 
 func (server *Server) initPublisher(subject string) saga.Publisher {
@@ -145,6 +154,14 @@ func (server *Server) initAddSkillHandler(service *application.AdditionalUserSer
 func (server *Server) initDeleteSkillHandler(service *application.AdditionalUserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewDeleteSkillCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initUpdateSkillHandler(service *application.AdditionalUserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewUpdateSkillCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -276,6 +293,15 @@ func (server *Server) initSkillOrchestrator(publisher saga.Publisher,
 func (server *Server) initDeleteSkillOrchestrator(publisher saga.Publisher,
 	subscriber saga.Subscriber) *application.DeleteSkillOrchestrator {
 	orchestrator, err := application.NewDeleteSkillOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
+func (server *Server) initUpdateSkillOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.UpdateSkillOrchestrator {
+	orchestrator, err := application.NewUpdateSkillOrchestrator(publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -28,4 +28,7 @@ type ConnectionStore interface {
 	DeleteSkillForUser(userId string, skillName string) (res string, err error)
 	CheckIfUsersConnected(uuid1 string, uuid2 string) (isConnected bool, err error)
 	CheckIfUsersBlocked(uuid1 string, uuid2 string) (isBlocked bool, err error)
+	UpdateSkillForUser(userUUID string, skillNameOld string, skillNameNew string) (res string, err error)
+	UpdateFieldForUser(userUUID string, fieldNameOld string, fieldNameNew string) (res string, err error)
+	CheckIfDatabaseFilled() (isFilled bool, err error)
 }
