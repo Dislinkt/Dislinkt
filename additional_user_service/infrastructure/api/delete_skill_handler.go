@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"github.com/dislinkt/additional_user_service/application"
 	"github.com/dislinkt/common/saga/events"
@@ -36,8 +37,8 @@ func (handler *DeleteSkillCommandHandler) handle(command *events.DeleteSkillComm
 	switch command.Type {
 	case events.DeleteSkillInAdditional:
 		fmt.Println("additional handler add skill")
-		skill, _ := handler.additionalService.FindUserSkill(command.Skill.Id, command.UserId)
-		_, err := handler.additionalService.DeleteUserSkill(command.UserId, command.Skill.Id)
+		skill, _ := handler.additionalService.FindUserSkill(context.TODO(), command.Skill.Id, command.UserId)
+		_, err := handler.additionalService.DeleteUserSkill(context.TODO(), command.UserId, command.Skill.Id)
 		if err != nil {
 			fmt.Println("additional handler error not added skill")
 			reply.Type = events.AdditionalServiceSkillNotDeleted
@@ -51,8 +52,8 @@ func (handler *DeleteSkillCommandHandler) handle(command *events.DeleteSkillComm
 		// reply.Type = events.RegistrationApproved
 	case events.RollbackSkillDeleteInAdditional:
 		fmt.Println("additional handler-rollback education")
-		skill, _ := handler.additionalService.FindUserSkill(command.Skill.Id, command.UserId)
-		err, _ := handler.additionalService.CreateSkill(command.UserId, skill)
+		skill, _ := handler.additionalService.FindUserSkill(context.TODO(), command.Skill.Id, command.UserId)
+		err, _ := handler.additionalService.CreateSkill(context.TODO(), command.UserId, skill)
 		if err != nil {
 			return
 		}
