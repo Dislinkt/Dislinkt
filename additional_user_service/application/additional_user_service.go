@@ -236,6 +236,7 @@ func (service *AdditionalUserService) FindUserSkill(skillId string, uuid string)
 	}
 	fmt.Println("[AdditionalUserService: FindUserSkill]")
 	fmt.Println("skill")
+	fmt.Println(skill)
 	return &skill, nil
 }
 
@@ -267,6 +268,9 @@ func (service *AdditionalUserService) DeleteUserSkill(uuid string, additionID st
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println("[AdditionalUserService: DeleteUserSkill]")
+
 	return userSkill.Skills, nil
 }
 
