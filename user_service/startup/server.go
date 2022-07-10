@@ -97,7 +97,7 @@ func (server *Server) addAdmin(store domain.UserStore) {
 		Blocked:     false,
 		CreatedAt:   time.Time{},
 		UpdatedAt:   time.Time{},
-		Private:     false,
+		Private:     true,
 	}
 	err := store.Insert(&user)
 	if err != nil {
