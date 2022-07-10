@@ -76,6 +76,10 @@ func (server *Server) Start() {
 	replyUpdateSkillPublisher := server.initPublisher(server.config.UpdateSkillReplySubject)
 	server.initUpdateSkillHandler(connectionService, replyUpdateSkillPublisher, commandUpdateSkillSubscriber)
 
+	commandDeleteEducationSubscriber := server.initSubscriber(server.config.DeleteEducationCommandSubject, QueueGroup)
+	replyDeleteEducationPublisher := server.initPublisher(server.config.DeleteEducationReplySubject)
+	server.initDeleteEducationHandler(connectionService, replyDeleteEducationPublisher, commandDeleteEducationSubscriber)
+
 	connectionHandler := server.initConnectionHandler(connectionService)
 
 	server.startGrpcServer(connectionHandler)
@@ -239,6 +243,13 @@ func (server *Server) initAddSkillHandler(service *application.ConnectionService
 
 func (server *Server) initDeleteSkillHandler(service *application.ConnectionService, publisher saga.Publisher, subscriber saga.Subscriber) {
 	_, err := api.NewDeleteSkillCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initDeleteEducationHandler(service *application.ConnectionService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewDeleteEducationCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}

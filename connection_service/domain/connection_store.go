@@ -31,4 +31,5 @@ type ConnectionStore interface {
 	UpdateSkillForUser(userUUID string, skillNameOld string, skillNameNew string) (res string, err error)
 	UpdateFieldForUser(userUUID string, fieldNameOld string, fieldNameNew string) (res string, err error)
 	CheckIfDatabaseFilled() (isFilled bool, err error)
+	DeleteFieldForUser(userUUID string, fieldName string) (res string, err error)
 }

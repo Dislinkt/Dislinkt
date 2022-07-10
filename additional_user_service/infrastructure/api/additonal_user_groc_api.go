@@ -148,7 +148,7 @@ func (handler *AdditionalUserHandler) DeleteEducation(ctx context.Context, reque
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	educations, err := handler.service.DeleteUserEducation(ctx, request.UserId, request.AdditionId)
+	educations, err := handler.service.DeleteUserEducationStart(ctx, request.UserId, request.AdditionId)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err

@@ -59,7 +59,12 @@ func (server *Server) Start() {
 	replyUpdateSkillSubscriber := server.initSubscriber(server.config.UpdateSkillReplySubject, QueueGroup)
 	updateSkillOrchestrator := server.initUpdateSkillOrchestrator(commandUpdateSkillPublisher, replyUpdateSkillSubscriber)
 
-	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator, updateSkillOrchestrator)
+	commandDeleteEducationPublisher := server.initPublisher(server.config.DeleteEducationCommandSubject)
+	replyDeleteEducationSubscriber := server.initSubscriber(server.config.DeleteEducationReplySubject, QueueGroup)
+	deleteEducationOrchestrator := server.initDeleteEducationOrchestrator(commandDeleteEducationPublisher, replyDeleteEducationSubscriber)
+
+	additionalUserService := server.initAdditionalUserService(additionalUserStore, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator, updateSkillOrchestrator,
+		deleteEducationOrchestrator)
 
 	commandSubscriber := server.initSubscriber(server.config.RegisterUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.RegisterUserReplySubject)
@@ -80,6 +85,10 @@ func (server *Server) Start() {
 	commandUpdateSkillSubscriber := server.initSubscriber(server.config.UpdateSkillCommandSubject, QueueGroup)
 	replyUpdateSkillPublisher := server.initPublisher(server.config.UpdateSkillReplySubject)
 	server.initUpdateSkillHandler(additionalUserService, replyUpdateSkillPublisher, commandUpdateSkillSubscriber)
+
+	commandDeleteEducationSubscriber := server.initSubscriber(server.config.DeleteEducationCommandSubject, QueueGroup)
+	replyDeleteEducationPublisher := server.initPublisher(server.config.DeleteEducationReplySubject)
+	server.initDeleteEducationHandler(additionalUserService, replyDeleteEducationPublisher, commandDeleteEducationSubscriber)
 
 	additionalUserHandler := server.initAdditionalUserHandler(additionalUserService)
 
@@ -103,8 +112,8 @@ func (server *Server) initAdditionalUserStore(client *mongo.Client) domain.Addit
 
 func (server *Server) initAdditionalUserService(store domain.AdditionalUserStore, addEducationOrchestrator *application.AddEducationOrchestrator,
 	addSkillOrchestrator *application.AddSkillOrchestrator, deleteSkillOrchestrator *application.DeleteSkillOrchestrator,
-	updateSkillOrchestrator *application.UpdateSkillOrchestrator) *application.AdditionalUserService {
-	return application.NewAdditionalUserService(store, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator, updateSkillOrchestrator)
+	updateSkillOrchestrator *application.UpdateSkillOrchestrator, deleteEducationOrchestrator *application.DeleteEducationOrchestrator) *application.AdditionalUserService {
+	return application.NewAdditionalUserService(store, addEducationOrchestrator, addSkillOrchestrator, deleteSkillOrchestrator, updateSkillOrchestrator, deleteEducationOrchestrator)
 }
 
 func (server *Server) initPublisher(subject string) saga.Publisher {
@@ -154,6 +163,14 @@ func (server *Server) initAddSkillHandler(service *application.AdditionalUserSer
 func (server *Server) initDeleteSkillHandler(service *application.AdditionalUserService, publisher saga.Publisher,
 	subscriber saga.Subscriber) {
 	_, err := api.NewDeleteSkillCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (server *Server) initDeleteEducationHandler(service *application.AdditionalUserService, publisher saga.Publisher,
+	subscriber saga.Subscriber) {
+	_, err := api.NewDeleteEducationCommandHandler(service, publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -293,6 +310,15 @@ func (server *Server) initSkillOrchestrator(publisher saga.Publisher,
 func (server *Server) initDeleteSkillOrchestrator(publisher saga.Publisher,
 	subscriber saga.Subscriber) *application.DeleteSkillOrchestrator {
 	orchestrator, err := application.NewDeleteSkillOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
+func (server *Server) initDeleteEducationOrchestrator(publisher saga.Publisher,
+	subscriber saga.Subscriber) *application.DeleteEducationOrchestrator {
+	orchestrator, err := application.NewDeleteEducationOrchestrator(publisher, subscriber)
 	if err != nil {
 		log.Fatal(err)
 	}
