@@ -465,12 +465,8 @@ func (store *ConnectionDBStore) BlockUser(currentUser string, blockedUser string
 				return nil, err
 			}
 			if records.Next() {
-				record, err := records.Single()
-				if err != nil {
-					return nil, err
-				}
 
-				status := record.Values[0].(string)
+				status := records.Record().Values[0]
 				dateNow := time.Now().Local().Unix()
 				fmt.Println(status)
 				if status == "CONNECTED" {
